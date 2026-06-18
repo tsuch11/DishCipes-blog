@@ -1,9 +1,7 @@
-const App = () => {
-  return (
-    <section>
-      <h1>My First React App on Vite</h1>
-    </section>
-  )
-}
+import LandingPage from './pages/LandingPage';
 
-export default App
+const App = () => {
+	return <LandingPage />;
+};
+
+export default App;

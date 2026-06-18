@@ -1,1 +1,23 @@
 @import "tailwindcss";
+
+@theme {
+	--font-sans: "Poppins", sans-serif;
+
+	--color-brown-600: #26231E;
+	--color-brown-500: #43403B;
+	--color-brown-400: #75716B;
+	--color-brown-300: #DAD6D1;
+	--color-brown-200: #EFEEEB;
+	--color-brown-100: #F9F8F6;
+	--color-brand-orange: #F2B68C;
+	--color-brand-green: #12B279;
+	--color-brand-green-light: #D7F2E9;
+	--color-brand-red: #EB5164;
+}
+
+@layer base {
+	body {
+		background-color: var(--color-brown-100);
+		color: var(--color-brown-600);
+	}
+}
