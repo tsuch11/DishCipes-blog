@@ -1,16 +1,11 @@
-type ArticleCardProps = {
-	image: string;
-	category: string;
-	title: string;
-	description: string;
-	authorName: string;
-	authorAvatar: string;
-	date: string;
-};
+import { Link } from 'react-router-dom';
+import type { Article } from '../../types/article';
 
-const ArticleCard = ({ image, category, title, description, authorName, authorAvatar, date }: ArticleCardProps) => {
+type ArticleCardProps = Pick<Article, 'id' | 'image' | 'category' | 'title' | 'description' | 'authorName' | 'authorAvatar' | 'date'>;
+
+const ArticleCard = ({ id, image, category, title, description, authorName, authorAvatar, date }: ArticleCardProps) => {
 	return (
-		<article className="flex flex-col cursor-pointer group">
+		<Link to={`/article/${id}`} className="flex flex-col group rounded-2xl p-3 -mx-3 transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
 			<div className="relative w-full aspect-video bg-brown-200 rounded-xl overflow-hidden mb-3">
 				{image ? (
 					<img src={image} alt={title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
@@ -41,7 +36,7 @@ const ArticleCard = ({ image, category, title, description, authorName, authorAv
 				<span className="text-xs text-brown-300">|</span>
 				<span className="text-xs text-brown-400">{date}</span>
 			</div>
-		</article>
+		</Link>
 	);
 };
 

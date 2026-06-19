@@ -1,85 +1,35 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { articles } from '../../data/articles';
 import ArticleCard from './ArticleCard';
 
-type Article = {
-	id: number;
-	image: string;
-	category: string;
-	title: string;
-	description: string;
-	authorName: string;
-	authorAvatar: string;
-	date: string;
-};
-
 const tabs = ['Highlight', 'Food', 'Dessert', 'drinks'];
-
-const articles: Article[] = [
-	{
-		id: 1,
-		image: '/src/assets/images/food/Tom_yum_kung.jpg',
-		category: 'Food',
-		title: 'Tom Yum Kung',
-		description: "Dive into the bold, aromatic world of Thailand's most famous soup. This article explores the perfect balance of spicy, sour, and savory flavors, and shares tips on selecting the freshest shrimp and herbs...",
-		authorName: 'Teerapat N.',
-		authorAvatar: '',
-		date: '11 September 2024',
-	},
-	{
-		id: 2,
-		image: '/src/assets/images/food/Padthai.jpg',
-		category: 'Food',
-		title: 'Pad Thai',
-		description: "Discover the story behind Thailand's beloved street food classic. From the tangy tamarind sauce to the perfect wok-fried noodle texture, learn what makes an authentic Pad Thai truly unforgettable...",
-		authorName: 'Teerapat N.',
-		authorAvatar: '',
-		date: '11 September 2024',
-	},
-	{
-		id: 3,
-		image: '/src/assets/images/food/Pad_kra_pao.jpg',
-		category: 'Food',
-		title: 'Pad Kra Pao',
-		description: "Explore the fiery simplicity of this Thai stir-fry staple. This article breaks down the key ingredients, from holy basil to chili, and shares techniques for getting that signature smoky wok flavor...",
-		authorName: 'Teerapat N.',
-		authorAvatar: '',
-		date: '11 September 2024',
-	},
-	{
-		id: 4,
-		image: '/src/assets/images/food/Spaghetti_carbonara.jpg',
-		category: 'Food',
-		title: 'Spaghetti Carbonara',
-		description: "Uncover the secrets behind this creamy Italian classic. Learn the traditional technique using eggs, cheese, and pancetta, and why authentic carbonara never needs cream...",
-		authorName: 'Teerapat N.',
-		authorAvatar: '',
-		date: '11 September 2024',
-	},
-	{
-		id: 5,
-		image: '/src/assets/images/food/Tonkatsu_don.jpg',
-		category: 'Food',
-		title: 'Tonkatsu Don',
-		description: "Get to know the crispy, comforting world of Japanese tonkatsu rice bowls. This guide covers the perfect breading technique, the right cut of pork, and the savory-sweet sauce that ties it all together...",
-		authorName: 'Teerapat N.',
-		authorAvatar: '',
-		date: '11 September 2024',
-	},
-	{
-		id: 6,
-		image: '/src/assets/images/food/Mango_sticky_rice.jpg',
-		category: 'Dessert',
-		title: 'Mango Sticky Rice',
-		description: "Indulge in Thailand's most iconic dessert. This article explores how to achieve perfectly sticky coconut rice paired with ripe mango, plus tips for the ideal coconut sauce...",
-		authorName: 'Teerapat N.',
-		authorAvatar: '',
-		date: '11 September 2024',
-	},
-];
+const INITIAL_COUNT = 6;
 
 const ArticlesSection = () => {
 	const [activeTab, setActiveTab] = useState('Highlight');
 	const [searchQuery, setSearchQuery] = useState('');
+	const [showAll, setShowAll] = useState(false);
+
+	const handleTabChange = (tab: string) => {
+		setActiveTab(tab);
+		setShowAll(false);
+	};
+
+	const filtered = useMemo(() => {
+		const byTab = activeTab === 'Highlight'
+			? articles
+			: articles.filter((a) => a.category.toLowerCase() === activeTab.toLowerCase());
+
+		return searchQuery.trim() === ''
+			? byTab
+			: byTab.filter((a) => a.title.toLowerCase().includes(searchQuery.toLowerCase()));
+	}, [activeTab, searchQuery]);
+
+	const visible = activeTab === 'Highlight' && !showAll
+		? filtered.slice(0, INITIAL_COUNT)
+		: filtered;
+
+	const hasMore = activeTab === 'Highlight' && !showAll && filtered.length > INITIAL_COUNT;
 
 	return (
 		<section className="max-w-4xl mx-auto px-4 py-6 md:px-6 md:py-8">
@@ -90,7 +40,7 @@ const ArticlesSection = () => {
 					{tabs.map((tab) => (
 						<button
 							key={tab}
-							onClick={() => setActiveTab(tab)}
+							onClick={() => handleTabChange(tab)}
 							className={`px-3 py-1 text-xs font-medium rounded-full shrink-0 transition-colors duration-150 md:px-4 md:py-1.5 md:text-sm ${activeTab === tab ? 'bg-white text-brown-600 shadow-sm' : 'text-brown-400 hover:text-brown-600'}`}
 						>
 							{tab}
@@ -112,17 +62,28 @@ const ArticlesSection = () => {
 				</div>
 			</div>
 
-			<div className="grid grid-cols-1 gap-y-8 sm:grid-cols-2 sm:gap-x-6">
-				{articles.map((article) => (
-					<ArticleCard key={article.id} {...article} />
-				))}
-			</div>
+			{visible.length > 0 ? (
+				<div className="grid grid-cols-1 gap-y-8 sm:grid-cols-2 sm:gap-x-6">
+					{visible.map((article) => (
+						<ArticleCard key={article.id} {...article} />
+					))}
+				</div>
+			) : (
+				<div className="py-16 text-center text-sm text-brown-300">
+					No articles found.
+				</div>
+			)}
 
-			<div className="flex justify-center mt-10">
-				<button className="text-sm font-medium text-brown-500 underline underline-offset-4 hover:text-brown-600 transition-colors duration-150">
-					View more
-				</button>
-			</div>
+			{(hasMore || (activeTab === 'Highlight' && showAll)) && (
+				<div className="flex justify-center mt-10">
+					<button
+						onClick={() => setShowAll(!showAll)}
+						className="cursor-pointer px-6 py-2 text-sm font-medium text-brown-500 border border-brown-300 rounded-full hover:bg-brown-200 hover:text-brown-600 hover:border-brown-400 hover:-translate-y-1 hover:shadow-md transition-all duration-200"
+					>
+						{showAll ? 'View less' : 'View more'}
+					</button>
+				</div>
+			)}
 		</section>
 	);
 };
