@@ -11,11 +11,11 @@ type ArticleCardProps = {
 const ArticleCard = ({ image, category, title, description, authorName, authorAvatar, date }: ArticleCardProps) => {
 	return (
 		<article className="flex flex-col cursor-pointer group">
-			<div className="w-full aspect-video bg-brown-200 rounded-xl overflow-hidden mb-3">
+			<div className="relative w-full aspect-video bg-brown-200 rounded-xl overflow-hidden mb-3">
 				{image ? (
-					<img src={image} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+					<img src={image} alt={title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
 				) : (
-					<div className="w-full h-full bg-brown-300" />
+					<div className="absolute inset-0 bg-brown-300" />
 				)}
 			</div>
 

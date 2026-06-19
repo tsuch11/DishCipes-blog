@@ -1,7 +1,7 @@
 import Navbar from '../components/layout/Navbar';
-import Footer from '../components/layout/Footer';
 import HeroSection from '../components/shared/HeroSection';
 import ArticlesSection from '../components/shared/ArticlesSection';
+import Footer from '../components/layout/Footer';
 
 const LandingPage = () => {
 	return (
