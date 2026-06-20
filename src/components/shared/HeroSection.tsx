@@ -1,6 +1,6 @@
 const HeroSection = () => {
 	return (
-		<section className="flex flex-col items-center gap-6 max-w-4xl mx-auto px-4 py-8 md:flex-row md:items-center md:gap-10 md:px-6 md:py-12">
+		<section className="flex flex-col items-center gap-6 max-w-7xl mx-auto px-4 py-8 md:flex-row md:items-center md:gap-10 md:px-10 md:py-12">
 			<div className="w-full text-center order-2 md:flex-1 md:text-right md:order-1">
 				<h1 className="text-3xl font-bold text-brown-600 leading-tight md:text-4xl">
 					Savor Every Bite,<br />Discover Every Recipe

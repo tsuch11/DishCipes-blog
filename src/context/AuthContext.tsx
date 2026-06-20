@@ -5,6 +5,7 @@ import type { User } from '../types/user';
 type AuthContextType = {
 	user: User | null;
 	login: (email: string, password: string) => Promise<{ success: boolean; message: string }>;
+	register: (email: string) => Promise<{ success: boolean; message: string }>;
 	logout: () => void;
 	isAuthenticated: boolean;
 };
@@ -29,10 +30,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 		return { success: false, message: 'Your email or password is incorrect.' };
 	};
 
+	const register = async (email: string) => {
+		const exists = MOCK_USERS.find((u) => u.email === email);
+		if (exists) return { success: false, message: 'Email is already taken.' };
+		return { success: true, message: '' };
+	};
+
 	const logout = () => setUser(null);
 
 	return (
-		<AuthContext.Provider value={{ user, login, logout, isAuthenticated: user !== null }}>
+		<AuthContext.Provider value={{ user, login, register, logout, isAuthenticated: user !== null }}>
 			{children}
 		</AuthContext.Provider>
 	);
