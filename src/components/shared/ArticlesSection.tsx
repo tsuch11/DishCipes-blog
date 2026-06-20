@@ -32,7 +32,7 @@ const ArticlesSection = () => {
 	const hasMore = activeTab === 'Highlight' && !showAll && filtered.length > INITIAL_COUNT;
 
 	return (
-		<section className="max-w-4xl mx-auto px-4 py-6 md:px-6 md:py-8">
+		<section className="max-w-7xl mx-auto px-4 py-6 md:px-10 md:py-8">
 			<h2 className="text-lg font-bold text-brown-600 mb-4 md:mb-5">Latest Recipes</h2>
 
 			<div className="flex items-center justify-between bg-brown-200 px-2 py-3 rounded-lg mb-6">
