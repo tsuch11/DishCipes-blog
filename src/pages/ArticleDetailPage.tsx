@@ -190,13 +190,13 @@ const ArticleDetailPage = () => {
 										</button>
 
 										<div className="flex items-center gap-1 md:gap-2">
-											<a href="#" aria-label="Share on Facebook" className="hover:opacity-70 transition-opacity duration-150">
+											<a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Share on Facebook" className="hover:opacity-70 transition-opacity duration-150">
 												<img src={facebookIcon} alt="" className="w-12 h-12" />
 											</a>
-											<a href="#" aria-label="Share on LinkedIn" className="hover:opacity-70 transition-opacity duration-150">
+											<a href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer" aria-label="Share on LinkedIn" className="hover:opacity-70 transition-opacity duration-150">
 												<img src={linkedinIcon} alt="" className="w-12 h-12" />
 											</a>
-											<a href="#" aria-label="Share on Twitter" className="hover:opacity-70 transition-opacity duration-150">
+											<a href="https://x.com/" target="_blank" rel="noopener noreferrer" aria-label="Share on X" className="hover:opacity-70 transition-opacity duration-150">
 												<img src={twitterIcon} alt="" className="w-12 h-12" />
 											</a>
 										</div>
