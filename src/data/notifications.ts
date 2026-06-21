@@ -1,8 +1,6 @@
 import type { Notification } from '../types/notification';
 
 import jacobAvatar from '../assets/images/icons/Jacob_lash.svg';
-import ahriAvatar from '../assets/images/icons/Ahri.svg';
-import mimiAvatar from '../assets/images/icons/Mimi_mama.svg';
 
 export const MOCK_NOTIFICATIONS: Notification[] = [
 	{
