@@ -1,33 +1,8 @@
 import { NavLink } from 'react-router-dom';
-import type { User } from '../../types/user';
 
-type ProfileSidebarProps = {
-	user: User;
-	section: string;
-};
-
-const ProfileSidebar = ({ user, section }: ProfileSidebarProps) => {
+const ProfileSidebar = () => {
 	return (
-		<div className="flex flex-col gap-6">
-			<div className="flex items-center gap-3">
-				<div className="w-10 h-10 rounded-full overflow-hidden bg-brown-300 shrink-0">
-					{user.avatar ? (
-						<img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
-					) : (
-						<div className="w-full h-full flex items-center justify-center">
-							<svg className="w-5 h-5 text-brown-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-							</svg>
-						</div>
-					)}
-				</div>
-				<div className="flex items-center gap-2 text-brown-600">
-					<span className="font-semibold">{user.name}</span>
-					<span className="text-brown-300">|</span>
-					<span className="font-bold">{section}</span>
-				</div>
-			</div>
-
+		<div className="flex flex-col gap-2">
 			<nav className="flex flex-col gap-1">
 				<NavLink
 					to="/profile"
