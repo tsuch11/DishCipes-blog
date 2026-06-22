@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/layout/Navbar';
@@ -9,16 +9,17 @@ const ProfilePage = () => {
 	const { user, updateProfile, isAuthenticated } = useAuth();
 	const navigate = useNavigate();
 
-	if (!isAuthenticated || !user) {
-		navigate('/login');
-		return null;
-	}
-
-	const [name, setName] = useState(user.name);
-	const [username, setUsername] = useState(user.username);
-	const [avatar, setAvatar] = useState(user.avatar ?? '');
+	const [name, setName] = useState(user?.name ?? '');
+	const [username, setUsername] = useState(user?.username ?? '');
+	const [avatar, setAvatar] = useState(user?.avatar ?? '');
 	const [showToast, setShowToast] = useState(false);
 	const fileRef = useRef<HTMLInputElement>(null);
+
+	useEffect(() => {
+		if (!isAuthenticated || !user) navigate('/login');
+	}, [isAuthenticated, user, navigate]);
+
+	if (!isAuthenticated || !user) return null;
 
 	const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];

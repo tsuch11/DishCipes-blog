@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/layout/Navbar';
@@ -10,17 +10,18 @@ const ResetPasswordPage = () => {
 	const { user, resetPassword, isAuthenticated } = useAuth();
 	const navigate = useNavigate();
 
-	if (!isAuthenticated || !user) {
-		navigate('/login');
-		return null;
-	}
-
 	const [current, setCurrent] = useState('');
 	const [newPass, setNewPass] = useState('');
 	const [confirm, setConfirm] = useState('');
 	const [errors, setErrors] = useState<Record<string, string>>({});
 	const [showModal, setShowModal] = useState(false);
 	const [toast, setToast] = useState<{ show: boolean; success: boolean; message: string }>({ show: false, success: true, message: '' });
+
+	useEffect(() => {
+		if (!isAuthenticated || !user) navigate('/login');
+	}, [isAuthenticated, user, navigate]);
+
+	if (!isAuthenticated || !user) return null;
 
 	const validate = () => {
 		const errs: Record<string, string> = {};
