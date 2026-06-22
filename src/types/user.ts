@@ -7,4 +7,5 @@ export type User = {
 	email: string;
 	role: UserRole;
 	avatar?: string;
+	bio?: string;
 };

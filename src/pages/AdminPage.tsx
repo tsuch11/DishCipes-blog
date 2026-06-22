@@ -60,6 +60,7 @@ const AdminPage = () => {
 	const [profileName, setProfileName] = useState(user?.name ?? '');
 	const [profileUsername, setProfileUsername] = useState(user?.username ?? '');
 	const [profileAvatar, setProfileAvatar] = useState(user?.avatar ?? '');
+	const [profileBio, setProfileBio] = useState(user?.bio ?? '');
 	const profileAvatarRef = useRef<HTMLInputElement>(null);
 
 	const [resetCurrent, setResetCurrent] = useState('');
@@ -150,7 +151,7 @@ const AdminPage = () => {
 
 	const handleProfileSave = async (e: React.FormEvent) => {
 		e.preventDefault();
-		await updateProfile({ name: profileName, username: profileUsername, avatar: profileAvatar });
+		await updateProfile({ name: profileName, username: profileUsername, avatar: profileAvatar, bio: profileBio });
 		showToast('Profile updated', 'Your profile has been successfully updated');
 	};
 
@@ -176,13 +177,13 @@ const AdminPage = () => {
 		`w-full px-4 py-3 text-sm text-stone-700 bg-white border rounded-xl outline-none placeholder:text-stone-300 transition-colors duration-150 ${err ? 'border-red-400' : 'border-stone-200 focus:border-stone-400'}`;
 
 	return (
-		<div className="min-h-screen bg-stone-50 font-sans flex">
+		<div className="h-screen bg-brown-100 font-sans flex overflow-hidden">
 			<AdminSidebar activeView={view} onNavigate={handleNavigate} onLogout={handleLogout} />
 
-			<main className="ml-56 flex-1 min-h-screen">
+			<main className="flex-1 overflow-y-auto">
 
 				{view === 'articles' && articleSubview === 'list' && (
-					<div className="px-8 py-8">
+					<div className="px-12 py-8">
 						<div className="flex items-center justify-between mb-6">
 							<h1 className="text-xl font-bold text-stone-800">Article management</h1>
 							<button onClick={openCreate} className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-stone-800 rounded-full hover:bg-stone-700 transition-colors duration-150">
@@ -212,10 +213,10 @@ const AdminPage = () => {
 								<img src={expandDownIcon} alt="" className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" />
 							</div>
 						</div>
-						<div className="bg-white rounded-xl border border-stone-200 overflow-hidden">
+						<div className="rounded-xl overflow-hidden border border-brown-300">
 							<table className="w-full text-sm">
 								<thead>
-									<tr className="border-b border-stone-200">
+									<tr className="bg-brown-200 border-b border-brown-300">
 										<th className="text-left px-5 py-3 text-stone-500 font-medium">Article title</th>
 										<th className="text-left px-5 py-3 text-stone-500 font-medium w-32">Category</th>
 										<th className="text-left px-5 py-3 text-stone-500 font-medium w-36">Status</th>
@@ -224,7 +225,7 @@ const AdminPage = () => {
 								</thead>
 								<tbody>
 									{filteredArticles.map(a => (
-										<tr key={a.id} className="border-b border-stone-100 last:border-0 hover:bg-stone-50 transition-colors duration-100">
+										<tr key={a.id} className="odd:bg-brown-100 even:bg-brown-200 transition-colors duration-100">
 											<td className="px-5 py-3.5 text-stone-700 font-medium max-w-xs truncate">{a.title}</td>
 											<td className="px-5 py-3.5 text-stone-500">{a.category}</td>
 											<td className="px-5 py-3.5">
@@ -255,7 +256,7 @@ const AdminPage = () => {
 				)}
 
 				{view === 'articles' && (articleSubview === 'create' || articleSubview === 'edit') && (
-					<div className="px-8 py-8">
+					<div className="px-12 py-8">
 						<div className="flex items-center justify-between mb-6">
 							<h1 className="text-xl font-bold text-stone-800">{articleSubview === 'create' ? 'Create article' : 'Edit article'}</h1>
 							<div className="flex items-center gap-3">
@@ -323,7 +324,7 @@ const AdminPage = () => {
 				)}
 
 				{view === 'categories' && (
-					<div className="px-8 py-8">
+					<div className="px-12 py-8">
 						<h1 className="text-xl font-bold text-stone-800 mb-6">Category management</h1>
 						<hr className="border-stone-200 mb-6" />
 						<div className="max-w-sm">
@@ -347,10 +348,13 @@ const AdminPage = () => {
 				)}
 
 				{view === 'profile' && (
-					<div className="px-8 py-8">
-						<h1 className="text-xl font-bold text-stone-800 mb-6">Profile</h1>
+					<div className="px-12 py-8">
+						<div className="flex items-center justify-between mb-6">
+							<h1 className="text-xl font-bold text-stone-800">Profile</h1>
+							<button type="submit" form="profile-form" className="px-6 py-2.5 text-sm font-medium text-white bg-stone-800 rounded-full hover:bg-stone-700 transition-colors duration-150">Save</button>
+						</div>
 						<hr className="border-stone-200 mb-6" />
-						<form onSubmit={handleProfileSave} className="max-w-md flex flex-col gap-5">
+						<form id="profile-form" onSubmit={handleProfileSave} className="max-w-2xl flex flex-col gap-5">
 							<div className="flex items-center gap-5 pb-5 border-b border-stone-200">
 								<div className="w-20 h-20 rounded-full overflow-hidden bg-stone-200 shrink-0">
 									{profileAvatar ? (
@@ -376,17 +380,21 @@ const AdminPage = () => {
 							</div>
 							<div className="flex flex-col gap-1.5">
 								<label className="text-sm text-stone-500">Email</label>
-								<p className="px-4 py-3 text-sm text-stone-400">{user.email}</p>
+								<input type="email" value={user.email} disabled className="w-full px-4 py-3 text-sm text-stone-400 bg-stone-50 border border-stone-200 rounded-xl outline-none cursor-not-allowed" />
 							</div>
-							<div>
-								<button type="submit" className="px-8 py-2.5 text-sm font-medium text-white bg-stone-800 rounded-full hover:bg-stone-700 transition-colors duration-150">Save</button>
+							<div className="flex flex-col gap-1.5">
+								<div className="flex items-center justify-between">
+									<label className="text-sm text-stone-500">Bio (max 120 letters)</label>
+									<span className={`text-xs ${profileBio.length > 120 ? 'text-red-400' : 'text-stone-400'}`}>{profileBio.length}/120</span>
+								</div>
+								<textarea value={profileBio} maxLength={120} rows={4} onChange={e => setProfileBio(e.target.value)} placeholder="Tell us about yourself..." className="w-full px-4 py-3 text-sm text-stone-700 bg-white border border-stone-200 rounded-xl outline-none focus:border-stone-400 placeholder:text-stone-300 transition-colors duration-150 resize-none" />
 							</div>
 						</form>
 					</div>
 				)}
 
 				{view === 'notifications' && (
-					<div className="px-8 py-8">
+					<div className="px-12 py-8">
 						<h1 className="text-xl font-bold text-stone-800 mb-6">Notification</h1>
 						<hr className="border-stone-200 mb-6" />
 						<div className="max-w-lg bg-white rounded-xl border border-stone-200 overflow-hidden">
@@ -408,7 +416,7 @@ const AdminPage = () => {
 				)}
 
 				{view === 'reset-password' && (
-					<div className="px-8 py-8">
+					<div className="px-12 py-8">
 						<h1 className="text-xl font-bold text-stone-800 mb-6">Reset password</h1>
 						<hr className="border-stone-200 mb-6" />
 						<form onSubmit={handleResetSubmit} className="max-w-md flex flex-col gap-5">

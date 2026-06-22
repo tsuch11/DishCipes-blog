@@ -6,7 +6,7 @@ type AuthContextType = {
 	user: User | null;
 	login: (email: string, password: string) => Promise<{ success: boolean; message: string; role?: string }>;
 	register: (email: string) => Promise<{ success: boolean; message: string }>;
-	updateProfile: (data: { name: string; username: string; avatar?: string }) => Promise<{ success: boolean }>;
+	updateProfile: (data: { name: string; username: string; avatar?: string; bio?: string }) => Promise<{ success: boolean }>;
 	resetPassword: (current: string, newPassword: string) => Promise<{ success: boolean; message: string }>;
 	logout: () => void;
 	isAuthenticated: boolean;
@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 		return { success: true, message: '' };
 	};
 
-	const updateProfile = async (data: { name: string; username: string; avatar?: string }) => {
+	const updateProfile = async (data: { name: string; username: string; avatar?: string; bio?: string }) => {
 		if (!user) return { success: false };
 		setUser((prev) => prev ? { ...prev, ...data } : prev);
 		return { success: true };
