@@ -132,7 +132,7 @@ const Navbar = () => {
 										</Link>
 										{user.role === 'admin' && (
 											<Link
-												to="/admin"
+												to="/admin/login"
 												onClick={() => setMenuOpen(false)}
 												className="flex items-center gap-2 px-4 py-2.5 text-sm text-brown-500 hover:bg-brown-100 hover:text-brown-600 transition-colors duration-150"
 											>

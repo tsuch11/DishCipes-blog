@@ -4,7 +4,7 @@ import type { User } from '../types/user';
 
 type AuthContextType = {
 	user: User | null;
-	login: (email: string, password: string) => Promise<{ success: boolean; message: string }>;
+	login: (email: string, password: string) => Promise<{ success: boolean; message: string; role?: string }>;
 	register: (email: string) => Promise<{ success: boolean; message: string }>;
 	updateProfile: (data: { name: string; username: string; avatar?: string }) => Promise<{ success: boolean }>;
 	resetPassword: (current: string, newPassword: string) => Promise<{ success: boolean; message: string }>;
@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 			const { password: pw, ...userData } = found;
 			setUser(userData);
 			setCurrentPassword(pw);
-			return { success: true, message: '' };
+			return { success: true, message: '', role: userData.role };
 		}
 		return { success: false, message: 'Your email or password is incorrect.' };
 	};

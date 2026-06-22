@@ -6,6 +6,7 @@ import SignupPage from '../pages/SignupPage';
 import ProfilePage from '../pages/ProfilePage';
 import ResetPasswordPage from '../pages/ResetPasswordPage';
 import AdminPage from '../pages/AdminPage';
+import AdminLoginPage from '../pages/AdminLoginPage';
 
 const AppRouter = () => {
 	return (
@@ -17,6 +18,7 @@ const AppRouter = () => {
 				<Route path="/signup" element={<SignupPage />} />
 				<Route path="/profile" element={<ProfilePage />} />
 				<Route path="/profile/reset-password" element={<ResetPasswordPage />} />
+				<Route path="/admin/login" element={<AdminLoginPage />} />
 				<Route path="/admin" element={<AdminPage />} />
 			</Routes>
 		</BrowserRouter>
