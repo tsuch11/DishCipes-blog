@@ -1,4 +1,4 @@
-import notebookIcon from '../../assets/images/icons/notebook_light.svg';
+﻿import notebookIcon from '../../assets/images/icons/notebook_light.svg';
 import fileIcon from '../../assets/images/icons/File_light.svg';
 import userIcon from '../../assets/images/icons/User_duotone.svg';
 import bellIcon from '../../assets/images/icons/Bell_light.svg';
@@ -23,10 +23,10 @@ const NAV_ITEMS: { view: AdminView; label: string; icon: string }[] = [
 
 const AdminSidebar = ({ activeView, onNavigate, onLogout }: Props) => {
 	return (
-		<aside className="fixed top-0 left-0 h-full w-56 bg-stone-100 border-r border-stone-200 flex flex-col z-40">
+		<aside className="h-full w-60 shrink-0 bg-brown-200 border-r border-brown-300 flex flex-col">
 			<div className="px-6 pt-8 pb-6">
-				<p className="text-2xl font-bold text-stone-800 tracking-tight">hh.</p>
-				<p className="text-sm font-medium text-brown-500 mt-0.5">Admin panel</p>
+				<p className="text-4xl font-medium text-stone-800 tracking-tight">hh.</p>
+				<p className="text-lg font-medium text-orange-300 mt-0.5">Admin panel</p>
 			</div>
 
 			<nav className="flex-1 px-3 flex flex-col gap-0.5">
@@ -34,14 +34,15 @@ const AdminSidebar = ({ activeView, onNavigate, onLogout }: Props) => {
 					<button
 						key={view}
 						onClick={() => onNavigate(view)}
-						className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-left transition-colors duration-150 ${
-							activeView === view
-								? 'bg-white text-stone-800 font-medium shadow-sm'
-								: 'text-stone-500 hover:bg-white/60 hover:text-stone-700'
-						}`}
+						className={`w-[calc(100%+1.5rem)] flex items-center gap-3 text-sm text-left transition-colors duration-150 ${
+    					activeView === view
+       		 				? '-mx-3 px-6 py-5 rounded-none bg-brown-300 text-stone-800 font-medium'
+							: '-mx-3 px-6 py-4 rounded-none text-stone-500 hover:bg-brown-300/40 hover:text-stone-700'
+}`}
+					
 					>
 						<img src={icon} alt="" className="w-5 h-5 shrink-0" />
-						{label}
+						<span className="whitespace-nowrap">{label}</span>
 					</button>
 				))}
 			</nav>
