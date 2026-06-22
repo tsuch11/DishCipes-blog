@@ -9,4 +9,5 @@ export type Article = {
 	date: string;
 	readTime?: number;
 	content?: string[];
+	status?: 'published' | 'draft';
 };
