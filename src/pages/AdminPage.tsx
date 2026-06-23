@@ -1,4 +1,9 @@
-﻿import { useState, useRef, useEffect } from 'react';
+﻿// AdminPage — หน้า admin panel (route: /admin) — ไม่มี Navbar, ใช้ AdminSidebar แทน
+// แก้ไขได้: views (articles list/create/edit, categories, profile, notifications, reset-password),
+//           article form fields, category management, notifications list,
+//           toast messages, delete confirm modal
+
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { articles as initialArticles } from '../data/articles';
@@ -42,6 +47,7 @@ const AdminPage = () => {
 
 	const [view, setView] = useState<AdminView>('articles');
 	const [articleSubview, setArticleSubview] = useState<'list' | 'create' | 'edit'>('list');
+	const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 	const [adminArticles, setAdminArticles] = useState<AdminArticle[]>(() =>
 		initialArticles.map(a => ({ ...a, status: 'published' as const, readTime: a.readTime ?? 5, content: a.content ?? [] }))
 	);
@@ -55,6 +61,15 @@ const AdminPage = () => {
 	const thumbnailRef = useRef<HTMLInputElement>(null);
 
 	const [categories, setCategories] = useState<string[]>(() => Array.from(new Set(initialArticles.map(a => a.category))));
+	const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+
+	useEffect(() => {
+		const handler = (e: MouseEvent) => {
+			if (!(e.target as Element).closest('[data-row-menu]')) setOpenMenuId(null);
+		};
+		document.addEventListener('mousedown', handler);
+		return () => document.removeEventListener('mousedown', handler);
+	}, []);
 	const [newCategory, setNewCategory] = useState('');
 
 	const [profileName, setProfileName] = useState(user?.name ?? '');
@@ -178,12 +193,32 @@ const AdminPage = () => {
 
 	return (
 		<div className="h-screen bg-brown-100 font-sans flex overflow-hidden">
-			<AdminSidebar activeView={view} onNavigate={handleNavigate} onLogout={handleLogout} />
+			<AdminSidebar
+				activeView={view}
+				onNavigate={handleNavigate}
+				onLogout={handleLogout}
+				mobileOpen={mobileSidebarOpen}
+				onMobileClose={() => setMobileSidebarOpen(false)}
+			/>
 
 			<main className="flex-1 overflow-y-auto">
+				{/* ── Mobile topbar ── */}
+				<div className="md:hidden flex items-center gap-3 px-4 py-3 border-b border-brown-300 bg-brown-100 sticky top-0 z-30">
+					<button
+						onClick={() => setMobileSidebarOpen(true)}
+						className="w-9 h-9 flex flex-col justify-center items-center gap-1.5 rounded-lg hover:bg-brown-200 active:scale-90 transition-all duration-150"
+					>
+						<span className="block w-5 h-0.5 bg-stone-600 rounded-full" />
+						<span className="block w-5 h-0.5 bg-stone-600 rounded-full" />
+						<span className="block w-5 h-0.5 bg-stone-600 rounded-full" />
+					</button>
+					<p className="text-lg font-medium text-stone-800 tracking-tight">DishCipes<span className="text-brand-green">.</span></p>
+				</div>
+
+				<div key={`${view}-${articleSubview}`} className="animate-viewFade">
 
 				{view === 'articles' && articleSubview === 'list' && (
-					<div className="px-12 py-8">
+					<div className="px-4 py-6 md:px-12 md:py-8">
 						<div className="flex items-center justify-between mb-6">
 							<h1 className="text-xl font-bold text-stone-800">Article management</h1>
 							<button onClick={openCreate} className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-stone-800 rounded-full hover:bg-stone-700 transition-colors duration-150">
@@ -192,56 +227,93 @@ const AdminPage = () => {
 							</button>
 						</div>
 						<hr className="border-stone-200 mb-6" />
-						<div className="flex items-center gap-3 mb-4 flex-wrap">
-							<div className="relative flex-1 min-w-48 max-w-xs">
+						<div className="flex flex-col gap-2 mb-4 md:flex-row md:items-center md:gap-3">
+							<div className="relative w-full md:flex-1 md:min-w-48 md:max-w-xs">
 								<img src={searchIcon} alt="" className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" />
 								<input type="text" placeholder="Search..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="w-full pl-9 pr-4 py-2 text-sm text-stone-700 bg-white border border-stone-200 rounded-lg outline-none focus:border-stone-400 transition-colors duration-150" />
 							</div>
-							<div className="relative">
-								<select value={statusFilter} onChange={e => setStatusFilter(e.target.value as typeof statusFilter)} className="appearance-none pl-4 pr-9 py-2 text-sm text-stone-600 bg-white border border-stone-200 rounded-lg outline-none focus:border-stone-400 cursor-pointer transition-colors duration-150">
+							<div className="flex items-center gap-2 md:gap-3">
+							<div className="relative flex-1 md:flex-none">
+								<select value={statusFilter} onChange={e => setStatusFilter(e.target.value as typeof statusFilter)} className="appearance-none w-full pl-4 pr-9 py-2 text-sm text-stone-600 bg-white border border-stone-200 rounded-lg outline-none focus:border-stone-400 cursor-pointer transition-colors duration-150">
 									<option value="all">Status</option>
 									<option value="published">Published</option>
 									<option value="draft">Draft</option>
 								</select>
 								<img src={expandDownIcon} alt="" className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" />
 							</div>
-							<div className="relative">
-								<select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)} className="appearance-none pl-4 pr-9 py-2 text-sm text-stone-600 bg-white border border-stone-200 rounded-lg outline-none focus:border-stone-400 cursor-pointer transition-colors duration-150">
+							<div className="relative flex-1 md:flex-none">
+								<select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)} className="appearance-none w-full pl-4 pr-9 py-2 text-sm text-stone-600 bg-white border border-stone-200 rounded-lg outline-none focus:border-stone-400 cursor-pointer transition-colors duration-150">
 									<option value="all">Category</option>
 									{categories.map(c => <option key={c} value={c}>{c}</option>)}
 								</select>
 								<img src={expandDownIcon} alt="" className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" />
 							</div>
+							</div>
 						</div>
 						<div className="rounded-xl overflow-hidden border border-brown-300">
-							<table className="w-full text-sm">
+							<table className="w-full text-base">
 								<thead>
 									<tr className="bg-brown-200 border-b border-brown-300">
-										<th className="text-left px-5 py-3 text-stone-500 font-medium">Article title</th>
-										<th className="text-left px-5 py-3 text-stone-500 font-medium w-32">Category</th>
-										<th className="text-left px-5 py-3 text-stone-500 font-medium w-36">Status</th>
-										<th className="w-20" />
+										<th className="text-left px-4 py-3 text-stone-500 font-medium md:px-5">Article title</th>
+										<th className="hidden md:table-cell text-left px-5 py-3 text-stone-500 font-medium w-32">Category</th>
+										<th className="hidden md:table-cell text-left px-5 py-3 text-stone-500 font-medium w-36">Status</th>
+										<th className="w-12 md:w-20" />
 									</tr>
 								</thead>
 								<tbody>
 									{filteredArticles.map(a => (
 										<tr key={a.id} className="odd:bg-brown-100 even:bg-brown-200 transition-colors duration-100">
-											<td className="px-5 py-3.5 text-stone-700 font-medium max-w-xs truncate">{a.title}</td>
-											<td className="px-5 py-3.5 text-stone-500">{a.category}</td>
-											<td className="px-5 py-3.5">
+											<td className="px-4 py-3 md:px-5 md:py-3.5">
+											<p className="md:hidden text-[10px] font-medium text-emerald-600 mb-0.5">
+												{a.status === 'published' ? 'Published' : <span className="text-stone-400">Draft</span>}
+											</p>
+											<p className="text-stone-700 font-medium truncate max-w-[200px] md:max-w-xs text-base">{a.title}</p>
+										</td>
+											<td className="hidden md:table-cell px-5 py-3.5 text-base font-medium text-stone-600">{a.category}</td>
+											<td className="hidden md:table-cell px-5 py-3.5">
 												{a.status === 'published'
-													? <span className="text-emerald-600 font-medium">• Published</span>
-													: <span className="text-stone-400 font-medium">• Draft</span>
+													? <span className="text-base text-emerald-600 font-medium">• Published</span>
+													: <span className="text-base text-stone-400 font-medium">• Draft</span>
 												}
 											</td>
 											<td className="px-4 py-3.5">
-												<div className="flex items-center gap-3 justify-end">
+												{/* Desktop: icon buttons */}
+												<div className="hidden md:flex items-center gap-3 justify-end">
 													<button onClick={() => openEdit(a)} className="hover:opacity-60 transition-opacity duration-150">
 														<img src={editIcon} alt="Edit" className="w-5 h-5" />
 													</button>
 													<button onClick={() => setDeleteTargetId(a.id)} className="hover:opacity-60 transition-opacity duration-150">
 														<img src={trashIcon} alt="Delete" className="w-5 h-5" />
 													</button>
+												</div>
+												{/* Mobile: 3-dot menu */}
+												<div className="md:hidden relative flex justify-end" data-row-menu>
+													<button
+														onClick={() => setOpenMenuId(openMenuId === a.id ? null : a.id)}
+														className="w-8 h-8 flex flex-col items-center justify-center gap-[3px] rounded-lg hover:bg-brown-300/60 active:scale-90 transition-all duration-150"
+													>
+														<span className="block w-1 h-1 rounded-full bg-stone-500" />
+														<span className="block w-1 h-1 rounded-full bg-stone-500" />
+														<span className="block w-1 h-1 rounded-full bg-stone-500" />
+													</button>
+													{openMenuId === a.id && (
+														<div className="absolute right-0 top-full mt-1 w-36 bg-white border border-brown-200 rounded-xl shadow-lg overflow-hidden z-20 animate-slideDown">
+															<button
+																onClick={() => { openEdit(a); setOpenMenuId(null); }}
+																className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-stone-700 hover:bg-brown-50 transition-colors duration-150"
+															>
+																<img src={editIcon} alt="" className="w-4 h-4" />
+																Edit
+															</button>
+															<button
+																onClick={() => { setDeleteTargetId(a.id); setOpenMenuId(null); }}
+																className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors duration-150"
+															>
+																<img src={trashIcon} alt="" className="w-4 h-4" />
+																Delete
+															</button>
+														</div>
+													)}
 												</div>
 											</td>
 										</tr>
@@ -256,7 +328,7 @@ const AdminPage = () => {
 				)}
 
 				{view === 'articles' && (articleSubview === 'create' || articleSubview === 'edit') && (
-					<div className="px-12 py-8">
+					<div className="px-4 py-6 md:px-12 md:py-8">
 						<div className="flex items-center justify-between mb-6">
 							<h1 className="text-xl font-bold text-stone-800">{articleSubview === 'create' ? 'Create article' : 'Edit article'}</h1>
 							<div className="flex items-center gap-3">
@@ -324,7 +396,7 @@ const AdminPage = () => {
 				)}
 
 				{view === 'categories' && (
-					<div className="px-12 py-8">
+					<div className="px-4 py-6 md:px-12 md:py-8">
 						<h1 className="text-xl font-bold text-stone-800 mb-6">Category management</h1>
 						<hr className="border-stone-200 mb-6" />
 						<div className="max-w-sm">
@@ -348,7 +420,7 @@ const AdminPage = () => {
 				)}
 
 				{view === 'profile' && (
-					<div className="px-12 py-8">
+					<div className="px-4 py-6 md:px-12 md:py-8">
 						<div className="flex items-center justify-between mb-6">
 							<h1 className="text-xl font-bold text-stone-800">Profile</h1>
 							<button type="submit" form="profile-form" className="px-6 py-2.5 text-sm font-medium text-white bg-stone-800 rounded-full hover:bg-stone-700 transition-colors duration-150">Save</button>
@@ -394,7 +466,7 @@ const AdminPage = () => {
 				)}
 
 				{view === 'notifications' && (
-					<div className="px-12 py-8">
+					<div className="px-4 py-6 md:px-12 md:py-8">
 						<h1 className="text-xl font-bold text-stone-800 mb-6">Notification</h1>
 						<hr className="border-stone-200 mb-6" />
 						<div className="max-w-lg bg-white rounded-xl border border-stone-200 overflow-hidden">
@@ -416,7 +488,7 @@ const AdminPage = () => {
 				)}
 
 				{view === 'reset-password' && (
-					<div className="px-12 py-8">
+					<div className="px-4 py-6 md:px-12 md:py-8">
 						<h1 className="text-xl font-bold text-stone-800 mb-6">Reset password</h1>
 						<hr className="border-stone-200 mb-6" />
 						<form onSubmit={handleResetSubmit} className="max-w-md flex flex-col gap-5">
@@ -441,6 +513,7 @@ const AdminPage = () => {
 						</form>
 					</div>
 				)}
+				</div>
 			</main>
 
 			{deleteTargetId !== null && (
