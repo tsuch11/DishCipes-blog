@@ -114,14 +114,14 @@ const ArticleDetailPage = () => {
 		<div className="min-h-screen flex flex-col font-sans">
 			<Navbar />
 
-			<main className="flex-1">
+			<main className="flex-1 animate-pageFade">
 				<div className="max-w-7xl mx-auto px-4 pt-6 md:px-10">
-					<Link to="/" className="inline-flex items-center gap-1.5 text-sm text-brown-400 hover:text-brown-600 transition-colors duration-150 mb-5">
+					<button onClick={() => navigate(-1)} className="inline-flex items-center gap-1.5 text-sm text-brown-400 hover:text-brown-600 transition-colors duration-150 mb-5">
 						<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
 						</svg>
 						Latest Recipes
-					</Link>
+					</button>
 
 					<div className="relative w-full aspect-video bg-brown-200 rounded-2xl overflow-hidden mb-8">
 						{article.image ? (
@@ -145,11 +145,25 @@ const ArticleDetailPage = () => {
 							</h1>
 
 							<div className="flex flex-col gap-5 mb-12 max-w-3xl">
-								{article.content?.map((paragraph, index) => (
-									<p key={index} className="text-base font-medium text-brown-500 leading-relaxed whitespace-pre-line md:text-lg">
-										{paragraph}
-									</p>
-								))}
+								{article.content?.map((paragraph, index) => {
+									const isStep = /^Step \d+/.test(paragraph);
+									if (isStep) {
+										const colonIdx = paragraph.indexOf(':');
+										const label = paragraph.substring(0, colonIdx + 1);
+										const body = paragraph.substring(colonIdx + 1);
+										return (
+											<p key={index} className="text-base text-brown-500 leading-relaxed whitespace-pre-line md:text-lg">
+												<span className="font-bold">{label}</span>
+												<span className="font-normal">{body}</span>
+											</p>
+										);
+									}
+									return (
+										<p key={index} className="text-base font-medium text-brown-500 leading-relaxed whitespace-pre-line md:text-lg">
+											{paragraph}
+										</p>
+									);
+								})}
 							</div>
 
 							<div className="mb-8 bg-brown-200 rounded-2xl p-5 md:hidden">
@@ -176,7 +190,7 @@ const ArticleDetailPage = () => {
 										onClick={handleLike}
 										className={`flex items-center justify-center gap-1.5 w-full py-2 text-base font-medium rounded-full border transition-colors duration-150 md:w-auto md:px-10 md:py-2.5 ${liked ? 'bg-brown-600 text-white border-brown-600' : 'bg-white text-brown-500 border-brown-400 hover:bg-brown-100'}`}
 									>
-										<img src={happyLightIcon} alt="" className="w-6 h-6 md:w-8 md:h-8" />
+										<img src={happyLightIcon} alt="" className={`w-6 h-6 md:w-8 md:h-8 ${liked ? 'invert' : ''}`} />
 										{likeCount}
 									</button>
 
@@ -244,7 +258,7 @@ const ArticleDetailPage = () => {
 						</article>
 
 						<aside className="hidden md:block">
-							<div className="sticky top-6 bg-brown-200 rounded-2xl p-5">
+							<div className="sticky top-32 bg-brown-200 rounded-2xl p-5">
 								<p className="text-xs text-brown-400 mb-4">Author</p>
 								<div className="flex items-center gap-3 pb-4 mb-4 border-b border-brown-300">
 									<div className="w-10 h-10 rounded-full bg-brown-300 overflow-hidden shrink-0">
@@ -291,16 +305,16 @@ const ArticleDetailPage = () => {
 								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
 							</svg>
 						</button>
-						<h2 className="text-4xl font-bold text-brown-600 mb-8">Create an account to<br />continue</h2>
+						<h2 className="text-4xl font-semibold text-brown-600 mb-8">Create an account to<br />continue</h2>
 						<button
 							onClick={() => { setShowAuthModal(false); navigate('/signup', { state: { from: location.pathname } }); }}
-							className="w-full py-3.5 text-base font-medium text-white bg-brown-600 rounded-full hover:bg-brown-500 transition-colors duration-150"
+							className="px-12 py-3.5 text-base font-medium text-white bg-brown-600 rounded-full hover:bg-brown-500 transition-colors duration-150"
 						>
 							Create account
 						</button>
 						<p className="text-sm text-brown-400 mt-4">
 							Already have an account?{' '}
-							<Link to="/login" onClick={() => setShowAuthModal(false)} className="font-medium text-brown-600 hover:underline">
+							<Link to="/login" state={{ from: location.pathname }} onClick={() => setShowAuthModal(false)} className="font-medium text-brown-600 hover:underline">
 								Log in
 							</Link>
 						</p>
