@@ -5,7 +5,7 @@ import type { User } from '../types/user';
 type AuthContextType = {
 	user: User | null;
 	login: (email: string, password: string) => Promise<{ success: boolean; message: string; role?: string }>;
-	register: (email: string) => Promise<{ success: boolean; message: string }>;
+	register: (data: { name: string; username: string; email: string; password: string }) => Promise<{ success: boolean; message: string }>;
 	updateProfile: (data: { name: string; username: string; avatar?: string; bio?: string }) => Promise<{ success: boolean }>;
 	resetPassword: (current: string, newPassword: string) => Promise<{ success: boolean; message: string }>;
 	logout: () => void;
@@ -22,9 +22,11 @@ const MOCK_USERS: (User & { password: string })[] = [
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	const [user, setUser] = useState<User | null>(null);
 	const [currentPassword, setCurrentPassword] = useState('');
+	const [registeredUsers, setRegisteredUsers] = useState<(User & { password: string })[]>([]);
 
 	const login = async (email: string, password: string) => {
-		const found = MOCK_USERS.find((u) => u.email === email && u.password === password);
+		const allUsers = [...MOCK_USERS, ...registeredUsers];
+		const found = allUsers.find((u) => u.email === email && u.password === password);
 		if (found) {
 			const { password: pw, ...userData } = found;
 			setUser(userData);
@@ -34,9 +36,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 		return { success: false, message: 'Your email or password is incorrect.' };
 	};
 
-	const register = async (email: string) => {
-		const exists = MOCK_USERS.find((u) => u.email === email);
+	const register = async (data: { name: string; username: string; email: string; password: string }) => {
+		const allUsers = [...MOCK_USERS, ...registeredUsers];
+		const exists = allUsers.find((u) => u.email === data.email);
 		if (exists) return { success: false, message: 'Email is already taken.' };
+		const newUser: User & { password: string } = {
+			id: String(Date.now()),
+			name: data.name,
+			username: data.username,
+			email: data.email,
+			password: data.password,
+			role: 'member',
+		};
+		setRegisteredUsers((prev) => [...prev, newUser]);
 		return { success: true, message: '' };
 	};
 

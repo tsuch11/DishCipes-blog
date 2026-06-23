@@ -1,11 +1,18 @@
+// LoginPage — หน้า login สำหรับ member
+// แก้ไขได้: form card style (bg-brown-200, rounded-2xl), heading text,
+//           input border error color, submit button style,
+//           error toast message, "Sign up" link text
+
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/layout/Navbar';
 
 const LoginPage = () => {
 	const { login } = useAuth();
 	const navigate = useNavigate();
+	const location = useLocation();
+	const returnPath: string = (location.state as { from?: string })?.from ?? '/';
 
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
@@ -21,7 +28,7 @@ const LoginPage = () => {
 		setLoading(false);
 
 		if (result.success) {
-			navigate('/');
+			navigate(returnPath);
 		} else {
 			setError(result.message);
 		}
@@ -31,7 +38,7 @@ const LoginPage = () => {
 		<div className="min-h-screen flex flex-col font-sans">
 			<Navbar />
 
-			<main className="flex-1 flex items-center justify-center px-4 py-12">
+			<main className="flex-1 flex items-center justify-center px-4 py-12 animate-fadeInUp">
 				<div className="w-full max-w-lg bg-brown-200 rounded-2xl px-10 py-12">
 					<h1 className="text-4xl font-bold text-brown-600 text-center mb-8">Log in</h1>
 
@@ -64,7 +71,7 @@ const LoginPage = () => {
 							<button
 								type="submit"
 								disabled={loading}
-								className="px-12 py-3 text-base font-medium text-white bg-brown-600 rounded-full hover:bg-brown-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
+								className="px-12 py-3 text-base font-medium text-white bg-brown-600 rounded-full hover:bg-brown-500 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150"
 							>
 								{loading ? 'Logging in...' : 'Log in'}
 							</button>
@@ -81,7 +88,7 @@ const LoginPage = () => {
 			</main>
 
 			{error && (
-				<div className="fixed bottom-6 right-6 flex items-start gap-3 bg-[#E8545A] text-white px-5 py-4 rounded-2xl shadow-lg z-50">
+				<div className="fixed bottom-6 right-6 flex items-start gap-3 bg-[#E8545A] text-white px-5 py-4 rounded-2xl shadow-lg z-50 animate-slideDown">
 					<div className="flex-1">
 						<p className="text-sm font-semibold whitespace-nowrap">Your password is incorrect or this email doesn't exist</p>
 						<p className="text-xs mt-0.5 opacity-90">Please try another password or email</p>

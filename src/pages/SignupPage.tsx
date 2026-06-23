@@ -1,8 +1,14 @@
+// SignupPage — หน้าสมัครสมาชิก
+// แก้ไขได้: form fields (name, username, email, password), validation messages,
+//           success screen (checkmark icon, heading text, continue button),
+//           "Log in" link text, form card style
+
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/layout/Navbar';
 
+// signup
 const SignupPage = () => {
 	const { register } = useAuth();
 	const navigate = useNavigate();
@@ -33,7 +39,7 @@ const SignupPage = () => {
 			return;
 		}
 
-		const result = await register(email);
+		const result = await register({ name, username, email, password });
 		if (!result.success) {
 			setErrors({ email: 'Email is already taken. Please try another email.' });
 			return;
@@ -47,7 +53,7 @@ const SignupPage = () => {
 		return (
 			<div className="min-h-screen flex flex-col font-sans">
 				<Navbar />
-				<main className="flex-1 flex items-center justify-center px-4 py-12">
+				<main className="flex-1 flex items-center justify-center px-4 py-12 animate-fadeInUp">
 					<div className="w-full max-w-lg bg-brown-200 rounded-2xl px-10 py-16 text-center">
 						<div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center mx-auto mb-8">
 							<svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -57,7 +63,7 @@ const SignupPage = () => {
 						<h2 className="text-3xl font-bold text-brown-600 mb-8">Registration success</h2>
 						<button
 							onClick={() => navigate(returnPath)}
-							className="px-10 py-3 text-sm font-medium text-white bg-brown-600 rounded-full hover:bg-brown-500 transition-colors duration-150"
+							className="px-10 py-3 text-sm font-medium text-white bg-brown-600 rounded-full hover:bg-brown-500 active:scale-95 transition-all duration-150"
 						>
 							Continue
 						</button>
@@ -71,7 +77,7 @@ const SignupPage = () => {
 		<div className="min-h-screen flex flex-col font-sans">
 			<Navbar />
 
-			<main className="flex-1 flex items-center justify-center px-4 py-12">
+			<main className="flex-1 flex items-center justify-center px-4 py-12 animate-fadeInUp">
 				<div className="w-full max-w-lg bg-brown-200 rounded-2xl px-10 py-12">
 					<h1 className="text-4xl font-bold text-brown-600 text-center mb-8">Sign up</h1>
 
@@ -127,7 +133,7 @@ const SignupPage = () => {
 						<div className="flex justify-center mt-2">
 							<button
 								type="submit"
-								className="px-12 py-3 text-base font-medium text-white bg-brown-600 rounded-full hover:bg-brown-500 transition-colors duration-150"
+								className="px-12 py-3 text-base font-medium text-white bg-brown-600 rounded-full hover:bg-brown-500 active:scale-95 transition-all duration-150"
 							>
 								Sign up
 							</button>
