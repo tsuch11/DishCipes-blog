@@ -1,11 +1,20 @@
+// ArticleCard — card แสดงตัวอย่างบทความ ใช้ใน ArticlesSection และ AdminPage
+// แก้ไขได้: card hover offset (-translate-y-1), image aspect ratio (aspect-video),
+//           category badge color (brand-green), title line clamp (2), description line clamp (2),
+//           author avatar size, date format
+
 import { Link } from 'react-router-dom';
 import type { Article } from '../../types/article';
 
 type ArticleCardProps = Pick<Article, 'id' | 'image' | 'category' | 'title' | 'description' | 'authorName' | 'authorAvatar' | 'date'>;
 
+// card
 const ArticleCard = ({ id, image, category, title, description, authorName, authorAvatar, date }: ArticleCardProps) => {
 	return (
-		<Link to={`/article/${id}`} className="flex flex-col group rounded-2xl p-3 -mx-3 transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
+		<Link
+			to={`/article/${id}`}
+			className="flex flex-col group rounded-2xl p-3 -mx-3 transition-all duration-200 hover:-translate-y-1 hover:shadow-md active:scale-[0.99]"
+		>
 			<div className="relative w-full aspect-video bg-brown-200 rounded-xl overflow-hidden mb-3">
 				{image ? (
 					<img src={image} alt={title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
@@ -18,11 +27,11 @@ const ArticleCard = ({ id, image, category, title, description, authorName, auth
 				{category}
 			</span>
 
-			<h3 className="text-sm font-bold text-brown-600 leading-snug line-clamp-2 mb-1">
+			<h3 className="text-xl font-semibold text-brown-600 leading-snug line-clamp-2 mb-1">
 				{title}
 			</h3>
 
-			<p className="text-xs text-brown-400 leading-relaxed line-clamp-2 mb-3">
+			<p className="text-sm text-brown-400 leading-relaxed line-clamp-2 mb-3">
 				{description}
 			</p>
 
@@ -32,9 +41,9 @@ const ArticleCard = ({ id, image, category, title, description, authorName, auth
 						<img src={authorAvatar} alt={authorName} className="w-full h-full object-cover" />
 					) : null}
 				</div>
-				<span className="text-xs font-medium text-brown-500">{authorName}</span>
-				<span className="text-xs text-brown-300">|</span>
-				<span className="text-xs text-brown-400">{date}</span>
+				<span className="text-sm font-medium text-brown-500">{authorName}</span>
+				<span className="text-sm text-brown-300">|</span>
+				<span className="text-sm text-brown-400">{date}</span>
 			</div>
 		</Link>
 	);

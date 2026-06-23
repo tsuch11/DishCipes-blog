@@ -1,60 +1,132 @@
-import { useState, useMemo } from 'react';
+// ArticlesSection — grid บทความพร้อม filter และ search
+// แก้ไขได้: CATEGORIES list, INITIAL_COUNT (จำนวนบทความเริ่มต้น),
+//           desktop tab bar style, mobile dropdown style, search input style,
+//           "View more" button style, grid columns (sm:grid-cols-2)
+
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { articles } from '../../data/articles';
 import ArticleCard from './ArticleCard';
+import useScrollReveal from '../../animations/useScrollReveal';
 
-const tabs = ['Highlight', 'Food', 'Dessert', 'drinks'];
+const CATEGORIES = ['Highlight', 'Food', 'Dessert', 'Drinks'];
 const INITIAL_COUNT = 6;
 
+// articles section
 const ArticlesSection = () => {
-	const [activeTab, setActiveTab] = useState('Highlight');
+	const [activeCategory, setActiveCategory] = useState('Highlight');
 	const [searchQuery, setSearchQuery] = useState('');
 	const [showAll, setShowAll] = useState(false);
+	const [dropdownOpen, setDropdownOpen] = useState(false);
+	const dropdownRef = useRef<HTMLDivElement>(null);
 
-	const handleTabChange = (tab: string) => {
-		setActiveTab(tab);
+	const { ref, visible } = useScrollReveal();
+
+	useEffect(() => {
+		const handler = (e: MouseEvent) => {
+			if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+				setDropdownOpen(false);
+			}
+		};
+		document.addEventListener('mousedown', handler);
+		return () => document.removeEventListener('mousedown', handler);
+	}, []);
+
+	const handleCategoryChange = (cat: string) => {
+		setActiveCategory(cat);
 		setShowAll(false);
 	};
 
 	const filtered = useMemo(() => {
-		const byTab = activeTab === 'Highlight'
+		const byCategory = activeCategory === 'Highlight'
 			? articles
-			: articles.filter((a) => a.category.toLowerCase() === activeTab.toLowerCase());
+			: articles.filter((a) => a.category.toLowerCase() === activeCategory.toLowerCase());
 
 		return searchQuery.trim() === ''
-			? byTab
-			: byTab.filter((a) => a.title.toLowerCase().includes(searchQuery.toLowerCase()));
-	}, [activeTab, searchQuery]);
+			? byCategory
+			: byCategory.filter((a) => a.title.toLowerCase().includes(searchQuery.toLowerCase()));
+	}, [activeCategory, searchQuery]);
 
-	const visible = activeTab === 'Highlight' && !showAll
+	const visible2 = activeCategory === 'Highlight' && !showAll
 		? filtered.slice(0, INITIAL_COUNT)
 		: filtered;
 
-	const hasMore = activeTab === 'Highlight' && !showAll && filtered.length > INITIAL_COUNT;
+	const hasMore = activeCategory === 'Highlight' && !showAll && filtered.length > INITIAL_COUNT;
 
 	return (
-		<section className="max-w-7xl mx-auto px-4 py-6 md:px-10 md:py-8">
-			<h2 className="text-lg font-bold text-brown-600 mb-4 md:mb-5">Latest Recipes</h2>
+		<section
+			ref={ref}
+			className={`max-w-7xl mx-auto px-4 py-6 md:px-10 md:py-8 transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+		>
+			<h2 className="text-lg font-bold text-brown-600 mb-4 md:mb-5">Latest articles</h2>
 
-			<div className="flex items-center justify-between bg-brown-200 px-2 py-3 rounded-lg mb-6">
-				<div className="flex items-center gap-1 overflow-x-auto">
-					{tabs.map((tab) => (
+			{/* ── Mobile: search + category custom dropdown ── */}
+			<div className="md:hidden flex flex-col gap-3 mb-6">
+				<div className="relative">
+					<input
+						type="text"
+						placeholder="Search"
+						value={searchQuery}
+						onChange={(e) => setSearchQuery(e.target.value)}
+						className="w-full pl-4 pr-11 py-2.5 text-sm text-brown-600 bg-white border border-brown-200 rounded-xl outline-none placeholder:text-brown-300 focus:border-brown-400 transition-colors duration-150"
+					/>
+					<svg className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-brown-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+					</svg>
+				</div>
+
+				<div className="flex items-center gap-3">
+					<span className="text-sm text-brown-400 shrink-0">Category</span>
+					<div className="relative flex-1" ref={dropdownRef}>
 						<button
-							key={tab}
-							onClick={() => handleTabChange(tab)}
-							className={`px-4 py-2 text-xs font-sm rounded-lg shrink-0 transition-colors duration-150 ${activeTab === tab ? 'bg-brown-300 text-brown-600 shadow-sm' : 'text-brown-400 hover:text-brown-600'}`}
+							onClick={() => setDropdownOpen((prev) => !prev)}
+							className="w-full flex items-center justify-between pl-4 pr-3.5 py-2.5 text-sm text-brown-600 bg-white border border-brown-200 rounded-xl focus:border-brown-400 transition-colors duration-150 active:scale-[0.98]"
 						>
-							{tab}
+							{activeCategory}
+							<svg
+								className={`w-4 h-4 text-brown-400 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`}
+								fill="none" stroke="currentColor" viewBox="0 0 24 24"
+							>
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+							</svg>
+						</button>
+
+						{dropdownOpen && (
+							<div className="absolute top-full left-0 right-0 mt-1 bg-white border border-brown-200 rounded-xl shadow-lg overflow-hidden z-20 animate-slideDown">
+								{CATEGORIES.map((cat) => (
+									<button
+										key={cat}
+										onClick={() => { handleCategoryChange(cat); setDropdownOpen(false); }}
+										className={`w-full text-left px-4 py-3 text-sm transition-colors duration-150 active:scale-[0.98] ${activeCategory === cat ? 'bg-brown-100 text-brown-600 font-medium' : 'text-brown-500 hover:bg-brown-50'}`}
+									>
+										{cat}
+									</button>
+								))}
+							</div>
+						)}
+					</div>
+				</div>
+			</div>
+
+			{/* ── Desktop: tab bar + search ── */}
+			<div className="hidden md:flex items-center justify-between bg-brown-200 px-5 py-4 rounded-lg mb-6">
+				<div className="flex items-center gap-1 overflow-x-auto">
+					{CATEGORIES.map((cat) => (
+						<button
+							key={cat}
+							onClick={() => handleCategoryChange(cat)}
+							className={`px-5 py-3 text-sm rounded-lg shrink-0 active:scale-95 transition-all duration-150 ${activeCategory === cat ? 'bg-brown-300 text-brown-600 shadow-sm font-medium' : 'text-brown-400 hover:text-brown-600'}`}
+						>
+							{cat}
 						</button>
 					))}
 				</div>
-
 				<div className="relative shrink-0">
 					<input
 						type="text"
 						placeholder="Search"
 						value={searchQuery}
 						onChange={(e) => setSearchQuery(e.target.value)}
-						className="w-60 pl-3 pr-9 py-1.5 text-xs text-brown-600 bg-white rounded-sm outline-none placeholder:text-brown-400"
+						className="w-72 pl-3 pr-9 py-3 text-sm font-normal text-brown-600 bg-white border border-brown-300 rounded-lg outline-none placeholder:text-brown-400"
 					/>
 					<svg className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 text-brown-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -62,9 +134,9 @@ const ArticlesSection = () => {
 				</div>
 			</div>
 
-			{visible.length > 0 ? (
-				<div className="grid grid-cols-1 gap-y-8 sm:grid-cols-2 sm:gap-x-6">
-					{visible.map((article) => (
+			{visible2.length > 0 ? (
+				<div key={activeCategory} className="grid grid-cols-1 gap-y-8 sm:grid-cols-2 sm:gap-x-6 animate-fadeInUp" style={{ animationDuration: '1s' }}>
+					{visible2.map((article) => (
 						<ArticleCard key={article.id} {...article} />
 					))}
 				</div>
@@ -74,11 +146,11 @@ const ArticlesSection = () => {
 				</div>
 			)}
 
-			{(hasMore || (activeTab === 'Highlight' && showAll)) && (
+			{(hasMore || (activeCategory === 'Highlight' && showAll)) && (
 				<div className="flex justify-center mt-10">
 					<button
 						onClick={() => setShowAll(!showAll)}
-						className="cursor-pointer px-6 py-2 text-sm font-medium text-brown-500 border border-brown-300 rounded-full hover:bg-brown-200 hover:text-brown-600 hover:border-brown-400 hover:-translate-y-1 hover:shadow-md transition-all duration-200"
+						className="cursor-pointer px-6 py-2 text-sm font-medium text-brown-500 border border-brown-300 rounded-full hover:bg-brown-200 hover:text-brown-600 hover:border-brown-400 hover:-translate-y-1 hover:shadow-md active:scale-95 transition-all duration-200"
 					>
 						{showAll ? 'View less' : 'View more'}
 					</button>
