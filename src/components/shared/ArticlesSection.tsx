@@ -6,10 +6,12 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { articles } from '../../data/articles';
 import ArticleCard from './ArticleCard';
+import ArticleCardSkeleton from './ArticleCardSkeleton';
 import useScrollReveal from '../../animations/useScrollReveal';
 
 const CATEGORIES = ['Highlight', 'Food', 'Dessert', 'Drinks'];
 const INITIAL_COUNT = 6;
+const SKELETON_COUNT = 4;
 
 // articles section
 const ArticlesSection = () => {
@@ -17,6 +19,7 @@ const ArticlesSection = () => {
 	const [searchQuery, setSearchQuery] = useState('');
 	const [showAll, setShowAll] = useState(false);
 	const [dropdownOpen, setDropdownOpen] = useState(false);
+	const [loading, setLoading] = useState(true);
 	const dropdownRef = useRef<HTMLDivElement>(null);
 
 	const { ref, visible } = useScrollReveal();
@@ -30,6 +33,12 @@ const ArticlesSection = () => {
 		document.addEventListener('mousedown', handler);
 		return () => document.removeEventListener('mousedown', handler);
 	}, []);
+
+	useEffect(() => {
+		setLoading(true);
+		const t = setTimeout(() => setLoading(false), 600);
+		return () => clearTimeout(t);
+	}, [activeCategory]);
 
 	const handleCategoryChange = (cat: string) => {
 		setActiveCategory(cat);
@@ -134,7 +143,13 @@ const ArticlesSection = () => {
 				</div>
 			</div>
 
-			{visible2.length > 0 ? (
+			{loading ? (
+				<div className="grid grid-cols-1 gap-y-8 sm:grid-cols-2 sm:gap-x-6">
+					{Array.from({ length: SKELETON_COUNT }).map((_, i) => (
+						<ArticleCardSkeleton key={i} />
+					))}
+				</div>
+			) : visible2.length > 0 ? (
 				<div key={activeCategory} className="grid grid-cols-1 gap-y-8 sm:grid-cols-2 sm:gap-x-6 animate-fadeInUp" style={{ animationDuration: '1s' }}>
 					{visible2.map((article) => (
 						<ArticleCard key={article.id} {...article} />
