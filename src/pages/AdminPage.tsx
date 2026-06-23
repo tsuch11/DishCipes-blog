@@ -267,7 +267,7 @@ const AdminPage = () => {
 											<p className="md:hidden text-[10px] font-medium text-emerald-600 mb-0.5">
 												{a.status === 'published' ? 'Published' : <span className="text-stone-400">Draft</span>}
 											</p>
-											<p className="text-stone-700 font-medium truncate max-w-[200px] md:max-w-xs text-base">{a.title}</p>
+											<p className="text-stone-700 font-medium truncate max-w-50 md:max-w-xs text-base">{a.title}</p>
 										</td>
 											<td className="hidden md:table-cell px-5 py-3.5 text-base font-medium text-stone-600">{a.category}</td>
 											<td className="hidden md:table-cell px-5 py-3.5">
@@ -290,7 +290,7 @@ const AdminPage = () => {
 												<div className="md:hidden relative flex justify-end" data-row-menu>
 													<button
 														onClick={() => setOpenMenuId(openMenuId === a.id ? null : a.id)}
-														className="w-8 h-8 flex flex-col items-center justify-center gap-[3px] rounded-lg hover:bg-brown-300/60 active:scale-90 transition-all duration-150"
+														className="w-8 h-8 flex flex-col items-center justify-center gap-0.75 rounded-lg hover:bg-brown-300/60 active:scale-90 transition-all duration-150"
 													>
 														<span className="block w-1 h-1 rounded-full bg-stone-500" />
 														<span className="block w-1 h-1 rounded-full bg-stone-500" />
