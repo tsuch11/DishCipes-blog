@@ -59,36 +59,47 @@ const ResetPasswordPage = () => {
 		setTimeout(() => setToast((prev) => ({ ...prev, show: false })), 3000);
 	};
 
+	const inputCls = (hasError?: boolean) =>
+		`w-full px-4 py-3 text-sm text-brown-400 dark:text-brown-100 bg-white dark:bg-dark-elevated border-2 rounded-xl outline-none placeholder:text-brown-300 dark:placeholder:text-brown-400 transition-all duration-150 ${hasError ? 'border-red-400' : 'border-transparent focus:ring-2 focus:ring-brown-300 dark:focus:ring-dark-border'}`;
+
 	return (
-		<div className="min-h-screen flex flex-col font-sans">
+		<div className="min-h-screen flex flex-col font-sans dark:bg-dark-bg">
 			<Navbar />
 
 			{/* ── Mobile sidebar nav (top) ── */}
-			<div className="md:hidden border-b border-brown-200">
+			<div className="md:hidden border-b border-brown-200 dark:border-dark-border">
 				<div className="max-w-7xl mx-auto px-4">
 					<ProfileSidebar />
 				</div>
 			</div>
 
 			<main className="flex-1 animate-viewFade">
+				<div className="max-w-7xl mx-auto px-4 pt-6 md:px-10">
+					<button onClick={() => navigate(-1)} className="inline-flex items-center gap-1.5 text-sm text-brown-400 dark:text-brown-300 hover:text-brown-600 dark:hover:text-brown-100 transition-colors duration-150">
+						<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+						</svg>
+						Go back
+					</button>
+				</div>
 				<div className="max-w-7xl mx-auto px-4 py-6 md:px-10 md:py-12">
 					{/* ── User header ── */}
 					<div className="flex items-center gap-4 mb-6 md:mb-8">
-						<div className="w-16 h-16 rounded-full overflow-hidden bg-brown-300 shrink-0">
+						<div className="w-16 h-16 rounded-full overflow-hidden bg-brown-300 dark:bg-dark-elevated shrink-0">
 							{user.avatar ? (
 								<img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
 							) : (
 								<div className="w-full h-full flex items-center justify-center">
-									<svg className="w-7 h-7 text-brown-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<svg className="w-7 h-7 text-brown-500 dark:text-brown-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
 									</svg>
 								</div>
 							)}
 						</div>
 						<div className="flex items-center gap-3 min-w-0">
-							<span className="text-2xl font-semibold text-brown-400 truncate">{user.name}</span>
-							<span className="text-brown-300 text-lg shrink-0">|</span>
-							<span className="text-2xl font-bold text-brown-700 shrink-0">Reset password</span>
+							<span className="text-2xl font-semibold text-brown-400 dark:text-brown-300 truncate">{user.name}</span>
+							<span className="text-brown-300 dark:text-dark-border text-lg shrink-0">|</span>
+							<span className="text-2xl font-bold text-brown-700 dark:text-brown-100 shrink-0">Reset password</span>
 						</div>
 					</div>
 
@@ -100,40 +111,40 @@ const ResetPasswordPage = () => {
 
 						{/* ── Reset password form ── */}
 						<div className="flex-1 max-w-xl">
-							<div className="bg-brown-200 rounded-2xl p-6 md:p-8">
+							<div className="bg-brown-200 dark:bg-dark-surface rounded-2xl p-6 md:p-8">
 								<form onSubmit={handleSubmit} className="flex flex-col gap-5">
 									<div className="flex flex-col gap-1.5">
-										<label className="text-sm font-medium text-brown-400">Current password</label>
+										<label className="text-sm font-medium text-brown-400 dark:text-brown-300">Current password</label>
 										<input
 											type="password"
 											placeholder="Current password"
 											value={current}
 											onChange={(e) => setCurrent(e.target.value)}
-											className={`w-full px-4 py-3 text-sm text-brown-400 bg-white border-2 rounded-xl outline-none placeholder:text-brown-300 transition-all duration-150 ${errors.current ? 'border-red-400' : 'border-transparent focus:ring-2 focus:ring-brown-300'}`}
+											className={inputCls(!!errors.current)}
 										/>
 										{errors.current && <p className="text-xs text-red-500">{errors.current}</p>}
 									</div>
 
 									<div className="flex flex-col gap-1.5">
-										<label className="text-sm font-medium text-brown-400">New password</label>
+										<label className="text-sm font-medium text-brown-400 dark:text-brown-300">New password</label>
 										<input
 											type="password"
 											placeholder="New password"
 											value={newPass}
 											onChange={(e) => setNewPass(e.target.value)}
-											className={`w-full px-4 py-3 text-sm text-brown-400 bg-white border-2 rounded-xl outline-none placeholder:text-brown-300 transition-all duration-150 ${errors.newPass ? 'border-red-400' : 'border-transparent focus:ring-2 focus:ring-brown-300'}`}
+											className={inputCls(!!errors.newPass)}
 										/>
 										{errors.newPass && <p className="text-xs text-red-500">{errors.newPass}</p>}
 									</div>
 
 									<div className="flex flex-col gap-1.5">
-										<label className="text-sm font-medium text-brown-400">Confirm new password</label>
+										<label className="text-sm font-medium text-brown-400 dark:text-brown-300">Confirm new password</label>
 										<input
 											type="password"
 											placeholder="Confirm new password"
 											value={confirm}
 											onChange={(e) => setConfirm(e.target.value)}
-											className={`w-full px-4 py-3 text-sm text-brown-400 bg-white border-2 rounded-xl outline-none placeholder:text-brown-300 transition-all duration-150 ${errors.confirm ? 'border-red-400' : 'border-transparent focus:ring-2 focus:ring-brown-300'}`}
+											className={inputCls(!!errors.confirm)}
 										/>
 										{errors.confirm && <p className="text-xs text-red-500">{errors.confirm}</p>}
 									</div>

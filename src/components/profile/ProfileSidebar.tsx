@@ -14,7 +14,7 @@ const ProfileSidebar = () => {
 				to="/profile"
 				end
 				className={({ isActive }) =>
-					`flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg transition-all duration-150 active:scale-95 ${isActive ? 'text-brown-600 font-semibold' : 'text-brown-400 hover:text-brown-600'}`
+					`flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg transition-all duration-150 active:scale-95 ${isActive ? 'text-brown-600 dark:text-brown-100 font-semibold' : 'text-brown-400 dark:text-brown-300 hover:text-brown-600 dark:hover:text-brown-100'}`
 				}
 			>
 				<img src={userIcon} alt="" className="w-4 h-4 shrink-0" />
@@ -23,7 +23,7 @@ const ProfileSidebar = () => {
 			<NavLink
 				to="/profile/reset-password"
 				className={({ isActive }) =>
-					`flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg transition-all duration-150 active:scale-95 ${isActive ? 'text-brown-600 font-semibold' : 'text-brown-400 hover:text-brown-600'}`
+					`flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg transition-all duration-150 active:scale-95 ${isActive ? 'text-brown-600 dark:text-brown-100 font-semibold' : 'text-brown-400 dark:text-brown-300 hover:text-brown-600 dark:hover:text-brown-100'}`
 				}
 			>
 				<img src={refreshIcon} alt="" className="w-4 h-4 shrink-0" />

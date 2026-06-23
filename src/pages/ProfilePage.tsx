@@ -41,11 +41,11 @@ const ProfilePage = () => {
 	};
 
 	return (
-		<div className="min-h-screen flex flex-col font-sans">
+		<div className="min-h-screen flex flex-col font-sans dark:bg-dark-bg">
 			<Navbar />
 
 			{/* ── Mobile sidebar nav (top) ── */}
-			<div className="md:hidden border-b border-brown-200">
+			<div className="md:hidden border-b border-brown-200 dark:border-dark-border">
 				<div className="max-w-7xl mx-auto px-4">
 					<ProfileSidebar />
 				</div>
@@ -53,7 +53,7 @@ const ProfilePage = () => {
 
 			<main className="flex-1 animate-viewFade">
 				<div className="max-w-7xl mx-auto px-4 pt-6 md:px-10">
-					<button onClick={() => navigate(-1)} className="inline-flex items-center gap-1.5 text-sm text-brown-400 hover:text-brown-600 transition-colors duration-150">
+					<button onClick={() => navigate(-1)} className="inline-flex items-center gap-1.5 text-sm text-brown-400 dark:text-brown-300 hover:text-brown-600 dark:hover:text-brown-100 transition-colors duration-150">
 						<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
 						</svg>
@@ -63,21 +63,21 @@ const ProfilePage = () => {
 				<div className="max-w-7xl mx-auto px-4 py-6 md:px-10 md:py-12">
 					{/* ── User header ── */}
 					<div className="flex items-center gap-4 mb-6 md:mb-8">
-						<div className="w-16 h-16 rounded-full overflow-hidden bg-brown-300 shrink-0">
+						<div className="w-16 h-16 rounded-full overflow-hidden bg-brown-300 dark:bg-dark-elevated shrink-0">
 							{user.avatar ? (
 								<img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
 							) : (
 								<div className="w-full h-full flex items-center justify-center">
-									<svg className="w-7 h-7 text-brown-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<svg className="w-7 h-7 text-brown-500 dark:text-brown-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
 									</svg>
 								</div>
 							)}
 						</div>
 						<div className="flex items-center gap-3 min-w-0">
-							<span className="text-2xl font-semibold text-brown-400 truncate">{user.name}</span>
-							<span className="text-brown-300 text-lg shrink-0">|</span>
-							<span className="text-2xl font-bold text-brown-700 shrink-0">Profile</span>
+							<span className="text-2xl font-semibold text-brown-400 dark:text-brown-300 truncate">{user.name}</span>
+							<span className="text-brown-300 dark:text-dark-border text-lg shrink-0">|</span>
+							<span className="text-2xl font-bold text-brown-700 dark:text-brown-100 shrink-0">Profile</span>
 						</div>
 					</div>
 
@@ -89,32 +89,26 @@ const ProfilePage = () => {
 
 						{/* ── Profile form ── */}
 						<div className="flex-1 max-w-xl">
-							<div className="bg-brown-200 rounded-2xl p-6 md:p-8">
+							<div className="bg-brown-200 dark:bg-dark-surface rounded-2xl p-6 md:p-8">
 								<form onSubmit={handleSave} className="flex flex-col gap-6">
-									<div className="flex items-center gap-5 pb-5 border-b border-brown-300">
-										<div className="w-24 h-24 rounded-full overflow-hidden bg-brown-300 shrink-0">
+									<div className="flex items-center gap-5 pb-5 border-b border-brown-300 dark:border-dark-border">
+										<div className="w-24 h-24 rounded-full overflow-hidden bg-brown-300 dark:bg-dark-elevated shrink-0">
 											{avatar ? (
 												<img src={avatar} alt={name} className="w-full h-full object-cover" />
 											) : (
 												<div className="w-full h-full flex items-center justify-center">
-													<svg className="w-9 h-9 text-brown-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+													<svg className="w-9 h-9 text-brown-500 dark:text-brown-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 														<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
 													</svg>
 												</div>
 											)}
 										</div>
 										<div>
-											<input
-												ref={fileRef}
-												type="file"
-												accept="image/*"
-												className="hidden"
-												onChange={handleAvatarChange}
-											/>
+											<input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
 											<button
 												type="button"
 												onClick={() => fileRef.current?.click()}
-												className="px-8 py-3 text-sm font-medium text-brown-600 bg-white border border-brown-400 rounded-full hover:bg-brown-100 active:scale-95 transition-all duration-150"
+												className="px-8 py-3 text-sm font-medium text-brown-600 dark:text-brown-100 bg-white dark:bg-dark-elevated border border-brown-400 dark:border-dark-border rounded-full hover:bg-brown-100 dark:hover:bg-dark-border active:scale-95 transition-all duration-150"
 											>
 												Upload profile picture
 											</button>
@@ -122,28 +116,28 @@ const ProfilePage = () => {
 									</div>
 
 									<div className="flex flex-col gap-1.5">
-										<label className="text-sm text-brown-400">Name</label>
+										<label className="text-sm text-brown-400 dark:text-brown-300">Name</label>
 										<input
 											type="text"
 											value={name}
 											onChange={(e) => setName(e.target.value)}
-											className="w-full px-4 py-3 text-sm font-medium text-brown-500 bg-white border-2 border-transparent rounded-xl outline-none focus:ring-2 focus:ring-brown-300 transition-all duration-150"
+											className="w-full px-4 py-3 text-sm font-medium text-brown-500 dark:text-brown-100 bg-white dark:bg-dark-elevated border-2 border-transparent rounded-xl outline-none focus:ring-2 focus:ring-brown-300 dark:focus:ring-dark-border transition-all duration-150"
 										/>
 									</div>
 
 									<div className="flex flex-col gap-1.5">
-										<label className="text-sm text-brown-400">Username</label>
+										<label className="text-sm text-brown-400 dark:text-brown-300">Username</label>
 										<input
 											type="text"
 											value={username}
 											onChange={(e) => setUsername(e.target.value)}
-											className="w-full px-4 py-3 text-sm font-medium text-brown-500 bg-white border-2 border-transparent rounded-xl outline-none focus:ring-2 focus:ring-brown-300 transition-all duration-150"
+											className="w-full px-4 py-3 text-sm font-medium text-brown-500 dark:text-brown-100 bg-white dark:bg-dark-elevated border-2 border-transparent rounded-xl outline-none focus:ring-2 focus:ring-brown-300 dark:focus:ring-dark-border transition-all duration-150"
 										/>
 									</div>
 
 									<div className="flex flex-col gap-1.5">
-										<label className="text-sm text-brown-400">Email</label>
-										<p className="px-4 py-3 text-sm text-brown-400">{user.email}</p>
+										<label className="text-sm text-brown-400 dark:text-brown-300">Email</label>
+										<p className="px-4 py-3 text-sm text-brown-400 dark:text-brown-300">{user.email}</p>
 									</div>
 
 									<div>
