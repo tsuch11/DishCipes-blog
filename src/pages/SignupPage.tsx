@@ -51,16 +51,16 @@ const SignupPage = () => {
 
 	if (success) {
 		return (
-			<div className="min-h-screen flex flex-col font-sans">
+			<div className="min-h-screen flex flex-col font-sans dark:bg-dark-bg">
 				<Navbar />
 				<main className="flex-1 flex items-center justify-center px-4 py-12 animate-fadeInUp">
-					<div className="w-full max-w-lg bg-brown-200 rounded-2xl px-10 py-16 text-center">
+					<div className="w-full max-w-lg bg-brown-200 dark:bg-dark-surface rounded-2xl px-10 py-16 text-center">
 						<div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center mx-auto mb-8">
 							<svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
 							</svg>
 						</div>
-						<h2 className="text-3xl font-bold text-brown-600 mb-8">Registration success</h2>
+						<h2 className="text-3xl font-bold text-brown-600 dark:text-brown-100 mb-8">Registration success</h2>
 						<button
 							onClick={() => navigate(returnPath)}
 							className="px-10 py-3 text-sm font-medium text-white bg-brown-600 rounded-full hover:bg-brown-500 active:scale-95 transition-all duration-150"
@@ -73,60 +73,39 @@ const SignupPage = () => {
 		);
 	}
 
+	const inputCls = (err?: boolean) =>
+		`w-full px-4 py-3 text-sm text-brown-600 dark:text-brown-100 bg-white dark:bg-dark-elevated border-2 rounded-xl outline-none placeholder:text-brown-300 dark:placeholder:text-brown-400 transition-all duration-150 ${err ? 'border-red-400' : 'border-transparent focus:ring-2 focus:ring-brown-300 dark:focus:ring-dark-border'}`;
+
 	return (
-		<div className="min-h-screen flex flex-col font-sans">
+		<div className="min-h-screen flex flex-col font-sans dark:bg-dark-bg">
 			<Navbar />
 
 			<main className="flex-1 flex items-center justify-center px-4 py-12 animate-fadeInUp">
-				<div className="w-full max-w-lg bg-brown-200 rounded-2xl px-10 py-12">
-					<h1 className="text-4xl font-bold text-brown-600 text-center mb-8">Sign up</h1>
+				<div className="w-full max-w-lg bg-brown-200 dark:bg-dark-surface rounded-2xl px-10 py-12">
+					<h1 className="text-4xl font-bold text-brown-600 dark:text-brown-100 text-center mb-8">Sign up</h1>
 
 					<form onSubmit={handleSubmit} className="flex flex-col gap-5">
 						<div className="flex flex-col gap-1.5">
-							<label className="text-sm text-brown-500">Name</label>
-							<input
-								type="text"
-								placeholder="Full name"
-								value={name}
-								onChange={(e) => setName(e.target.value)}
-								className={`w-full px-4 py-3 text-sm text-brown-600 bg-white border-2 rounded-xl outline-none placeholder:text-brown-300 transition-all duration-150 ${errors.name ? 'border-red-400' : 'border-transparent focus:ring-2 focus:ring-brown-300'}`}
-							/>
+							<label className="text-sm text-brown-500 dark:text-brown-300">Name</label>
+							<input type="text" placeholder="Full name" value={name} onChange={(e) => setName(e.target.value)} className={inputCls(!!errors.name)} />
 							{errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
 						</div>
 
 						<div className="flex flex-col gap-1.5">
-							<label className="text-sm text-brown-500">Username</label>
-							<input
-								type="text"
-								placeholder="Username"
-								value={username}
-								onChange={(e) => setUsername(e.target.value)}
-								className={`w-full px-4 py-3 text-sm text-brown-600 bg-white border-2 rounded-xl outline-none placeholder:text-brown-300 transition-all duration-150 ${errors.username ? 'border-red-400' : 'border-transparent focus:ring-2 focus:ring-brown-300'}`}
-							/>
+							<label className="text-sm text-brown-500 dark:text-brown-300">Username</label>
+							<input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} className={inputCls(!!errors.username)} />
 							{errors.username && <p className="text-xs text-red-500">{errors.username}</p>}
 						</div>
 
 						<div className="flex flex-col gap-1.5">
-							<label className="text-sm text-brown-500">Email</label>
-							<input
-								type="email"
-								placeholder="Email"
-								value={email}
-								onChange={(e) => setEmail(e.target.value)}
-								className={`w-full px-4 py-3 text-sm text-brown-600 bg-white border-2 rounded-xl outline-none placeholder:text-brown-300 transition-all duration-150 ${errors.email ? 'border-red-400' : 'border-transparent focus:ring-2 focus:ring-brown-300'}`}
-							/>
+							<label className="text-sm text-brown-500 dark:text-brown-300">Email</label>
+							<input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputCls(!!errors.email)} />
 							{errors.email && <p className="text-xs text-red-500">{errors.email}</p>}
 						</div>
 
 						<div className="flex flex-col gap-1.5">
-							<label className="text-sm text-brown-500">Password</label>
-							<input
-								type="password"
-								placeholder="Password"
-								value={password}
-								onChange={(e) => setPassword(e.target.value)}
-								className={`w-full px-4 py-3 text-sm text-brown-600 bg-white border-2 rounded-xl outline-none placeholder:text-brown-300 transition-all duration-150 ${errors.password ? 'border-red-400' : 'border-transparent focus:ring-2 focus:ring-brown-300'}`}
-							/>
+							<label className="text-sm text-brown-500 dark:text-brown-300">Password</label>
+							<input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className={inputCls(!!errors.password)} />
 							{errors.password && <p className="text-xs text-red-500">{errors.password}</p>}
 						</div>
 
@@ -140,9 +119,9 @@ const SignupPage = () => {
 						</div>
 					</form>
 
-					<p className="text-center text-sm text-brown-400 mt-6">
+					<p className="text-center text-sm text-brown-400 dark:text-brown-300 mt-6">
 						Already have an account?{' '}
-						<Link to="/login" className="font-medium text-brown-600 hover:underline">
+						<Link to="/login" className="font-medium text-brown-600 dark:text-brown-100 hover:underline">
 							Log in
 						</Link>
 					</p>

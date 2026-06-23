@@ -35,35 +35,35 @@ const LoginPage = () => {
 	};
 
 	return (
-		<div className="min-h-screen flex flex-col font-sans">
+		<div className="min-h-screen flex flex-col font-sans dark:bg-dark-bg">
 			<Navbar />
 
 			<main className="flex-1 flex items-center justify-center px-4 py-12 animate-fadeInUp">
-				<div className="w-full max-w-lg bg-brown-200 rounded-2xl px-10 py-12">
-					<h1 className="text-4xl font-bold text-brown-600 text-center mb-8">Log in</h1>
+				<div className="w-full max-w-lg bg-brown-200 dark:bg-dark-surface rounded-2xl px-10 py-12">
+					<h1 className="text-4xl font-bold text-brown-600 dark:text-brown-100 text-center mb-8">Log in</h1>
 
 					<form onSubmit={handleSubmit} className="flex flex-col gap-5">
 						<div className="flex flex-col gap-1.5">
-							<label className="text-sm text-brown-500">Email</label>
+							<label className="text-sm text-brown-500 dark:text-brown-300">Email</label>
 							<input
 								type="email"
 								placeholder="Email"
 								value={email}
 								onChange={(e) => setEmail(e.target.value)}
 								required
-								className={`w-full px-4 py-3 text-sm text-brown-600 bg-white border-2 rounded-xl outline-none placeholder:text-brown-300 transition-all duration-150 ${error ? 'border-red-400' : 'border-transparent focus:ring-2 focus:ring-brown-300'}`}
+								className={`w-full px-4 py-3 text-sm text-brown-600 dark:text-brown-100 bg-white dark:bg-dark-elevated border-2 rounded-xl outline-none placeholder:text-brown-300 dark:placeholder:text-brown-400 transition-all duration-150 ${error ? 'border-red-400' : 'border-transparent focus:ring-2 focus:ring-brown-300 dark:focus:ring-dark-border'}`}
 							/>
 						</div>
 
 						<div className="flex flex-col gap-1.5">
-							<label className="text-sm text-brown-500">Password</label>
+							<label className="text-sm text-brown-500 dark:text-brown-300">Password</label>
 							<input
 								type="password"
 								placeholder="Password"
 								value={password}
 								onChange={(e) => setPassword(e.target.value)}
 								required
-								className={`w-full px-4 py-3 text-sm text-brown-600 bg-white border-2 rounded-xl outline-none placeholder:text-brown-300 transition-all duration-150 ${error ? 'border-red-400' : 'border-transparent focus:ring-2 focus:ring-brown-300'}`}
+								className={`w-full px-4 py-3 text-sm text-brown-600 dark:text-brown-100 bg-white dark:bg-dark-elevated border-2 rounded-xl outline-none placeholder:text-brown-300 dark:placeholder:text-brown-400 transition-all duration-150 ${error ? 'border-red-400' : 'border-transparent focus:ring-2 focus:ring-brown-300 dark:focus:ring-dark-border'}`}
 							/>
 						</div>
 
@@ -78,9 +78,9 @@ const LoginPage = () => {
 						</div>
 					</form>
 
-					<p className="text-center text-sm text-brown-400 mt-6">
+					<p className="text-center text-sm text-brown-400 dark:text-brown-300 mt-6">
 						Don't have any account?{' '}
-						<Link to="/signup" className="font-medium text-brown-600 hover:underline">
+						<Link to="/signup" className="font-medium text-brown-600 dark:text-brown-100 hover:underline">
 							Sign up
 						</Link>
 					</p>

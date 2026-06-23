@@ -18,7 +18,7 @@ const LandingPage = () => {
 	}, []);
 
 	return (
-		<div className="min-h-screen flex flex-col font-sans">
+		<div className="min-h-screen flex flex-col font-sans dark:bg-dark-bg transition-colors duration-300">
 			<Navbar />
 			<main className="flex-1 animate-fadeInUp">
 				{/* ── Hero ── */}
