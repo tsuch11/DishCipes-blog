@@ -3,12 +3,12 @@ import type { Article } from '../types/article';
 export const articles: Article[] = [
 	{
 		id: 1,
-		image: '/src/assets/images/food/Tom_yum_kung.jpg',
+		image: '/images/food/Tom_yum_kung.jpg',
 		category: 'Food',
 		title: 'Tom Yum Kung',
 		description: "Dive into the bold, aromatic world of Thailand's most famous soup. This article explores the perfect balance of spicy, sour, and savory flavors, and shares tips on selecting the freshest shrimp and herbs...",
 		authorName: 'Teerapat N.',
-		authorAvatar: '/src/assets/images/icons/Teerapat.jpg',
+		authorAvatar: '/images/icons/Teerapat.jpg',
 		date: '11 September 2024',
 		readTime: 5,
 		content: [
@@ -24,12 +24,12 @@ export const articles: Article[] = [
 	},
 	{
 		id: 2,
-		image: '/src/assets/images/food/Padthai.jpg',
+		image: '/images/food/Padthai.jpg',
 		category: 'Food',
 		title: 'Pad Thai',
 		description: "Discover the story behind Thailand's beloved street food classic. From the tangy tamarind sauce to the perfect wok-fried noodle texture, learn what makes an authentic Pad Thai truly unforgettable...",
 		authorName: 'Teerapat N.',
-		authorAvatar: '/src/assets/images/icons/Teerapat.jpg',
+		authorAvatar: '/images/icons/Teerapat.jpg',
 		date: '11 September 2024',
 		readTime: 6,
 		content: [
@@ -46,12 +46,12 @@ export const articles: Article[] = [
 	},
 	{
 		id: 3,
-		image: '/src/assets/images/food/Pad_kra_pao.jpg',
+		image: '/images/food/Pad_kra_pao.jpg',
 		category: 'Food',
 		title: 'Pad Kra Pao',
 		description: "Explore the fiery simplicity of this Thai stir-fry staple. This article breaks down the key ingredients, from holy basil to chili, and shares techniques for getting that signature smoky wok flavor...",
 		authorName: 'Teerapat N.',
-		authorAvatar: '/src/assets/images/icons/Teerapat.jpg',
+		authorAvatar: '/images/icons/Teerapat.jpg',
 		date: '11 September 2024',
 		readTime: 4,
 		content: [
@@ -68,12 +68,12 @@ export const articles: Article[] = [
 	},
 	{
 		id: 4,
-		image: '/src/assets/images/food/Spaghetti_carbonara.jpg',
+		image: '/images/food/Spaghetti_carbonara.jpg',
 		category: 'Food',
 		title: 'Spaghetti Carbonara',
 		description: "Uncover the secrets behind this creamy Italian classic. Learn the traditional technique using eggs, cheese, and pancetta, and why authentic carbonara never needs cream...",
 		authorName: 'Teerapat N.',
-		authorAvatar: '/src/assets/images/icons/Teerapat.jpg',
+		authorAvatar: '/images/icons/Teerapat.jpg',
 		date: '11 September 2024',
 		readTime: 5,
 		content: [
@@ -90,12 +90,12 @@ export const articles: Article[] = [
 	},
 	{
 		id: 5,
-		image: '/src/assets/images/food/Tonkatsu_don.jpg',
+		image: '/images/food/Tonkatsu_don.jpg',
 		category: 'Food',
 		title: 'Tonkatsu Don',
 		description: "Get to know the crispy, comforting world of Japanese tonkatsu rice bowls. This guide covers the perfect breading technique, the right cut of pork, and the savory-sweet sauce that ties it all together...",
 		authorName: 'Teerapat N.',
-		authorAvatar: '/src/assets/images/icons/Teerapat.jpg',
+		authorAvatar: '/images/icons/Teerapat.jpg',
 		date: '11 September 2024',
 		readTime: 6,
 		content: [
@@ -112,12 +112,12 @@ export const articles: Article[] = [
 	},
 	{
 		id: 6,
-		image: '/src/assets/images/food/Mango_sticky_rice.jpg',
+		image: '/images/food/Mango_sticky_rice.jpg',
 		category: 'Dessert',
 		title: 'Mango Sticky Rice',
 		description: "Indulge in Thailand's most iconic dessert. This article explores how to achieve perfectly sticky coconut rice paired with ripe mango, plus tips for the ideal coconut sauce...",
 		authorName: 'Teerapat N.',
-		authorAvatar: '/src/assets/images/icons/Teerapat.jpg',
+		authorAvatar: '/images/icons/Teerapat.jpg',
 		date: '11 September 2024',
 		readTime: 4,
 		content: [
@@ -133,12 +133,12 @@ export const articles: Article[] = [
 	},
 	{
 		id: 7,
-		image: '/src/assets/images/food/Khao_pad-kung.jpg',
+		image: '/images/food/Khao_pad-kung.jpg',
 		category: 'Food',
 		title: 'Khao Pad',
 		description: "Learn the simple secret to restaurant-style fried rice at home. This guide covers the right rice texture, seasoning balance, and how to use up leftover ingredients in your fridge...",
 		authorName: 'Teerapat N.',
-		authorAvatar: '/src/assets/images/icons/Teerapat.jpg',
+		authorAvatar: '/images/icons/Teerapat.jpg',
 		date: '18 October 2024',
 		readTime: 4,
 		content: [
@@ -155,12 +155,12 @@ export const articles: Article[] = [
 	},
 	{
 		id: 8,
-		image: '/src/assets/images/food/Pad_pak.jpg',
+		image: '/images/food/Pad_pak.jpg',
 		category: 'Food',
 		title: 'Pad Pak',
 		description: "Explore a simple, healthy stir-fry you can customize with whatever vegetables you have on hand. This article covers wok techniques and seasoning tips for maximum flavor...",
 		authorName: 'Teerapat N.',
-		authorAvatar: '/src/assets/images/icons/Teerapat.jpg',
+		authorAvatar: '/images/icons/Teerapat.jpg',
 		date: '18 October 2024',
 		readTime: 3,
 		content: [
@@ -177,12 +177,12 @@ export const articles: Article[] = [
 	},
 	{
 		id: 9,
-		image: '/src/assets/images/food/Pad_mee.jpg',
+		image: '/images/food/Pad_mee.jpg',
 		category: 'Food',
 		title: 'Pad Mee',
 		description: "Discover this easy noodle dish that comes together in one pan. Learn the right noodle-to-sauce ratio and how to avoid clumping for perfectly stir-fried noodles every time...",
 		authorName: 'Teerapat N.',
-		authorAvatar: '/src/assets/images/icons/Teerapat.jpg',
+		authorAvatar: '/images/icons/Teerapat.jpg',
 		date: '18 October 2024',
 		readTime: 4,
 		content: [
@@ -199,12 +199,12 @@ export const articles: Article[] = [
 	},
 	{
 		id: 10,
-		image: '/src/assets/images/food/Pad_prik-kang.jpg',
+		image: '/images/food/Pad_prik-kang.jpg',
 		category: 'Food',
 		title: 'Pad Prik Kang',
 		description: "Discover this dry, intensely flavorful Thai stir-fry made with red curry paste and long beans. This article explores how to balance the spice and saltiness for an authentic home-style dish...",
 		authorName: 'Teerapat N.',
-		authorAvatar: '/src/assets/images/icons/Teerapat.jpg',
+		authorAvatar: '/images/icons/Teerapat.jpg',
 		date: '18 October 2024',
 		readTime: 5,
 		content: [
@@ -221,12 +221,12 @@ export const articles: Article[] = [
 	},
 	{
 		id: 11,
-		image: '/src/assets/images/food/Karaage.jpg',
+		image: '/images/food/Karaage.jpg',
 		category: 'Food',
 		title: 'Karaage',
 		description: "Discover the secret to crispy, juicy Japanese-style fried chicken at home. This article covers the marinade, the right potato starch coating, and double-frying technique for extra crunch...",
 		authorName: 'Teerapat N.',
-		authorAvatar: '/src/assets/images/icons/Teerapat.jpg',
+		authorAvatar: '/images/icons/Teerapat.jpg',
 		date: '18 October 2024',
 		readTime: 5,
 		content: [
@@ -242,12 +242,12 @@ export const articles: Article[] = [
 	},
 	{
 		id: 12,
-		image: '/src/assets/images/food/Dessert/Dorayaki.jpg',
+		image: '/images/food/Dessert/Dorayaki.jpg',
 		category: 'Dessert',
 		title: 'Dorayaki',
 		description: "Discover this fluffy Japanese pancake sandwich filled with sweet red bean paste. This article shares an easy home version using store-bought filling, so you can focus on getting the pancake light and spongy...",
 		authorName: 'Teerapat N.',
-		authorAvatar: '/src/assets/images/icons/Teerapat.jpg',
+		authorAvatar: '/images/icons/Teerapat.jpg',
 		date: '25 October 2024',
 		readTime: 4,
 		content: [
@@ -263,12 +263,12 @@ export const articles: Article[] = [
 	},
 	{
 		id: 13,
-		image: '/src/assets/images/food/Dessert/Panna_cotta.jpg',
+		image: '/images/food/Dessert/Panna_cotta.jpg',
 		category: 'Dessert',
 		title: 'Panna Cotta',
 		description: "Discover this silky Italian dessert made with just cream, sugar, and gelatin. This article covers the right setting time and ratio for that perfect wobbly, melt-in-your-mouth texture...",
 		authorName: 'Teerapat N.',
-		authorAvatar: '/src/assets/images/icons/Teerapat.jpg',
+		authorAvatar: '/images/icons/Teerapat.jpg',
 		date: '25 October 2024',
 		readTime: 4,
 		content: [
@@ -285,12 +285,12 @@ export const articles: Article[] = [
 	},
 	{
 		id: 14,
-		image: '/src/assets/images/food/Dessert/Bualoy.jpg',
+		image: '/images/food/Dessert/Bualoy.jpg',
 		category: 'Dessert',
 		title: 'Bua Loy',
 		description: "Dive into this comforting Thai dessert made from simple rolled rice flour dumplings simmered in sweet coconut milk...",
 		authorName: 'Teerapat N.',
-		authorAvatar: '/src/assets/images/icons/Teerapat.jpg',
+		authorAvatar: '/images/icons/Teerapat.jpg',
 		date: '25 October 2024',
 		readTime: 3,
 		content: [
@@ -306,12 +306,12 @@ export const articles: Article[] = [
 	},
 	{
 		id: 15,
-		image: '/src/assets/images/food/Drinks/Nomyen.jpg',
+		image: '/images/food/Drinks/Nomyen.jpg',
 		category: 'drinks',
 		title: 'Nom Yen',
 		description: "Explore Thailand's iconic pink milk drink, made with red syrup and creamy milk over ice. This guide covers the right syrup-to-milk ratio for that perfectly sweet, nostalgic flavor...",
 		authorName: 'Teerapat N.',
-		authorAvatar: '/src/assets/images/icons/Teerapat.jpg',
+		authorAvatar: '/images/icons/Teerapat.jpg',
 		date: '1 November 2024',
 		readTime: 2,
 		content: [
@@ -326,12 +326,12 @@ export const articles: Article[] = [
 	},
 	{
 		id: 16,
-		image: '/src/assets/images/food/Drinks/Iced-matcha-latte.jpg',
+		image: '/images/food/Drinks/Iced-matcha-latte.jpg',
 		category: 'drinks',
 		title: 'Iced Matcha Latte',
 		description: "Explore this trendy Japanese-Western fusion drink made from whisked matcha and milk over ice. This guide covers matcha-to-milk ratios for a smooth, balanced flavor...",
 		authorName: 'Teerapat N.',
-		authorAvatar: '/src/assets/images/icons/Teerapat.jpg',
+		authorAvatar: '/images/icons/Teerapat.jpg',
 		date: '1 November 2024',
 		readTime: 3,
 		content: [
@@ -347,12 +347,12 @@ export const articles: Article[] = [
 	},
 	{
 		id: 17,
-		image: '/src/assets/images/food/Drinks/Strawberry_milk_smoothie.jpg',
+		image: '/images/food/Drinks/Strawberry_milk_smoothie.jpg',
 		category: 'drinks',
 		title: 'Strawberry Milk Smoothie',
 		description: "Master this creamy, fruity smoothie using fresh or frozen strawberries blended with milk. This guide covers ratios for the perfect thickness and natural sweetness...",
 		authorName: 'Teerapat N.',
-		authorAvatar: '/src/assets/images/icons/Teerapat.jpg',
+		authorAvatar: '/images/icons/Teerapat.jpg',
 		date: '1 November 2024',
 		readTime: 3,
 		content: [
@@ -367,12 +367,12 @@ export const articles: Article[] = [
 	},
 	{
 		id: 18,
-		image: '/src/assets/images/food/Drinks/Chayen.jpg',
+		image: '/images/food/Drinks/Chayen.jpg',
 		category: 'drinks',
 		title: 'Cha Yen',
 		description: "Learn how to brew the iconic orange-hued Thai iced tea at home. This guide covers tea strength, sweetened condensed milk ratios, and the right way to layer it for that classic look...",
 		authorName: 'Teerapat N.',
-		authorAvatar: '/src/assets/images/icons/Teerapat.jpg',
+		authorAvatar: '/images/icons/Teerapat.jpg',
 		date: '1 November 2024',
 		readTime: 4,
 		content: [
