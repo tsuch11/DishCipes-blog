@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { articles } from '../data/articles';
 import { useAuth } from '../context/AuthContext';
@@ -95,13 +95,13 @@ const ArticleDetailPage = () => {
 
 	if (!article) {
 		return (
-			<div className="min-h-screen flex flex-col font-sans">
+			<div className="min-h-screen flex flex-col font-sans dark:bg-dark-bg">
 				<Navbar />
 				<main className="flex-1 flex items-center justify-center">
 					<div className="text-center">
-						<p className="text-brown-400 text-sm mb-4">Article not found.</p>
-						<Link to="/" className="text-sm font-medium text-brown-600 underline underline-offset-4 hover:text-brown-500 transition-colors duration-150">
-							â† Back to home
+						<p className="text-brown-400 dark:text-brown-300 text-sm mb-4">Article not found.</p>
+						<Link to="/" className="text-sm font-medium text-brown-600 dark:text-brown-100 underline underline-offset-4 hover:text-brown-500 transition-colors duration-150">
+							← Back to home
 						</Link>
 					</div>
 				</main>
@@ -111,36 +111,36 @@ const ArticleDetailPage = () => {
 	}
 
 	return (
-		<div className="min-h-screen flex flex-col font-sans">
+		<div className="min-h-screen flex flex-col font-sans dark:bg-dark-bg">
 			<Navbar />
 
 			<main className="flex-1 animate-pageFade">
 				<div className="max-w-7xl mx-auto px-4 pt-6 md:px-10">
-					<button onClick={() => navigate(-1)} className="inline-flex items-center gap-1.5 text-sm text-brown-400 hover:text-brown-600 transition-colors duration-150 mb-5">
+					<button onClick={() => navigate(-1)} className="inline-flex items-center gap-1.5 text-sm text-brown-400 dark:text-brown-300 hover:text-brown-600 dark:hover:text-brown-100 transition-colors duration-150 mb-5">
 						<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
 						</svg>
 						Latest Recipes
 					</button>
 
-					<div className="relative w-full aspect-video bg-brown-200 rounded-2xl overflow-hidden mb-8">
+					<div className="relative w-full aspect-video bg-brown-200 dark:bg-dark-elevated rounded-2xl overflow-hidden mb-8">
 						{article.image ? (
 							<img src={article.image} alt={article.title} className="absolute inset-0 w-full h-full object-cover" />
 						) : (
-							<div className="absolute inset-0 bg-brown-300" />
+							<div className="absolute inset-0 bg-brown-300 dark:bg-dark-border" />
 						)}
 					</div>
 
 					<div className="grid grid-cols-1 gap-10 pb-16 md:grid-cols-[1fr_260px]">
 						<article>
 							<div className="flex items-center gap-3 mb-3">
-								<span className="px-2.5 py-0.5 text-xs font-medium text-brand-green bg-brand-green-light rounded-full">
+								<span className="px-2.5 py-0.5 text-xs font-medium text-brand-green bg-brand-green-light dark:bg-brand-green/15 rounded-full">
 									{article.category}
 								</span>
-								<span className="text-xs text-brown-400">{article.date}</span>
+								<span className="text-xs text-brown-400 dark:text-brown-300">{article.date}</span>
 							</div>
 
-							<h1 className="text-2xl font-bold text-brown-600 leading-tight mb-6 md:text-3xl">
+							<h1 className="text-2xl font-bold text-brown-600 dark:text-brown-100 leading-tight mb-6 md:text-3xl">
 								{article.title}
 							</h1>
 
@@ -152,43 +152,45 @@ const ArticleDetailPage = () => {
 										const label = paragraph.substring(0, colonIdx + 1);
 										const body = paragraph.substring(colonIdx + 1);
 										return (
-											<p key={index} className="text-base text-brown-500 leading-relaxed whitespace-pre-line md:text-lg">
+											<p key={index} className="text-base text-brown-500 dark:text-brown-200 leading-relaxed whitespace-pre-line md:text-lg">
 												<span className="font-bold">{label}</span>
 												<span className="font-normal">{body}</span>
 											</p>
 										);
 									}
 									return (
-										<p key={index} className="text-base font-medium text-brown-500 leading-relaxed whitespace-pre-line md:text-lg">
+										<p key={index} className="text-base font-medium text-brown-500 dark:text-brown-200 leading-relaxed whitespace-pre-line md:text-lg">
 											{paragraph}
 										</p>
 									);
 								})}
 							</div>
 
-							<div className="mb-8 bg-brown-200 rounded-2xl p-5 md:hidden">
-								<p className="text-xs text-brown-400 mb-4">Author</p>
-								<div className="flex items-center gap-3 pb-4 mb-4 border-b border-brown-300">
-									<div className="w-10 h-10 rounded-full bg-brown-300 overflow-hidden shrink-0">
+							{/* ── Mobile author card ── */}
+							<div className="mb-8 bg-brown-200 dark:bg-dark-surface rounded-2xl p-5 md:hidden">
+								<p className="text-xs text-brown-400 dark:text-brown-300 mb-4">Author</p>
+								<div className="flex items-center gap-3 pb-4 mb-4 border-b border-brown-300 dark:border-dark-border">
+									<div className="w-10 h-10 rounded-full bg-brown-300 dark:bg-dark-elevated overflow-hidden shrink-0">
 										{article.authorAvatar ? (
 											<img src={article.authorAvatar} alt={article.authorName} className="w-full h-full object-cover" />
 										) : null}
 									</div>
-									<p className="text-sm font-bold text-brown-500">{article.authorName}</p>
+									<p className="text-sm font-bold text-brown-500 dark:text-brown-200">{article.authorName}</p>
 								</div>
-								<p className="text-base font-medium text-brown-400 leading-relaxed mb-3">
+								<p className="text-base font-medium text-brown-400 dark:text-brown-300 leading-relaxed mb-3">
 									I am a food enthusiast and freelance writer who specializes in recipe development and home cooking. With a deep love for Thai cuisine, I enjoy sharing recipes, cooking tips, and stories behind every dish.
 								</p>
-								<p className="text-base font-medium text-brown-400 leading-relaxed">
+								<p className="text-base font-medium text-brown-400 dark:text-brown-300 leading-relaxed">
 									When I'm not writing, I spend my time exploring local markets and street food stalls, discovering new flavors to bring back to my kitchen.
 								</p>
 							</div>
 
+							{/* ── Reactions bar ── */}
 							<div className="pt-6 mb-8 max-w-3xl">
-								<div className="flex flex-col gap-3 w-full bg-brown-200 rounded-lg px-3 py-3 md:flex-row md:items-center md:justify-between md:px-6 md:py-4">
+								<div className="flex flex-col gap-3 w-full bg-brown-200 dark:bg-dark-surface rounded-lg px-3 py-3 md:flex-row md:items-center md:justify-between md:px-6 md:py-4">
 									<button
 										onClick={handleLike}
-										className={`flex items-center justify-center gap-1.5 w-full py-2 text-base font-medium rounded-full border transition-colors duration-150 md:w-auto md:px-10 md:py-2.5 ${liked ? 'bg-brown-600 text-white border-brown-600' : 'bg-white text-brown-500 border-brown-400 hover:bg-brown-100'}`}
+										className={`flex items-center justify-center gap-1.5 w-full py-2 text-base font-medium rounded-full border transition-colors duration-150 md:w-auto md:px-10 md:py-2.5 ${liked ? 'bg-brown-600 text-white border-brown-600' : 'bg-white dark:bg-dark-elevated text-brown-500 dark:text-brown-200 border-brown-400 dark:border-dark-border hover:bg-brown-100 dark:hover:bg-dark-border'}`}
 									>
 										<img src={happyLightIcon} alt="" className={`w-6 h-6 md:w-8 md:h-8 ${liked ? 'invert' : ''}`} />
 										{likeCount}
@@ -197,20 +199,20 @@ const ArticleDetailPage = () => {
 									<div className="flex items-center gap-2 md:gap-3">
 										<button
 											onClick={handleCopyLink}
-											className="flex items-center gap-1.5 px-6 py-2.5 text-base font-medium text-brown-600 bg-white border border-brown-400 rounded-full hover:bg-brown-100 transition-colors duration-150 md:px-10 md:py-2.5"
+											className="flex items-center gap-1.5 px-6 py-2.5 text-base font-medium text-brown-600 dark:text-brown-100 bg-white dark:bg-dark-elevated border border-brown-400 dark:border-dark-border rounded-full hover:bg-brown-100 dark:hover:bg-dark-border transition-colors duration-150 md:px-10 md:py-2.5"
 										>
 											<img src={copyLightIcon} alt="" className="w-6 h-6 md:w-8 md:h-8" />
 											{copied ? 'Copied!' : 'Copy link'}
 										</button>
 
 										<div className="flex items-center gap-1 md:gap-2">
-											<a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Share on Facebook" className="hover:opacity-70 transition-opacity duration-150">
+											<a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Share on Facebook" className="opacity-90 dark:opacity-60 hover:opacity-70 dark:hover:opacity-90 transition-opacity duration-150">
 												<img src={facebookIcon} alt="" className="w-12 h-12" />
 											</a>
-											<a href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer" aria-label="Share on LinkedIn" className="hover:opacity-70 transition-opacity duration-150">
+											<a href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer" aria-label="Share on LinkedIn" className="opacity-90 dark:opacity-60 hover:opacity-70 dark:hover:opacity-90 transition-opacity duration-150">
 												<img src={linkedinIcon} alt="" className="w-12 h-12" />
 											</a>
-											<a href="https://x.com/" target="_blank" rel="noopener noreferrer" aria-label="Share on X" className="hover:opacity-70 transition-opacity duration-150">
+											<a href="https://x.com/" target="_blank" rel="noopener noreferrer" aria-label="Share on X" className="opacity-90 dark:opacity-60 hover:opacity-70 dark:hover:opacity-90 transition-opacity duration-150">
 												<img src={twitterIcon} alt="" className="w-12 h-12" />
 											</a>
 										</div>
@@ -218,14 +220,15 @@ const ArticleDetailPage = () => {
 								</div>
 							</div>
 
+							{/* ── Comments ── */}
 							<div className="max-w-3xl">
-								<p className="text-base text-brown-400 mb-3">Comment</p>
+								<p className="text-base text-brown-400 dark:text-brown-300 mb-3">Comment</p>
 								<textarea
 									value={commentText}
 									onChange={(e) => setCommentText(e.target.value)}
 									placeholder="What are your thoughts?"
 									rows={3}
-									className="w-full px-4 py-3 text-base text-brown-600 bg-white border border-brown-200 rounded-xl outline-none placeholder:text-brown-300 focus:border-brown-400 transition-colors duration-150 mb-3"
+									className="w-full px-4 py-3 text-base text-brown-600 dark:text-brown-100 bg-white dark:bg-dark-elevated border border-brown-200 dark:border-dark-border rounded-xl outline-none placeholder:text-brown-300 dark:placeholder:text-brown-400 focus:border-brown-400 dark:focus:border-dark-border transition-colors duration-150 mb-3"
 								/>
 								<div className="flex justify-start mb-8">
 									<button
@@ -236,44 +239,45 @@ const ArticleDetailPage = () => {
 									</button>
 								</div>
 
-								<div className="flex flex-col divide-y divide-brown-300">
+								<div className="flex flex-col divide-y divide-brown-300 dark:divide-dark-border">
 									{comments.map((c) => (
 										<div key={c.id} className="py-7">
 											<div className="flex items-center gap-3 mb-3">
-												<div className="w-9 h-9 rounded-full bg-brown-300 overflow-hidden shrink-0">
+												<div className="w-9 h-9 rounded-full bg-brown-300 dark:bg-dark-elevated overflow-hidden shrink-0">
 													{c.avatar ? (
 														<img src={c.avatar} alt={c.name} className="w-full h-full object-cover" />
 													) : null}
 												</div>
 												<div>
-													<p className="text-lg font-semibold text-brown-600">{c.name}</p>
-													<p className="text-xs text-brown-300">{c.date}</p>
+													<p className="text-lg font-semibold text-brown-600 dark:text-brown-100">{c.name}</p>
+													<p className="text-xs text-brown-300 dark:text-brown-400">{c.date}</p>
 												</div>
 											</div>
-											<p className="text-base text-brown-500 leading-relaxed">{c.text}</p>
+											<p className="text-base text-brown-500 dark:text-brown-200 leading-relaxed">{c.text}</p>
 										</div>
 									))}
 								</div>
 							</div>
 						</article>
 
+						{/* ── Desktop author card ── */}
 						<aside className="hidden md:block">
-							<div className="sticky top-32 bg-brown-200 rounded-2xl p-5">
-								<p className="text-xs text-brown-400 mb-4">Author</p>
-								<div className="flex items-center gap-3 pb-4 mb-4 border-b border-brown-300">
-									<div className="w-10 h-10 rounded-full bg-brown-300 overflow-hidden shrink-0">
+							<div className="sticky top-32 bg-brown-200 dark:bg-dark-surface rounded-2xl p-5">
+								<p className="text-xs text-brown-400 dark:text-brown-300 mb-4">Author</p>
+								<div className="flex items-center gap-3 pb-4 mb-4 border-b border-brown-300 dark:border-dark-border">
+									<div className="w-10 h-10 rounded-full bg-brown-300 dark:bg-dark-elevated overflow-hidden shrink-0">
 										{article.authorAvatar ? (
 											<img src={article.authorAvatar} alt={article.authorName} className="w-full h-full object-cover" />
 										) : null}
 									</div>
-									<p className="text-sm font-bold text-brown-500">{article.authorName}</p>
+									<p className="text-sm font-bold text-brown-500 dark:text-brown-200">{article.authorName}</p>
 								</div>
-								<p className="text-xs text-brown-400 leading-relaxed mb-3">
+								<p className="text-xs text-brown-400 dark:text-brown-300 leading-relaxed mb-3">
 									I am a food enthusiast and freelance writer who specializes in recipe development and home cooking. With a deep love for Thai cuisine, I enjoy sharing recipes, cooking tips, and stories behind every dish.
 								</p>
-								<p className="text-xs text-brown-400 leading-relaxed">
+								<p className="text-xs text-brown-400 dark:text-brown-300 leading-relaxed">
 									When I'm not writing, I spend my time exploring local markets and street food stalls, discovering new flavors to bring back to my kitchen.
-								</p>													
+								</p>
 							</div>
 						</aside>
 					</div>
@@ -296,25 +300,25 @@ const ArticleDetailPage = () => {
 
 			{showAuthModal && (
 				<div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4" onClick={() => setShowAuthModal(false)}>
-					<div className="relative bg-white rounded-2xl px-12 py-14 w-full max-w-lg text-center shadow-xl" onClick={(e) => e.stopPropagation()}>
+					<div className="relative bg-white dark:bg-dark-surface rounded-2xl px-12 py-14 w-full max-w-lg text-center shadow-xl" onClick={(e) => e.stopPropagation()}>
 						<button
 							onClick={() => setShowAuthModal(false)}
-							className="absolute top-5 right-5 w-8 h-8 flex items-center justify-center text-brown-400 hover:text-brown-600 transition-colors duration-150"
+							className="absolute top-5 right-5 w-8 h-8 flex items-center justify-center text-brown-400 dark:text-brown-300 hover:text-brown-600 dark:hover:text-brown-100 transition-colors duration-150"
 						>
 							<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
 							</svg>
 						</button>
-						<h2 className="text-4xl font-semibold text-brown-600 mb-8">Create an account to<br />continue</h2>
+						<h2 className="text-4xl font-semibold text-brown-600 dark:text-brown-100 mb-8">Create an account to<br />continue</h2>
 						<button
 							onClick={() => { setShowAuthModal(false); navigate('/signup', { state: { from: location.pathname } }); }}
 							className="px-12 py-3.5 text-base font-medium text-white bg-brown-600 rounded-full hover:bg-brown-500 transition-colors duration-150"
 						>
 							Create account
 						</button>
-						<p className="text-sm text-brown-400 mt-4">
+						<p className="text-sm text-brown-400 dark:text-brown-300 mt-4">
 							Already have an account?{' '}
-							<Link to="/login" state={{ from: location.pathname }} onClick={() => setShowAuthModal(false)} className="font-medium text-brown-600 hover:underline">
+							<Link to="/login" state={{ from: location.pathname }} onClick={() => setShowAuthModal(false)} className="font-medium text-brown-600 dark:text-brown-100 hover:underline">
 								Log in
 							</Link>
 						</p>
@@ -326,4 +330,3 @@ const ArticleDetailPage = () => {
 };
 
 export default ArticleDetailPage;
-
