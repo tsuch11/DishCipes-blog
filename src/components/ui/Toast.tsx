@@ -1,3 +1,7 @@
+// Toast — notification popup ล่างขวา ใช้ทั้ง success และ error
+// แก้ไขได้: position (bottom-6 right-6), background color ตาม variant,
+//           title/message text style, close button, animation
+
 type ToastProps = {
 	title: string;
 	message: string;
@@ -9,7 +13,7 @@ const Toast = ({ title, message, variant = 'success', onClose }: ToastProps) => 
 	const bg = variant === 'success' ? 'bg-green-500' : 'bg-[#E8545A]';
 
 	return (
-		<div className={`fixed bottom-6 right-6 flex items-start gap-3 ${bg} text-white px-5 py-4 rounded-2xl shadow-lg z-50`}>
+		<div className={`fixed bottom-6 right-6 flex items-start gap-3 ${bg} text-white px-5 py-4 rounded-2xl shadow-lg z-50 animate-slideDown`}>
 			<div className="flex-1">
 				<p className="text-sm font-semibold whitespace-nowrap">{title}</p>
 				<p className="text-xs mt-0.5 opacity-90">{message}</p>

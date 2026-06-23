@@ -1,3 +1,7 @@
+// ConfirmModal — modal ยืนยันก่อน action สำคัญ (delete, reset password)
+// แก้ไขได้: backdrop opacity (bg-black/40), card max-width (max-w-sm),
+//           button styles (cancel/confirm), close button icon
+
 import closeIcon from '../../assets/images/icons/Close_round_light.svg';
 
 type ConfirmModalProps = {
@@ -11,8 +15,8 @@ type ConfirmModalProps = {
 
 const ConfirmModal = ({ title, message, confirmLabel = 'Confirm', cancelLabel = 'Cancel', onConfirm, onCancel }: ConfirmModalProps) => {
 	return (
-		<div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4" onClick={onCancel}>
-			<div className="relative bg-white rounded-2xl px-10 py-10 w-full max-w-sm text-center shadow-xl" onClick={(e) => e.stopPropagation()}>
+		<div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4 animate-fadeIn" onClick={onCancel}>
+			<div className="relative bg-white rounded-2xl px-10 py-10 w-full max-w-sm text-center shadow-xl animate-fadeInUp" onClick={(e) => e.stopPropagation()}>
 				<button onClick={onCancel} className="absolute top-4 right-4 hover:opacity-60 transition-opacity duration-150">
 					<img src={closeIcon} alt="Close" className="w-5 h-5" />
 				</button>
