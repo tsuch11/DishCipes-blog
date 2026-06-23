@@ -1,3 +1,8 @@
+// ProfilePage — หน้าแก้ไขโปรไฟล์ผู้ใช้
+// แก้ไขได้: form fields (name, username), avatar upload button style,
+//           card background (bg-brown-200), save button style,
+//           mobile sidebar position (top border), desktop sidebar width (w-52)
+
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -5,6 +10,7 @@ import Navbar from '../components/layout/Navbar';
 import ProfileSidebar from '../components/profile/ProfileSidebar';
 import Toast from '../components/ui/Toast';
 
+// profile
 const ProfilePage = () => {
 	const { user, updateProfile, isAuthenticated } = useAuth();
 	const navigate = useNavigate();
@@ -24,8 +30,7 @@ const ProfilePage = () => {
 	const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (!file) return;
-		const url = URL.createObjectURL(file);
-		setAvatar(url);
+		setAvatar(URL.createObjectURL(file));
 	};
 
 	const handleSave = async (e: React.FormEvent) => {
@@ -39,9 +44,25 @@ const ProfilePage = () => {
 		<div className="min-h-screen flex flex-col font-sans">
 			<Navbar />
 
-			<main className="flex-1">
-				<div className="max-w-7xl mx-auto px-4 py-8 md:pl-60 md:pr-10 md:py-12">
-					<div className="flex items-center gap-4 mb-8">
+			{/* ── Mobile sidebar nav (top) ── */}
+			<div className="md:hidden border-b border-brown-200">
+				<div className="max-w-7xl mx-auto px-4">
+					<ProfileSidebar />
+				</div>
+			</div>
+
+			<main className="flex-1 animate-viewFade">
+				<div className="max-w-7xl mx-auto px-4 pt-6 md:px-10">
+					<button onClick={() => navigate(-1)} className="inline-flex items-center gap-1.5 text-sm text-brown-400 hover:text-brown-600 transition-colors duration-150">
+						<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+						</svg>
+						Go back
+					</button>
+				</div>
+				<div className="max-w-7xl mx-auto px-4 py-6 md:px-10 md:py-12">
+					{/* ── User header ── */}
+					<div className="flex items-center gap-4 mb-6 md:mb-8">
 						<div className="w-16 h-16 rounded-full overflow-hidden bg-brown-300 shrink-0">
 							{user.avatar ? (
 								<img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
@@ -53,23 +74,25 @@ const ProfilePage = () => {
 								</div>
 							)}
 						</div>
-						<div className="flex items-center gap-3 flex-nowrap whitespace-nowrap">
-							<span className="text-2xl font-semibold text-brown-400">{user.name}</span>
-							<span className="text-brown-300 text-lg">|</span>
-							<span className="text-2xl font-bold text-brown-700">Profile</span>
+						<div className="flex items-center gap-3 min-w-0">
+							<span className="text-2xl font-semibold text-brown-400 truncate">{user.name}</span>
+							<span className="text-brown-300 text-lg shrink-0">|</span>
+							<span className="text-2xl font-bold text-brown-700 shrink-0">Profile</span>
 						</div>
 					</div>
 
 					<div className="flex flex-col gap-8 md:flex-row md:gap-16">
-						<aside className="shrink-0 md:w-52">
+						{/* ── Desktop sidebar ── */}
+						<aside className="hidden md:block shrink-0 w-52">
 							<ProfileSidebar />
 						</aside>
 
+						{/* ── Profile form ── */}
 						<div className="flex-1 max-w-xl">
 							<div className="bg-brown-200 rounded-2xl p-6 md:p-8">
 								<form onSubmit={handleSave} className="flex flex-col gap-6">
 									<div className="flex items-center gap-5 pb-5 border-b border-brown-300">
-										<div className="w-30 h-30 rounded-full overflow-hidden bg-brown-300 shrink-0">
+										<div className="w-24 h-24 rounded-full overflow-hidden bg-brown-300 shrink-0">
 											{avatar ? (
 												<img src={avatar} alt={name} className="w-full h-full object-cover" />
 											) : (
@@ -91,7 +114,7 @@ const ProfilePage = () => {
 											<button
 												type="button"
 												onClick={() => fileRef.current?.click()}
-												className="px-10 py-3 text-md font-medium text-brown-600 bg-white border border-brown-400 rounded-full hover:bg-brown-100 transition-colors duration-150"
+												className="px-8 py-3 text-sm font-medium text-brown-600 bg-white border border-brown-400 rounded-full hover:bg-brown-100 active:scale-95 transition-all duration-150"
 											>
 												Upload profile picture
 											</button>
@@ -104,7 +127,7 @@ const ProfilePage = () => {
 											type="text"
 											value={name}
 											onChange={(e) => setName(e.target.value)}
-											className="w-full px-4 py-3 text-md font-medium text-brown-500 bg-white border-2 border-transparent rounded-xl outline-none placeholder:text-brown-300 focus:ring-2 focus:ring-brown-300 transition-all duration-150"
+											className="w-full px-4 py-3 text-sm font-medium text-brown-500 bg-white border-2 border-transparent rounded-xl outline-none focus:ring-2 focus:ring-brown-300 transition-all duration-150"
 										/>
 									</div>
 
@@ -114,19 +137,19 @@ const ProfilePage = () => {
 											type="text"
 											value={username}
 											onChange={(e) => setUsername(e.target.value)}
-											className="w-full px-4 py-3 text-md font-medium text-brown-500 bg-white border-2 border-transparent rounded-xl outline-none placeholder:text-brown-300 focus:ring-2 focus:ring-brown-300 transition-all duration-150"
+											className="w-full px-4 py-3 text-sm font-medium text-brown-500 bg-white border-2 border-transparent rounded-xl outline-none focus:ring-2 focus:ring-brown-300 transition-all duration-150"
 										/>
 									</div>
 
 									<div className="flex flex-col gap-1.5">
 										<label className="text-sm text-brown-400">Email</label>
-										<p className="px-4 py-3 text-md text-brown-400">{user.email}</p>
+										<p className="px-4 py-3 text-sm text-brown-400">{user.email}</p>
 									</div>
 
 									<div>
 										<button
 											type="submit"
-											className="px-8 py-2.5 text-md font-medium text-white bg-brown-600 rounded-full hover:bg-brown-500 transition-colors duration-150"
+											className="px-8 py-2.5 text-sm font-medium text-white bg-brown-600 rounded-full hover:bg-brown-500 active:scale-95 transition-all duration-150"
 										>
 											Save
 										</button>
