@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import LandingPage from '../pages/LandingPage';
 import ArticleDetailPage from '../pages/ArticleDetailPage';
 import LoginPage from '../pages/LoginPage';
@@ -8,9 +9,27 @@ import ResetPasswordPage from '../pages/ResetPasswordPage';
 import AdminPage from '../pages/AdminPage';
 import AdminLoginPage from '../pages/AdminLoginPage';
 
-const AppRouter = () => {
+// pageFade ใช้แค่ opacity (ไม่มี transform) → ไม่สร้าง containing block ให้ fixed element
+// overlay อยู่ใน keyed div เพื่อให้ z-index (z-40) เทียบกับ navbar (z-50) ในตัวเดียวกัน
+const RoutesWithTransition = () => {
+	const location = useLocation();
+	const showFade = location.pathname === '/' || location.pathname.startsWith('/article/');
+
+	useEffect(() => {
+		window.scrollTo(0, 0);
+	}, [location.pathname]);
+
 	return (
-		<BrowserRouter>
+		<div key={location.pathname} className="animate-pageFade">
+			{showFade && (
+				<div
+					className="fixed top-0 left-0 right-0 pointer-events-none z-40"
+					style={{
+						height: '90px',
+						background: 'linear-gradient(to bottom, rgb(249,248,246) 35%, rgba(249,248,246,0.6) 65%, rgba(249,248,246,0.15) 85%, rgba(249,248,246,0) 100%)',
+					}}
+				/>
+			)}
 			<Routes>
 				<Route path="/" element={<LandingPage />} />
 				<Route path="/article/:id" element={<ArticleDetailPage />} />
@@ -21,6 +40,14 @@ const AppRouter = () => {
 				<Route path="/admin/login" element={<AdminLoginPage />} />
 				<Route path="/admin" element={<AdminPage />} />
 			</Routes>
+		</div>
+	);
+};
+
+const AppRouter = () => {
+	return (
+		<BrowserRouter>
+			<RoutesWithTransition />
 		</BrowserRouter>
 	);
 };
