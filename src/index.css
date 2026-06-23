@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
+
 @theme {
 	--font-sans: "Poppins", sans-serif;
 
@@ -13,12 +15,33 @@
 	--color-brand-green: #12B279;
 	--color-brand-green-light: #D7F2E9;
 	--color-brand-red: #EB5164;
+
+	--color-dark-bg: #1c1917;
+	--color-dark-surface: #292524;
+	--color-dark-elevated: #3c3835;
+	--color-dark-border: #44403c;
 }
 
 @layer base {
+	html {
+		background-color: var(--color-brown-100);
+		color-scheme: light;
+	}
+
+	html.dark {
+		background-color: var(--color-dark-bg);
+		color-scheme: dark;
+	}
+
 	body {
 		background-color: var(--color-brown-100);
 		color: var(--color-brown-600);
+		transition: background-color 0.3s ease, color 0.3s ease;
+	}
+
+	html.dark body {
+		background-color: var(--color-dark-bg);
+		color: var(--color-brown-100);
 	}
 }
 

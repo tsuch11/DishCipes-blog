@@ -8,26 +8,25 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { MOCK_NOTIFICATIONS } from '../../data/notifications';
 import bellIcon from '../../assets/images/icons/Bell_light.svg';
+import useDarkMode from '../../hooks/useDarkMode';
 
-// ── brown-100 = #F9F8F6 = rgb(249,248,246)   brown-300 = #DAD6D1 = rgb(218,214,209)
-const B100 = '249,248,246';
-const B300 = '218,214,209';
-const SCROLL_RANGE = 300; // px ที่ใช้ morph จาก rectangle → pill
-const TARGET_PILL_W = 820; // ความกว้างสูงสุดของ pill (px)
+const SCROLL_RANGE = 300;
+const TARGET_PILL_W = 820;
 
 const Navbar = () => {
 	const { user, logout } = useAuth();
 	const navigate = useNavigate();
+	const { isDark, toggle: toggleDark } = useDarkMode();
 	const [menuOpen, setMenuOpen] = useState(false);
 	const [bellOpen, setBellOpen] = useState(false);
 	const [hamburgerOpen, setHamburgerOpen] = useState(false);
-	const [p, setP] = useState(0); // scroll progress 0 → 1 (visual, lerped)
+	const [p, setP] = useState(0);
 	const [vw, setVw] = useState(() => window.innerWidth);
 	const menuRef = useRef<HTMLDivElement>(null);
 	const bellRef = useRef<HTMLDivElement>(null);
 	const headerRef = useRef<HTMLElement>(null);
-	const targetP = useRef(0);  // ค่า target จาก scrollY
-	const displayP = useRef(0); // ค่า visual ที่ lerp อยู่
+	const targetP = useRef(0);
+	const displayP = useRef(0);
 	const rafId = useRef(0);
 
 	const notifications = user
@@ -83,11 +82,14 @@ const Navbar = () => {
 		navigate('/');
 	};
 
-	// ── Interpolated styles ───────────────────────────────────────────
+	// ── Interpolated styles — ค่า RGB เปลี่ยนตาม dark mode ───────────
+	const B100 = isDark ? '28,25,23' : '249,248,246';
+	const B300 = isDark ? '68,64,60' : '218,214,209';
+
 	const isDesktop = vw >= 768;
-	const endPx = isDesktop ? 32 : 16;               // header padding ที่ full scroll
-	const endPillW = Math.min(TARGET_PILL_W, vw - 32); // pill width ที่ full scroll
-	const pillMaxW = vw - (vw - endPillW) * p;       // linear interpolation
+	const endPx = isDesktop ? 32 : 16;
+	const endPillW = Math.min(TARGET_PILL_W, vw - 32);
+	const pillMaxW = vw - (vw - endPillW) * p;
 
 	const headerStyle: CSSProperties = {
 		backgroundColor: `rgba(${B100},${1 - p})`,
@@ -105,11 +107,11 @@ const Navbar = () => {
 		backgroundColor: `rgba(${B100},${p * 0.95})`,
 		boxShadow: `0 4px 24px rgba(0,0,0,${p * 0.1}),0 1px 8px rgba(0,0,0,${p * 0.05})`,
 		border: `1px solid rgba(${B300},${p * 0.5})`,
-		backdropFilter: `blur(${p * 12}px)`,
-		WebkitBackdropFilter: `blur(${p * 12}px)`,
+		backdropFilter: isDark ? 'none' : `blur(${p * 12}px)`,
+		WebkitBackdropFilter: isDark ? 'none' : `blur(${p * 12}px)`,
 	};
 
-	const navPy = (isDesktop ? 16 : 12) - p * (isDesktop ? 8 : 4); // 16/12 → 8
+	const navPy = (isDesktop ? 16 : 12) - p * (isDesktop ? 8 : 4);
 	const navStyle: CSSProperties = {
 		paddingTop: `${navPy}px`,
 		paddingBottom: `${navPy}px`,
@@ -126,17 +128,34 @@ const Navbar = () => {
 					className="flex items-center justify-between max-w-7xl mx-auto px-4 md:px-10"
 					style={navStyle}
 				>
-					<Link to="/" className="font-medium text-brown-600" style={{ fontSize: 'clamp(1.75rem, 2vw, 1.5rem)' }}>DishCipes<span className="text-brand-green">.</span></Link>
+					<Link to="/" className="font-medium text-brown-600 dark:text-brown-100" style={{ fontSize: 'clamp(1.75rem, 2vw, 1.5rem)' }}>DishCipes<span className="text-brand-green">.</span></Link>
 
 					{/* ── Desktop nav ── */}
 					<div className="hidden md:flex items-center gap-1">
+						{/* Dark mode toggle */}
+						<button
+							onClick={toggleDark}
+							className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-brown-200 dark:hover:bg-dark-elevated active:scale-90 transition-all duration-150"
+							aria-label="Toggle dark mode"
+						>
+							{isDark ? (
+								<svg className="w-4.5 h-4.5 text-brown-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+								</svg>
+							) : (
+								<svg className="w-4.5 h-4.5 text-brown-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+								</svg>
+							)}
+						</button>
+
 						{user ? (
 							<>
 								{/* Bell / notifications */}
 								<div className="relative" ref={bellRef}>
 									<button
 										onClick={() => { setBellOpen((prev) => !prev); setMenuOpen(false); }}
-										className="relative flex items-center justify-center w-9 h-9 rounded-full hover:bg-brown-200 active:scale-90 transition-all duration-150"
+										className="relative flex items-center justify-center w-9 h-9 rounded-full hover:bg-brown-200 dark:hover:bg-dark-elevated active:scale-90 transition-all duration-150"
 									>
 										<img src={bellIcon} alt="Notifications" className="w-5 h-5" />
 										{unreadCount > 0 && (
@@ -145,28 +164,28 @@ const Navbar = () => {
 									</button>
 
 									{bellOpen && (
-										<div className="absolute right-0 top-full mt-2 w-80 bg-white border border-brown-200 rounded-2xl shadow-xl py-2 z-50 animate-slideDown">
-											<p className="px-4 py-2 text-xs font-semibold text-brown-400 uppercase tracking-wide border-b border-brown-100">
+										<div className="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-dark-surface border border-brown-200 dark:border-dark-border rounded-2xl shadow-xl dark:shadow-black/40 py-2 z-50 animate-slideDown">
+											<p className="px-4 py-2 text-xs font-semibold text-brown-400 dark:text-brown-300 uppercase tracking-wide border-b border-brown-100 dark:border-dark-border">
 												Notifications
 											</p>
 											{notifications.length === 0 ? (
-												<p className="px-4 py-6 text-sm text-brown-300 text-center">No notifications</p>
+												<p className="px-4 py-6 text-sm text-brown-300 dark:text-brown-400 text-center">No notifications</p>
 											) : (
 												<ul>
 													{notifications.map((n) => (
 														<li
 															key={n.id}
-															className={`flex items-start gap-3 px-4 py-3 hover:bg-brown-50 transition-colors duration-150 ${!n.read ? 'bg-brown-50/60' : ''}`}
+															className={`flex items-start gap-3 px-4 py-3 hover:bg-brown-50 dark:hover:bg-dark-elevated transition-colors duration-150 ${!n.read ? 'bg-brown-50/60 dark:bg-dark-elevated/50' : ''}`}
 														>
-															<div className="w-10 h-10 rounded-full overflow-hidden bg-brown-200 shrink-0 mt-0.5">
+															<div className="w-10 h-10 rounded-full overflow-hidden bg-brown-200 dark:bg-dark-elevated shrink-0 mt-0.5">
 																<img src={n.actorAvatar} alt={n.actorName} className="w-full h-full object-cover" />
 															</div>
 															<div className="flex-1 min-w-0">
-																<p className="text-sm text-brown-600 leading-snug">
+																<p className="text-sm text-brown-600 dark:text-brown-100 leading-snug">
 																	<span className="font-semibold">{n.actorName}</span>{' '}
 																	{n.action}
 																</p>
-																<p className="text-xs text-brown-400 mt-1">{n.time}</p>
+																<p className="text-xs text-brown-400 dark:text-brown-300 mt-1">{n.time}</p>
 															</div>
 															{!n.read && (
 																<span className="w-2 h-2 bg-red-400 rounded-full shrink-0 mt-1.5" />
@@ -183,31 +202,31 @@ const Navbar = () => {
 								<div className="relative" ref={menuRef}>
 									<button
 										onClick={() => { setMenuOpen((prev) => !prev); setBellOpen(false); }}
-										className="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-brown-200 active:scale-95 transition-all duration-150"
+										className="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-brown-200 dark:hover:bg-dark-elevated active:scale-95 transition-all duration-150"
 									>
-										<div className="w-8 h-8 rounded-full overflow-hidden bg-brown-300 shrink-0">
+										<div className="w-8 h-8 rounded-full overflow-hidden bg-brown-300 dark:bg-dark-elevated shrink-0">
 											{user.avatar ? (
 												<img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
 											) : (
 												<div className="w-full h-full flex items-center justify-center">
-													<svg className="w-4 h-4 text-brown-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+													<svg className="w-4 h-4 text-brown-500 dark:text-brown-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 														<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
 													</svg>
 												</div>
 											)}
 										</div>
-										<span className="text-sm font-medium text-brown-600">{user.name.split(' ')[0]}</span>
-										<svg className="w-4 h-4 text-brown-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<span className="text-sm font-medium text-brown-600 dark:text-brown-100">{user.name.split(' ')[0]}</span>
+										<svg className="w-4 h-4 text-brown-400 dark:text-brown-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
 										</svg>
 									</button>
 
 									{menuOpen && (
-										<div className="absolute right-0 top-full mt-2 w-52 bg-white border border-brown-200 rounded-2xl shadow-lg py-2 z-50 animate-slideDown">
+										<div className="absolute right-0 top-full mt-2 w-52 bg-white dark:bg-dark-surface border border-brown-200 dark:border-dark-border rounded-2xl shadow-lg dark:shadow-black/40 py-2 z-50 animate-slideDown">
 											<Link
 												to="/profile"
 												onClick={() => setMenuOpen(false)}
-												className="flex items-center gap-2 px-4 py-2.5 text-sm text-brown-500 hover:bg-brown-100 hover:text-brown-600 transition-colors duration-150"
+												className="flex items-center gap-2 px-4 py-2.5 text-sm text-brown-500 dark:text-brown-300 hover:bg-brown-100 dark:hover:bg-dark-elevated hover:text-brown-600 dark:hover:text-brown-100 transition-colors duration-150"
 											>
 												<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 													<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -217,7 +236,7 @@ const Navbar = () => {
 											<Link
 												to="/profile/reset-password"
 												onClick={() => setMenuOpen(false)}
-												className="flex items-center gap-2 px-4 py-2.5 text-sm text-brown-500 hover:bg-brown-100 hover:text-brown-600 transition-colors duration-150"
+												className="flex items-center gap-2 px-4 py-2.5 text-sm text-brown-500 dark:text-brown-300 hover:bg-brown-100 dark:hover:bg-dark-elevated hover:text-brown-600 dark:hover:text-brown-100 transition-colors duration-150"
 											>
 												<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 													<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -228,7 +247,7 @@ const Navbar = () => {
 												<Link
 													to="/admin/login"
 													onClick={() => setMenuOpen(false)}
-													className="flex items-center gap-2 px-4 py-2.5 text-sm text-brown-500 hover:bg-brown-100 hover:text-brown-600 transition-colors duration-150"
+													className="flex items-center gap-2 px-4 py-2.5 text-sm text-brown-500 dark:text-brown-300 hover:bg-brown-100 dark:hover:bg-dark-elevated hover:text-brown-600 dark:hover:text-brown-100 transition-colors duration-150"
 												>
 													<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 														<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
@@ -236,10 +255,10 @@ const Navbar = () => {
 													Admin panel
 												</Link>
 											)}
-											<hr className="my-1 border-brown-200" />
+											<hr className="my-1 border-brown-200 dark:border-dark-border" />
 											<button
 												onClick={handleLogout}
-												className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-brown-500 hover:bg-brown-100 hover:text-brown-600 transition-colors duration-150"
+												className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-brown-500 dark:text-brown-300 hover:bg-brown-100 dark:hover:bg-dark-elevated hover:text-brown-600 dark:hover:text-brown-100 transition-colors duration-150"
 											>
 												<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 													<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -254,13 +273,13 @@ const Navbar = () => {
 							<>
 								<Link
 									to="/login"
-									className="px-10 py-3 text-base font-medium text-brown-600 border border-brown-400 rounded-full hover:bg-brown-100 active:scale-95 transition-all duration-150"
+									className="px-10 py-3 text-base font-medium text-brown-600 dark:text-brown-100 border border-brown-400 dark:border-dark-border rounded-full hover:bg-brown-100 dark:hover:bg-dark-elevated active:scale-95 transition-all duration-150"
 								>
 									Log in
 								</Link>
 								<Link
 									to="/signup"
-									className="px-10 py-3 text-base font-medium text-white bg-brown-600 rounded-full hover:bg-brown-500 active:scale-95 transition-all duration-150"
+									className="px-10 py-3 text-base font-medium text-white bg-brown-600 dark:bg-dark-elevated rounded-full hover:bg-brown-500 dark:hover:bg-dark-border active:scale-95 transition-all duration-150"
 								>
 									Sign up
 								</Link>
@@ -268,43 +287,61 @@ const Navbar = () => {
 						)}
 					</div>
 
-					{/* ── Mobile hamburger button ── */}
-					<button
-						className="flex flex-col justify-center items-center gap-1.5 w-9 h-9 rounded-md hover:bg-brown-200 active:scale-90 transition-all duration-150 md:hidden"
-						onClick={() => setHamburgerOpen((prev) => !prev)}
-						aria-label="Menu"
-					>
-						<span className={`block w-5 h-0.5 bg-brown-600 rounded-full transition-all duration-300 ${hamburgerOpen ? 'rotate-45 translate-y-2' : ''}`} />
-						<span className={`block w-5 h-0.5 bg-brown-600 rounded-full transition-all duration-300 ${hamburgerOpen ? 'opacity-0 scale-x-0' : ''}`} />
-						<span className={`block w-5 h-0.5 bg-brown-600 rounded-full transition-all duration-300 ${hamburgerOpen ? '-rotate-45 -translate-y-2' : ''}`} />
-					</button>
+					{/* ── Mobile: dark toggle + hamburger ── */}
+					<div className="flex items-center gap-1 md:hidden">
+						<button
+							onClick={toggleDark}
+							className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-brown-200 dark:hover:bg-dark-elevated active:scale-90 transition-all duration-150"
+							aria-label="Toggle dark mode"
+						>
+							{isDark ? (
+								<svg className="w-4 h-4 text-brown-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+								</svg>
+							) : (
+								<svg className="w-4 h-4 text-brown-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+								</svg>
+							)}
+						</button>
+
+						<button
+							className="flex flex-col justify-center items-center gap-1.5 w-9 h-9 rounded-md hover:bg-brown-200 dark:hover:bg-dark-elevated active:scale-90 transition-all duration-150"
+							onClick={() => setHamburgerOpen((prev) => !prev)}
+							aria-label="Menu"
+						>
+							<span className={`block w-5 h-0.5 bg-brown-600 dark:bg-brown-100 rounded-full transition-all duration-300 ${hamburgerOpen ? 'rotate-45 translate-y-2' : ''}`} />
+							<span className={`block w-5 h-0.5 bg-brown-600 dark:bg-brown-100 rounded-full transition-all duration-300 ${hamburgerOpen ? 'opacity-0 scale-x-0' : ''}`} />
+							<span className={`block w-5 h-0.5 bg-brown-600 dark:bg-brown-100 rounded-full transition-all duration-300 ${hamburgerOpen ? '-rotate-45 -translate-y-2' : ''}`} />
+						</button>
+					</div>
 				</nav>
 			</div>
 
 			{/* ── Mobile dropdown overlay ── */}
 			{hamburgerOpen && (
-				<div className="md:hidden absolute top-full left-0 right-0 z-50 bg-brown-100 border-b border-brown-300 px-4 pt-4 pb-5 animate-slideDown">
+				<div className="md:hidden absolute top-full left-0 right-0 z-50 bg-brown-100 dark:bg-dark-bg border-b border-brown-300 dark:border-dark-border px-4 pt-4 pb-5 animate-slideDown">
 					{user ? (
 						<>
-							<div className="flex items-center gap-3 pb-4 mb-2 border-b border-brown-200">
-								<div className="w-10 h-10 rounded-full overflow-hidden bg-brown-300 shrink-0">
+							<div className="flex items-center gap-3 pb-4 mb-2 border-b border-brown-200 dark:border-dark-border">
+								<div className="w-10 h-10 rounded-full overflow-hidden bg-brown-300 dark:bg-dark-elevated shrink-0">
 									{user.avatar ? (
 										<img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
 									) : (
 										<div className="w-full h-full flex items-center justify-center">
-											<svg className="w-5 h-5 text-brown-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<svg className="w-5 h-5 text-brown-500 dark:text-brown-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
 											</svg>
 										</div>
 									)}
 								</div>
-								<span className="text-sm font-semibold text-brown-600">{user.name}</span>
+								<span className="text-sm font-semibold text-brown-600 dark:text-brown-100">{user.name}</span>
 							</div>
 							<div className="flex flex-col">
 								<Link
 									to="/profile"
 									onClick={() => setHamburgerOpen(false)}
-									className="flex items-center gap-3 px-2 py-3 text-sm text-brown-500 hover:text-brown-600 hover:bg-brown-200 rounded-lg transition-colors duration-150"
+									className="flex items-center gap-3 px-2 py-3 text-sm text-brown-500 dark:text-brown-300 hover:text-brown-600 dark:hover:text-brown-100 hover:bg-brown-200 dark:hover:bg-dark-elevated rounded-lg transition-colors duration-150"
 								>
 									<svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -314,7 +351,7 @@ const Navbar = () => {
 								<Link
 									to="/profile/reset-password"
 									onClick={() => setHamburgerOpen(false)}
-									className="flex items-center gap-3 px-2 py-3 text-sm text-brown-500 hover:text-brown-600 hover:bg-brown-200 rounded-lg transition-colors duration-150"
+									className="flex items-center gap-3 px-2 py-3 text-sm text-brown-500 dark:text-brown-300 hover:text-brown-600 dark:hover:text-brown-100 hover:bg-brown-200 dark:hover:bg-dark-elevated rounded-lg transition-colors duration-150"
 								>
 									<svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -325,7 +362,7 @@ const Navbar = () => {
 									<Link
 										to="/admin/login"
 										onClick={() => setHamburgerOpen(false)}
-										className="flex items-center gap-3 px-2 py-3 text-sm text-brown-500 hover:text-brown-600 hover:bg-brown-200 rounded-lg transition-colors duration-150"
+										className="flex items-center gap-3 px-2 py-3 text-sm text-brown-500 dark:text-brown-300 hover:text-brown-600 dark:hover:text-brown-100 hover:bg-brown-200 dark:hover:bg-dark-elevated rounded-lg transition-colors duration-150"
 									>
 										<svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
@@ -333,10 +370,10 @@ const Navbar = () => {
 										Admin panel
 									</Link>
 								)}
-								<hr className="my-2 border-brown-200" />
+								<hr className="my-2 border-brown-200 dark:border-dark-border" />
 								<button
 									onClick={handleLogout}
-									className="flex items-center gap-3 w-full px-2 py-3 text-sm text-brown-500 hover:text-brown-600 hover:bg-brown-200 rounded-lg transition-colors duration-150"
+									className="flex items-center gap-3 w-full px-2 py-3 text-sm text-brown-500 dark:text-brown-300 hover:text-brown-600 dark:hover:text-brown-100 hover:bg-brown-200 dark:hover:bg-dark-elevated rounded-lg transition-colors duration-150"
 								>
 									<svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -350,14 +387,14 @@ const Navbar = () => {
 							<Link
 								to="/login"
 								onClick={() => setHamburgerOpen(false)}
-								className="w-full py-3.5 text-center text-sm font-medium text-brown-600 border border-brown-400 rounded-full hover:bg-brown-200 active:scale-95 transition-all duration-150"
+								className="w-full py-3.5 text-center text-sm font-medium text-brown-600 dark:text-brown-100 border border-brown-400 dark:border-dark-border rounded-full hover:bg-brown-200 dark:hover:bg-dark-elevated active:scale-95 transition-all duration-150"
 							>
 								Log in
 							</Link>
 							<Link
 								to="/signup"
 								onClick={() => setHamburgerOpen(false)}
-								className="w-full py-3.5 text-center text-sm font-medium text-white bg-brown-600 rounded-full hover:bg-brown-500 active:scale-95 transition-all duration-150"
+								className="w-full py-3.5 text-center text-sm font-medium text-white bg-brown-600 dark:bg-dark-elevated rounded-full hover:bg-brown-500 dark:hover:bg-dark-border active:scale-95 transition-all duration-150"
 							>
 								Sign up
 							</Link>
