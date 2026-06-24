@@ -1,12 +1,9 @@
-// LoginPage — หน้า login สำหรับ member
-// แก้ไขได้: form card style (bg-brown-200, rounded-2xl), heading text,
-//           input border error color, submit button style,
-//           error toast message, "Sign up" link text
-
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/layout/Navbar';
+import FormField from '../components/ui/FormField';
+import inputCls from '../utils/inputCls';
 
 const LoginPage = () => {
 	const { login } = useAuth();
@@ -43,29 +40,27 @@ const LoginPage = () => {
 					<h1 className="text-4xl font-bold text-brown-600 dark:text-brown-100 text-center mb-8">Log in</h1>
 
 					<form onSubmit={handleSubmit} className="flex flex-col gap-5">
-						<div className="flex flex-col gap-1.5">
-							<label className="text-sm text-brown-500 dark:text-brown-300">Email</label>
+						<FormField label="Email">
 							<input
 								type="email"
 								placeholder="Email"
 								value={email}
 								onChange={(e) => setEmail(e.target.value)}
 								required
-								className={`w-full px-4 py-3 text-sm text-brown-600 dark:text-brown-100 bg-white dark:bg-dark-elevated border-2 rounded-xl outline-none placeholder:text-brown-300 dark:placeholder:text-brown-400 transition-all duration-150 ${error ? 'border-red-400' : 'border-transparent focus:ring-2 focus:ring-brown-300 dark:focus:ring-dark-border'}`}
+								className={inputCls(!!error)}
 							/>
-						</div>
+						</FormField>
 
-						<div className="flex flex-col gap-1.5">
-							<label className="text-sm text-brown-500 dark:text-brown-300">Password</label>
+						<FormField label="Password">
 							<input
 								type="password"
 								placeholder="Password"
 								value={password}
 								onChange={(e) => setPassword(e.target.value)}
 								required
-								className={`w-full px-4 py-3 text-sm text-brown-600 dark:text-brown-100 bg-white dark:bg-dark-elevated border-2 rounded-xl outline-none placeholder:text-brown-300 dark:placeholder:text-brown-400 transition-all duration-150 ${error ? 'border-red-400' : 'border-transparent focus:ring-2 focus:ring-brown-300 dark:focus:ring-dark-border'}`}
+								className={inputCls(!!error)}
 							/>
-						</div>
+						</FormField>
 
 						<div className="flex justify-center mt-2">
 							<button

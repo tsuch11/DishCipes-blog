@@ -1,14 +1,10 @@
-// SignupPage — หน้าสมัครสมาชิก
-// แก้ไขได้: form fields (name, username, email, password), validation messages,
-//           success screen (checkmark icon, heading text, continue button),
-//           "Log in" link text, form card style
-
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/layout/Navbar';
+import FormField from '../components/ui/FormField';
+import inputCls from '../utils/inputCls';
 
-// signup
 const SignupPage = () => {
 	const { register } = useAuth();
 	const navigate = useNavigate();
@@ -73,9 +69,6 @@ const SignupPage = () => {
 		);
 	}
 
-	const inputCls = (err?: boolean) =>
-		`w-full px-4 py-3 text-sm text-brown-600 dark:text-brown-100 bg-white dark:bg-dark-elevated border-2 rounded-xl outline-none placeholder:text-brown-300 dark:placeholder:text-brown-400 transition-all duration-150 ${err ? 'border-red-400' : 'border-transparent focus:ring-2 focus:ring-brown-300 dark:focus:ring-dark-border'}`;
-
 	return (
 		<div className="min-h-screen flex flex-col font-sans dark:bg-dark-bg">
 			<Navbar />
@@ -85,29 +78,21 @@ const SignupPage = () => {
 					<h1 className="text-4xl font-bold text-brown-600 dark:text-brown-100 text-center mb-8">Sign up</h1>
 
 					<form onSubmit={handleSubmit} className="flex flex-col gap-5">
-						<div className="flex flex-col gap-1.5">
-							<label className="text-sm text-brown-500 dark:text-brown-300">Name</label>
+						<FormField label="Name" error={errors.name}>
 							<input type="text" placeholder="Full name" value={name} onChange={(e) => setName(e.target.value)} className={inputCls(!!errors.name)} />
-							{errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
-						</div>
+						</FormField>
 
-						<div className="flex flex-col gap-1.5">
-							<label className="text-sm text-brown-500 dark:text-brown-300">Username</label>
+						<FormField label="Username" error={errors.username}>
 							<input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} className={inputCls(!!errors.username)} />
-							{errors.username && <p className="text-xs text-red-500">{errors.username}</p>}
-						</div>
+						</FormField>
 
-						<div className="flex flex-col gap-1.5">
-							<label className="text-sm text-brown-500 dark:text-brown-300">Email</label>
+						<FormField label="Email" error={errors.email}>
 							<input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputCls(!!errors.email)} />
-							{errors.email && <p className="text-xs text-red-500">{errors.email}</p>}
-						</div>
+						</FormField>
 
-						<div className="flex flex-col gap-1.5">
-							<label className="text-sm text-brown-500 dark:text-brown-300">Password</label>
+						<FormField label="Password" error={errors.password}>
 							<input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className={inputCls(!!errors.password)} />
-							{errors.password && <p className="text-xs text-red-500">{errors.password}</p>}
-						</div>
+						</FormField>
 
 						<div className="flex justify-center mt-2">
 							<button
