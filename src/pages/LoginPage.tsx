@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import Navbar from '../components/layout/Navbar';
+import AuthPageLayout from '../components/ui/AuthPageLayout';
 import FormField from '../components/ui/FormField';
 import inputCls from '../utils/inputCls';
 
@@ -16,7 +16,7 @@ const LoginPage = () => {
 	const [error, setError] = useState('');
 	const [loading, setLoading] = useState(false);
 
-	const handleSubmit = async (e: React.FormEvent) => {
+	const handleSubmit = async (e: React.FormEvent): Promise<void> => {
 		e.preventDefault();
 		setError('');
 		setLoading(true);
@@ -32,55 +32,49 @@ const LoginPage = () => {
 	};
 
 	return (
-		<div className="min-h-screen flex flex-col font-sans dark:bg-dark-bg">
-			<Navbar />
+		<AuthPageLayout>
+			<h1 className="text-4xl font-bold text-brown-600 dark:text-brown-100 text-center mb-8">Log in</h1>
 
-			<main className="flex-1 flex items-center justify-center px-4 py-12 animate-fadeInUp">
-				<div className="w-full max-w-lg bg-brown-200 dark:bg-dark-surface rounded-2xl px-10 py-12">
-					<h1 className="text-4xl font-bold text-brown-600 dark:text-brown-100 text-center mb-8">Log in</h1>
+			<form onSubmit={handleSubmit} className="flex flex-col gap-5">
+				<FormField label="Email">
+					<input
+						type="email"
+						placeholder="Email"
+						value={email}
+						onChange={(e) => setEmail(e.target.value)}
+						required
+						className={inputCls(!!error)}
+					/>
+				</FormField>
 
-					<form onSubmit={handleSubmit} className="flex flex-col gap-5">
-						<FormField label="Email">
-							<input
-								type="email"
-								placeholder="Email"
-								value={email}
-								onChange={(e) => setEmail(e.target.value)}
-								required
-								className={inputCls(!!error)}
-							/>
-						</FormField>
+				<FormField label="Password">
+					<input
+						type="password"
+						placeholder="Password"
+						value={password}
+						onChange={(e) => setPassword(e.target.value)}
+						required
+						className={inputCls(!!error)}
+					/>
+				</FormField>
 
-						<FormField label="Password">
-							<input
-								type="password"
-								placeholder="Password"
-								value={password}
-								onChange={(e) => setPassword(e.target.value)}
-								required
-								className={inputCls(!!error)}
-							/>
-						</FormField>
-
-						<div className="flex justify-center mt-2">
-							<button
-								type="submit"
-								disabled={loading}
-								className="px-12 py-3 text-base font-medium text-white bg-brown-600 rounded-full hover:bg-brown-500 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150"
-							>
-								{loading ? 'Logging in...' : 'Log in'}
-							</button>
-						</div>
-					</form>
-
-					<p className="text-center text-sm text-brown-400 dark:text-brown-300 mt-6">
-						Don't have any account?{' '}
-						<Link to="/signup" className="font-medium text-brown-600 dark:text-brown-100 hover:underline">
-							Sign up
-						</Link>
-					</p>
+				<div className="flex justify-center mt-2">
+					<button
+						type="submit"
+						disabled={loading}
+						className="px-12 py-3 text-base font-medium text-white bg-brown-600 rounded-full hover:bg-brown-500 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150"
+					>
+						{loading ? 'Logging in...' : 'Log in'}
+					</button>
 				</div>
-			</main>
+			</form>
+
+			<p className="text-center text-sm text-brown-400 dark:text-brown-300 mt-6">
+				Don't have any account?{' '}
+				<Link to="/signup" className="font-medium text-brown-600 dark:text-brown-100 hover:underline">
+					Sign up
+				</Link>
+			</p>
 
 			{error && (
 				<div className="fixed bottom-6 right-6 flex items-start gap-3 bg-[#E8545A] text-white px-5 py-4 rounded-2xl shadow-lg z-50 animate-slideDown">
@@ -95,7 +89,7 @@ const LoginPage = () => {
 					</button>
 				</div>
 			)}
-		</div>
+		</AuthPageLayout>
 	);
 };
 

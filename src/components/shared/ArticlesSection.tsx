@@ -45,15 +45,11 @@ const ArticlesSection = () => {
 		setShowAll(false);
 	};
 
-	const filtered = useMemo(() => {
-		const byCategory = activeCategory === 'Highlight'
-			? articles
-			: articles.filter((a) => a.category.toLowerCase() === activeCategory.toLowerCase());
-
-		return searchQuery.trim() === ''
-			? byCategory
-			: byCategory.filter((a) => a.title.toLowerCase().includes(searchQuery.toLowerCase()));
-	}, [activeCategory, searchQuery]);
+	const filtered = useMemo(() => articles.filter((a) => {
+		const matchCategory = activeCategory === 'Highlight' || a.category.toLowerCase() === activeCategory.toLowerCase();
+		const matchSearch = searchQuery.trim() === '' || a.title.toLowerCase().includes(searchQuery.toLowerCase());
+		return matchCategory && matchSearch;
+	}), [activeCategory, searchQuery]);
 
 	const visible2 = activeCategory === 'Highlight' && !showAll
 		? filtered.slice(0, INITIAL_COUNT)
