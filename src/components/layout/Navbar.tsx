@@ -107,8 +107,8 @@ const Navbar = () => {
 		backgroundColor: `rgba(${B100},${p * 0.95})`,
 		boxShadow: `0 4px 24px rgba(0,0,0,${p * 0.1}),0 1px 8px rgba(0,0,0,${p * 0.05})`,
 		border: `1px solid rgba(${B300},${p * 0.5})`,
-		backdropFilter: isDark ? 'none' : `blur(${p * 12}px)`,
-		WebkitBackdropFilter: isDark ? 'none' : `blur(${p * 12}px)`,
+		backdropFilter: `blur(${p * 12}px)`,
+		WebkitBackdropFilter: `blur(${p * 12}px)`,
 	};
 
 	const navPy = (isDesktop ? 16 : 12) - p * (isDesktop ? 8 : 4);
