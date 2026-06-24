@@ -92,8 +92,8 @@ const Navbar = () => {
 	const pillMaxW = vw - (vw - endPillW) * p;
 
 	const headerStyle: CSSProperties = {
-		backgroundColor: `rgba(${B100},${1 - p})`,
-		borderBottomColor: `rgba(${B300},${1 - p})`,
+		backgroundColor: 'transparent',
+		borderBottomColor: 'transparent',
 		paddingLeft: `${p * endPx}px`,
 		paddingRight: `${p * endPx}px`,
 		paddingTop: `${p * 10}px`,
@@ -104,11 +104,11 @@ const Navbar = () => {
 		marginLeft: 'auto',
 		marginRight: 'auto',
 		borderRadius: `${p * 9999}px`,
-		backgroundColor: `rgba(${B100},${p * 0.95})`,
+		backgroundColor: `rgba(${B100},${p * 0.98})`,
 		boxShadow: `0 4px 24px rgba(0,0,0,${p * 0.1}),0 1px 8px rgba(0,0,0,${p * 0.05})`,
 		border: `1px solid rgba(${B300},${p * 0.5})`,
-		backdropFilter: `blur(${p * 12}px)`,
-		WebkitBackdropFilter: `blur(${p * 12}px)`,
+		backdropFilter: isDark ? 'none' : `blur(${p * 12}px)`,
+		WebkitBackdropFilter: isDark ? 'none' : `blur(${p * 12}px)`,
 	};
 
 	const navPy = (isDesktop ? 16 : 12) - p * (isDesktop ? 8 : 4);
