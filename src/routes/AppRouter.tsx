@@ -24,10 +24,7 @@ const RoutesWithTransition = () => {
 			{showFade && (
 				<div
 					className="fixed top-0 left-0 right-0 pointer-events-none z-40"
-					style={{
-						height: '90px',
-						background: 'linear-gradient(to bottom, rgb(249,248,246) 35%, rgba(249,248,246,0.6) 65%, rgba(249,248,246,0.15) 85%, rgba(249,248,246,0) 100%)',
-					}}
+					
 				/>
 			)}
 			<Routes>
