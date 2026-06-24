@@ -1,15 +1,13 @@
-// ArticleCard — card แสดงตัวอย่างบทความ ใช้ใน ArticlesSection และ AdminPage
-// แก้ไขได้: card hover offset (-translate-y-1), image aspect ratio (aspect-video),
-//           category badge color (brand-green), title line clamp (2), description line clamp (2),
-//           author avatar size, date format
-
 import { Link } from 'react-router-dom';
 import type { Article } from '../../types/article';
 
-type ArticleCardProps = Pick<Article, 'id' | 'image' | 'category' | 'title' | 'description' | 'authorName' | 'authorAvatar' | 'date'>;
+type ArticleCardProps = {
+	article: Pick<Article, 'id' | 'image' | 'category' | 'title' | 'description' | 'authorName' | 'authorAvatar' | 'date'>;
+};
 
-// card
-const ArticleCard = ({ id, image, category, title, description, authorName, authorAvatar, date }: ArticleCardProps) => {
+const ArticleCard = ({ article }: ArticleCardProps) => {
+	const { id, image, category, title, description, authorName, authorAvatar, date } = article;
+
 	return (
 		<Link
 			to={`/article/${id}`}
