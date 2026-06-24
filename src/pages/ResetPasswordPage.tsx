@@ -6,10 +6,11 @@ import ProfileSidebar from '../components/profile/ProfileSidebar';
 import Toast from '../components/ui/Toast';
 import ConfirmModal from '../components/ui/ConfirmModal';
 import FormField from '../components/ui/FormField';
+import GoBackButton from '../components/ui/GoBackButton';
 import inputCls from '../utils/inputCls';
 
 const resetLabelCls = 'text-sm font-medium text-brown-400 dark:text-brown-300';
-const resetInputCls = (hasError = false) =>
+const resetInputCls = (hasError = false): string =>
 	`w-full px-4 py-3 text-sm text-brown-400 dark:text-brown-100 bg-white dark:bg-dark-elevated border-2 rounded-xl outline-none placeholder:text-brown-300 dark:placeholder:text-brown-400 transition-all duration-150 ${hasError ? 'border-red-400' : 'border-transparent focus:ring-2 focus:ring-brown-300 dark:focus:ring-dark-border'}`;
 
 const ResetPasswordPage = () => {
@@ -29,7 +30,7 @@ const ResetPasswordPage = () => {
 
 	if (!isAuthenticated || !user) return null;
 
-	const validate = () => {
+	const validate = (): Record<string, string> => {
 		const errs: Record<string, string> = {};
 		if (!current) errs.current = 'Current password is required.';
 		if (newPass.length < 8) errs.newPass = 'Password must be at least 8 characters.';
@@ -72,12 +73,7 @@ const ResetPasswordPage = () => {
 
 			<main className="flex-1 animate-viewFade">
 				<div className="max-w-7xl mx-auto px-4 pt-6 md:px-10">
-					<button onClick={() => navigate(-1)} className="inline-flex items-center gap-1.5 text-sm text-brown-400 dark:text-brown-300 hover:text-brown-600 dark:hover:text-brown-100 transition-colors duration-150">
-						<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-						</svg>
-						Go back
-					</button>
+					<GoBackButton />
 				</div>
 
 				<div className="max-w-7xl mx-auto px-4 py-6 md:px-10 md:py-12">

@@ -8,13 +8,14 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/layout/Navbar';
 import ProfileSidebar from '../components/profile/ProfileSidebar';
+import GoBackButton from '../components/ui/GoBackButton';
+import FormField from '../components/ui/FormField';
 import Toast from '../components/ui/Toast';
 
 // profile
 const ProfilePage = () => {
 	const { user, updateProfile, isAuthenticated } = useAuth();
 	const navigate = useNavigate();
-
 	const [name, setName] = useState(user?.name ?? '');
 	const [username, setUsername] = useState(user?.username ?? '');
 	const [avatar, setAvatar] = useState(user?.avatar ?? '');
@@ -53,12 +54,7 @@ const ProfilePage = () => {
 
 			<main className="flex-1 animate-viewFade">
 				<div className="max-w-7xl mx-auto px-4 pt-6 md:px-10">
-					<button onClick={() => navigate(-1)} className="inline-flex items-center gap-1.5 text-sm text-brown-400 dark:text-brown-300 hover:text-brown-600 dark:hover:text-brown-100 transition-colors duration-150">
-						<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-						</svg>
-						Go back
-					</button>
+					<GoBackButton />
 				</div>
 				<div className="max-w-7xl mx-auto px-4 py-6 md:px-10 md:py-12">
 					{/* ── User header ── */}
@@ -115,30 +111,27 @@ const ProfilePage = () => {
 										</div>
 									</div>
 
-									<div className="flex flex-col gap-1.5">
-										<label className="text-sm text-brown-400 dark:text-brown-300">Name</label>
+									<FormField label="Name" labelCls="text-sm text-brown-400 dark:text-brown-300">
 										<input
 											type="text"
 											value={name}
 											onChange={(e) => setName(e.target.value)}
 											className="w-full px-4 py-3 text-sm font-medium text-brown-500 dark:text-brown-100 bg-white dark:bg-dark-elevated border-2 border-transparent rounded-xl outline-none focus:ring-2 focus:ring-brown-300 dark:focus:ring-dark-border transition-all duration-150"
 										/>
-									</div>
+									</FormField>
 
-									<div className="flex flex-col gap-1.5">
-										<label className="text-sm text-brown-400 dark:text-brown-300">Username</label>
+									<FormField label="Username" labelCls="text-sm text-brown-400 dark:text-brown-300">
 										<input
 											type="text"
 											value={username}
 											onChange={(e) => setUsername(e.target.value)}
 											className="w-full px-4 py-3 text-sm font-medium text-brown-500 dark:text-brown-100 bg-white dark:bg-dark-elevated border-2 border-transparent rounded-xl outline-none focus:ring-2 focus:ring-brown-300 dark:focus:ring-dark-border transition-all duration-150"
 										/>
-									</div>
+									</FormField>
 
-									<div className="flex flex-col gap-1.5">
-										<label className="text-sm text-brown-400 dark:text-brown-300">Email</label>
+									<FormField label="Email" labelCls="text-sm text-brown-400 dark:text-brown-300">
 										<p className="px-4 py-3 text-sm text-brown-400 dark:text-brown-300">{user.email}</p>
-									</div>
+									</FormField>
 
 									<div>
 										<button
