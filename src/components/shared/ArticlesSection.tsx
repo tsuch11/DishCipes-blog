@@ -152,7 +152,7 @@ const ArticlesSection = () => {
 			) : visible2.length > 0 ? (
 				<div key={activeCategory} className="grid grid-cols-1 gap-y-8 sm:grid-cols-2 sm:gap-x-6 animate-fadeInUp" style={{ animationDuration: '1s' }}>
 					{visible2.map((article) => (
-						<ArticleCard key={article.id} {...article} />
+						<ArticleCard key={article.id} article={article} />
 					))}
 				</div>
 			) : (

@@ -1,7 +1,3 @@
-// ResetPasswordPage — หน้าเปลี่ยนรหัสผ่านสำหรับ member
-// แก้ไขได้: password fields (current, new, confirm), confirm modal text,
-//           success/error toast message, form card style, submit button style
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -9,8 +5,13 @@ import Navbar from '../components/layout/Navbar';
 import ProfileSidebar from '../components/profile/ProfileSidebar';
 import Toast from '../components/ui/Toast';
 import ConfirmModal from '../components/ui/ConfirmModal';
+import FormField from '../components/ui/FormField';
+import inputCls from '../utils/inputCls';
 
-// reset password
+const resetLabelCls = 'text-sm font-medium text-brown-400 dark:text-brown-300';
+const resetInputCls = (hasError = false) =>
+	`w-full px-4 py-3 text-sm text-brown-400 dark:text-brown-100 bg-white dark:bg-dark-elevated border-2 rounded-xl outline-none placeholder:text-brown-300 dark:placeholder:text-brown-400 transition-all duration-150 ${hasError ? 'border-red-400' : 'border-transparent focus:ring-2 focus:ring-brown-300 dark:focus:ring-dark-border'}`;
+
 const ResetPasswordPage = () => {
 	const { user, resetPassword, isAuthenticated } = useAuth();
 	const navigate = useNavigate();
@@ -59,14 +60,10 @@ const ResetPasswordPage = () => {
 		setTimeout(() => setToast((prev) => ({ ...prev, show: false })), 3000);
 	};
 
-	const inputCls = (hasError?: boolean) =>
-		`w-full px-4 py-3 text-sm text-brown-400 dark:text-brown-100 bg-white dark:bg-dark-elevated border-2 rounded-xl outline-none placeholder:text-brown-300 dark:placeholder:text-brown-400 transition-all duration-150 ${hasError ? 'border-red-400' : 'border-transparent focus:ring-2 focus:ring-brown-300 dark:focus:ring-dark-border'}`;
-
 	return (
 		<div className="min-h-screen flex flex-col font-sans dark:bg-dark-bg">
 			<Navbar />
 
-			{/* ── Mobile sidebar nav (top) ── */}
 			<div className="md:hidden border-b border-brown-200 dark:border-dark-border">
 				<div className="max-w-7xl mx-auto px-4">
 					<ProfileSidebar />
@@ -82,8 +79,8 @@ const ResetPasswordPage = () => {
 						Go back
 					</button>
 				</div>
+
 				<div className="max-w-7xl mx-auto px-4 py-6 md:px-10 md:py-12">
-					{/* ── User header ── */}
 					<div className="flex items-center gap-4 mb-6 md:mb-8">
 						<div className="w-16 h-16 rounded-full overflow-hidden bg-brown-300 dark:bg-dark-elevated shrink-0">
 							{user.avatar ? (
@@ -104,50 +101,42 @@ const ResetPasswordPage = () => {
 					</div>
 
 					<div className="flex flex-col gap-8 md:flex-row md:gap-16">
-						{/* ── Desktop sidebar ── */}
 						<aside className="hidden md:block shrink-0 w-52">
 							<ProfileSidebar />
 						</aside>
 
-						{/* ── Reset password form ── */}
 						<div className="flex-1 max-w-xl">
 							<div className="bg-brown-200 dark:bg-dark-surface rounded-2xl p-6 md:p-8">
 								<form onSubmit={handleSubmit} className="flex flex-col gap-5">
-									<div className="flex flex-col gap-1.5">
-										<label className="text-sm font-medium text-brown-400 dark:text-brown-300">Current password</label>
+									<FormField label="Current password" error={errors.current} labelCls={resetLabelCls}>
 										<input
 											type="password"
 											placeholder="Current password"
 											value={current}
 											onChange={(e) => setCurrent(e.target.value)}
-											className={inputCls(!!errors.current)}
+											className={resetInputCls(!!errors.current)}
 										/>
-										{errors.current && <p className="text-xs text-red-500">{errors.current}</p>}
-									</div>
+									</FormField>
 
-									<div className="flex flex-col gap-1.5">
-										<label className="text-sm font-medium text-brown-400 dark:text-brown-300">New password</label>
+									<FormField label="New password" error={errors.newPass} labelCls={resetLabelCls}>
 										<input
 											type="password"
 											placeholder="New password"
 											value={newPass}
 											onChange={(e) => setNewPass(e.target.value)}
-											className={inputCls(!!errors.newPass)}
+											className={resetInputCls(!!errors.newPass)}
 										/>
-										{errors.newPass && <p className="text-xs text-red-500">{errors.newPass}</p>}
-									</div>
+									</FormField>
 
-									<div className="flex flex-col gap-1.5">
-										<label className="text-sm font-medium text-brown-400 dark:text-brown-300">Confirm new password</label>
+									<FormField label="Confirm new password" error={errors.confirm} labelCls={resetLabelCls}>
 										<input
 											type="password"
 											placeholder="Confirm new password"
 											value={confirm}
 											onChange={(e) => setConfirm(e.target.value)}
-											className={inputCls(!!errors.confirm)}
+											className={resetInputCls(!!errors.confirm)}
 										/>
-										{errors.confirm && <p className="text-xs text-red-500">{errors.confirm}</p>}
-									</div>
+									</FormField>
 
 									<div className="mt-1">
 										<button
