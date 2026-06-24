@@ -7,7 +7,6 @@ import Toast from '../components/ui/Toast';
 import ConfirmModal from '../components/ui/ConfirmModal';
 import FormField from '../components/ui/FormField';
 import GoBackButton from '../components/ui/GoBackButton';
-import inputCls from '../utils/inputCls';
 
 const resetLabelCls = 'text-sm font-medium text-brown-400 dark:text-brown-300';
 const resetInputCls = (hasError = false): string =>
