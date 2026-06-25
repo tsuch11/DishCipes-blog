@@ -1,9 +1,25 @@
-// HeroSection — banner หน้าแรก แสดง headline + author profile
-// แก้ไขได้: headline text ("Savor Every Bite..."), subtext, author image, author name,
-//           author bio paragraphs, layout order (mobile vs desktop), section padding
+// ── HeroSection ───────────────────────────────────────────────────────
+// Hero banner with Lottie cooking animation and author bio
+// แก้ไขได้: author name/bio text, Lottie animation file, scroll reveal threshold
 
-import teerapatImg from '../../assets/images/icons/Teerapat.jpg';
+import { Component, type ReactNode } from 'react';
+import _Lottie from 'lottie-react';
+import type { LottieComponentProps } from 'lottie-react';
+import cookingAnimation from '../../assets/animations/cooking.json';
 import useScrollReveal from '../../animations/useScrollReveal';
+
+// Rolldown pre-bundles CJS as { default: Component, ... } — unwrap if needed
+const Lottie = ((_Lottie as unknown as { default: React.FC<LottieComponentProps> }).default ?? _Lottie) as React.FC<LottieComponentProps>;
+
+class LottieErrorBoundary extends Component<{ children: ReactNode }, { error: boolean }> {
+	state = { error: false };
+	static getDerivedStateFromError() { return { error: true }; }
+	componentDidCatch(error: Error) { console.error('[LottieErrorBoundary]', error); }
+	render() {
+		if (this.state.error) return <div className="w-64 h-64 md:w-96 md:h-96 bg-brown-200 dark:bg-dark-elevated rounded-2xl" />;
+		return this.props.children;
+	}
+}
 
 const HeroSection = () => {
 	const { ref: leftRef, visible: leftVisible } = useScrollReveal();
@@ -26,12 +42,14 @@ const HeroSection = () => {
 				</p>
 			</div>
 
-			{/* ── Center: author photo ── */}
+			{/* ── Center: cooking animation ── */}
 			<div
 				ref={centerRef}
-				className={`w-64 shrink-0 rounded-2xl overflow-hidden order-1 md:w-96 md:order-2 transition-all duration-700 delay-100 ${centerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+				className={`w-64 shrink-0 order-1 md:w-96 md:order-2 transition-all duration-700 delay-100 ${centerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
 			>
-				<img src={teerapatImg} alt="Teerapat N." className="w-full h-full object-cover" />
+				<LottieErrorBoundary>
+					<Lottie animationData={cookingAnimation} loop={true} className="bg-transparent scale-150 -translate-y-10" />
+				</LottieErrorBoundary>
 			</div>
 
 			{/* ── Right: author bio ── */}
