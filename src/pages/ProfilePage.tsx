@@ -1,7 +1,6 @@
-// ProfilePage — หน้าแก้ไขโปรไฟล์ผู้ใช้
-// แก้ไขได้: form fields (name, username), avatar upload button style,
-//           card background (bg-brown-200), save button style,
-//           mobile sidebar position (top border), desktop sidebar width (w-52)
+// ── ProfilePage ───────────────────────────────────────────────────────
+// User profile edit page (route: /profile)
+// แก้ไขได้: form fields (name, username), avatar upload style, card background, save button
 
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';

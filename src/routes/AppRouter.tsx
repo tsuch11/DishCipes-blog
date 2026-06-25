@@ -1,3 +1,7 @@
+// ── AppRouter ─────────────────────────────────────────────────────────
+// Client-side routing config with scroll-to-top and page fade transition
+// แก้ไขได้: route paths, protected route logic, page transition animation
+
 import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import LandingPage from '../pages/LandingPage';

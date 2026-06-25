@@ -1,3 +1,7 @@
+// ── SignupPage ────────────────────────────────────────────────────────
+// Member registration form (route: /signup)
+// แก้ไขได้: form validation rules, required fields, success redirect path
+
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';

@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+// ── useScrollReveal ───────────────────────────────────────────────────
+// Trigger fade-in animation when element enters the viewport (IntersectionObserver)
+// แก้ไขได้: threshold (0.0–1.0), animation class applied in consumer component
 
-// useScrollReveal — trigger fade-in when element enters viewport
-// แก้ไขได้: threshold (0.0–1.0), animation class ใน component ที่ใช้งาน
+import { useEffect, useRef, useState } from 'react';
 const useScrollReveal = <T extends HTMLElement = HTMLDivElement>() => {
 	const ref = useRef<T>(null);
 	const [visible, setVisible] = useState(false);

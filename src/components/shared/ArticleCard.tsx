@@ -1,3 +1,7 @@
+// ── ArticleCard ───────────────────────────────────────────────────────
+// Card component for displaying a single article in the article grid
+// แก้ไขได้: image aspect ratio, category badge style, author avatar size, typography
+
 import { Link } from 'react-router-dom';
 import type { Article } from '../../types/article';
 

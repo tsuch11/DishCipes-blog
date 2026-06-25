@@ -1,7 +1,7 @@
-// AdminSidebar — sidebar navigation ของ Admin panel
-// แก้ไขได้: NAV_ITEMS list (ชื่อ, icon, view), logo text, sidebar width (w-60),
-//           active item highlight style, bottom links (hh. website, Log out)
-//           mobile: drawer overlay เปิด/ปิดด้วย mobileOpen prop
+// ── AdminSidebar ──────────────────────────────────────────────────────
+// Sidebar navigation for the Admin panel — desktop fixed + mobile drawer
+// แก้ไขได้: NAV_ITEMS list, logo text, sidebar width (w-60), active highlight style,
+//           mobile drawer overlay, bottom links (website, log out)
 
 import { useNavigate } from 'react-router-dom';
 import notebookIcon from '../../assets/images/icons/notebook_light.svg';

@@ -1,3 +1,7 @@
+// ── useDarkMode ───────────────────────────────────────────────────────
+// Toggle dark mode via View Transition API with localStorage persistence
+// แก้ไขได้: storage key ('theme'), transition clip-path animation
+
 import { useState, useEffect } from 'react';
 
 type VT = { finished: Promise<void> };

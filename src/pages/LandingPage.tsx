@@ -1,6 +1,6 @@
-// LandingPage — หน้าหลักของ food blog
-// แก้ไขได้: scroll threshold ของ back-to-top (300px), back-to-top button position/style,
-//           ลำดับ section (HeroSection → ArticlesSection), page background color
+// ── LandingPage ───────────────────────────────────────────────────────
+// Main landing page of the food blog (route: /)
+// แก้ไขได้: back-to-top threshold (300px), button position/style, section order
 
 import { useState, useEffect } from 'react';
 import Navbar from '../components/layout/Navbar';

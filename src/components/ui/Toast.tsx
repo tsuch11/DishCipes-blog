@@ -1,6 +1,6 @@
-// Toast — notification popup ล่างขวา ใช้ทั้ง success และ error
-// แก้ไขได้: position (bottom-6 right-6), background color ตาม variant,
-//           title/message text style, close button, animation
+// ── Toast ─────────────────────────────────────────────────────────────
+// Notification popup (bottom-right) for success and error feedback
+// แก้ไขได้: position (bottom-6 right-6), variant colors, animation
 
 type ToastProps = {
 	title: string;

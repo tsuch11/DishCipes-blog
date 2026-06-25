@@ -1,3 +1,7 @@
+// ── FormField ─────────────────────────────────────────────────────────
+// Label + error message wrapper for form inputs
+// แก้ไขได้: label style, error text style, gap between label and input
+
 type FormFieldProps = {
 	label: string;
 	error?: string;

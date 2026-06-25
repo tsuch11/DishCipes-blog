@@ -1,3 +1,6 @@
+// ── ArticleCardSkeleton ───────────────────────────────────────────────
+// Skeleton placeholder shown while ArticleCard data loads
+
 const ArticleCardSkeleton = () => (
 	<div className="flex flex-col rounded-2xl p-3 -mx-3 animate-pulse">
 		<div className="w-full aspect-video bg-brown-200 dark:bg-dark-elevated rounded-xl mb-3" />

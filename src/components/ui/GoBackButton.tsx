@@ -1,3 +1,6 @@
+// ── GoBackButton ──────────────────────────────────────────────────────
+// Back navigation button using browser history
+
 import { useNavigate } from 'react-router-dom';
 
 const GoBackButton = () => {
