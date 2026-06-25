@@ -1,6 +1,10 @@
+/* ── Config ──────────────────────────────────────────────────── */
+
 @import "tailwindcss";
 
 @custom-variant dark (&:is(.dark *));
+
+/* ── Theme Tokens ────────────────────────────────────────────── */
 
 @theme {
 	--font-sans: "Poppins", sans-serif;
@@ -21,6 +25,8 @@
 	--color-dark-elevated: #3c3835;
 	--color-dark-border: #44403c;
 }
+
+/* ── Base ────────────────────────────────────────────────────── */
 
 @layer base {
 	html {
@@ -45,10 +51,9 @@
 	}
 }
 
-/* ── Dark mode view transition ─────────────────────────────────────────
- * วงกลมขยายจากกลางจอ — ทำงานกับ View Transition API (Chrome 111+)
- * browser เก่าใช้ toggle ปกติโดยไม่มี animation
- * ──────────────────────────────────────────────────────────────────── */
+/* ── Dark Mode Transition ────────────────────────────────────── */
+/* วงกลมขยายจากกลางจอ — View Transition API (Chrome 111+)        */
+/* browser เก่าใช้ toggle ปกติโดยไม่มี animation                  */
 
 @keyframes dark-reveal {
 	from { clip-path: circle(0% at 50% 50%); }
@@ -84,9 +89,7 @@
 	z-index: 1;
 }
 
-/* ── Animations ────────────────────────────────────────────────────────
- * แก้ไขได้: ระยะเวลา, ระยะทาง translateY, timing function ของแต่ละ keyframe
- * ──────────────────────────────────────────────────────────────────── */
+/* ── Animations ──────────────────────────────────────────────── */
 
 @keyframes slideDown {
 	from {
@@ -130,6 +133,8 @@
 		transform: translateY(0);
 	}
 }
+
+/* ── Utilities ───────────────────────────────────────────────── */
 
 @layer utilities {
 	.animate-slideDown {
