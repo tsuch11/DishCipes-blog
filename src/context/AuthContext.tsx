@@ -1,3 +1,7 @@
+// ── AuthContext ───────────────────────────────────────────────────────
+// Auth state provider — user session, login, logout, register, updateProfile
+// แก้ไขได้: mock users in MOCK_USERS, role types (guest / member / admin)
+
 import { createContext, useContext, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { User } from '../types/user';

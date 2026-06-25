@@ -1,7 +1,6 @@
-// AdminPage — หน้า admin panel (route: /admin) — ไม่มี Navbar, ใช้ AdminSidebar แทน
-// แก้ไขได้: views (articles list/create/edit, categories, profile, notifications, reset-password),
-//           article form fields, category management, notifications list,
-//           toast messages, delete confirm modal
+// ── AdminPage ─────────────────────────────────────────────────────────
+// Admin panel (route: /admin) — no Navbar, uses AdminSidebar instead
+// แก้ไขได้: views (articles, categories, notifications, profile, reset-password), toast messages
 
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';

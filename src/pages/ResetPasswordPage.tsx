@@ -1,3 +1,7 @@
+// ── ResetPasswordPage ─────────────────────────────────────────────────
+// Password reset form for authenticated members (route: /profile/reset-password)
+// แก้ไขได้: password validation rules, confirm modal text, toast duration (3000ms)
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';

@@ -1,3 +1,7 @@
+// ── AuthPageLayout ────────────────────────────────────────────────────
+// Shared layout wrapper for auth pages (login, signup, reset password)
+// แก้ไขได้: background gradient, card max-width, Navbar inclusion
+
 import Navbar from '../layout/Navbar';
 
 type AuthPageLayoutProps = {

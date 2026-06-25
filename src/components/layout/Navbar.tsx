@@ -1,6 +1,8 @@
-// Navbar — navigation bar ทุกหน้า (ยกเว้น AdminPage)
-// แก้ไขได้: logo text ("hh."), SCROLL_RANGE (px ที่ใช้ morph เต็ม), TARGET_PILL_W (ความกว้าง pill),
-//           hamburger menu items, desktop dropdown links, notification list, backdrop-blur intensity
+// ── Navbar ────────────────────────────────────────────────────────────
+// navigation bar ทุกหน้า (ยกเว้น AdminPage)
+// แก้ไขได้: logo text, SCROLL_RANGE, TARGET_PILL_W, hamburger items, dropdown links
+
+// ── Imports ───────────────────────────────────────────────────────────
 
 import { useState, useRef, useEffect } from 'react';
 import type { CSSProperties } from 'react';
@@ -10,10 +12,17 @@ import { MOCK_NOTIFICATIONS } from '../../data/notifications';
 import bellIcon from '../../assets/images/icons/Bell_light.svg';
 import useDarkMode from '../../hooks/useDarkMode';
 
+// ── Constants ─────────────────────────────────────────────────────────
+
 const SCROLL_RANGE = 300;
 const TARGET_PILL_W = 820;
 
+// ── Component ─────────────────────────────────────────────────────────
+
 const Navbar = () => {
+
+	// ── State & Refs ────────────────────────────────────────────────────
+
 	const { user, logout } = useAuth();
 	const navigate = useNavigate();
 	const { isDark, toggle: toggleDark } = useDarkMode();
@@ -29,10 +38,14 @@ const Navbar = () => {
 	const displayP = useRef(0);
 	const rafId = useRef(0);
 
+	// ── Data ─────────────────────────────────────────────────────────────
+
 	const notifications = user
 		? MOCK_NOTIFICATIONS.filter((n) => n.forRoles.includes(user.role as 'member' | 'admin'))
 		: [];
 	const unreadCount = notifications.filter((n) => !n.read).length;
+
+	// ── Effects ──────────────────────────────────────────────────────────
 
 	useEffect(() => {
 		const handler = (e: MouseEvent) => {
@@ -75,6 +88,8 @@ const Navbar = () => {
 		return () => window.removeEventListener('resize', onResize);
 	}, []);
 
+	// ── Handlers ─────────────────────────────────────────────────────────
+
 	const handleLogout = () => {
 		setMenuOpen(false);
 		setHamburgerOpen(false);
@@ -82,7 +97,7 @@ const Navbar = () => {
 		navigate('/');
 	};
 
-	// ── Interpolated styles — ค่า RGB เปลี่ยนตาม dark mode ───────────
+	// ── Styles ────────────────────────────────────────────────────────────
 	const B100 = isDark ? '28,25,23' : '249,248,246';
 	const B300 = isDark ? '68,64,60' : '218,214,209';
 

@@ -1,6 +1,6 @@
-// ProfileSidebar — sidebar navigation สำหรับหน้า Profile และ Reset password
-// แก้ไขได้: nav items (เพิ่ม/ลด link), icons, active highlight style,
-//           mobile layout (flex-row), desktop layout (flex-col), gap ระหว่าง items
+// ── ProfileSidebar ────────────────────────────────────────────────────
+// Sidebar navigation for Profile and Reset password pages
+// แก้ไขได้: nav items, icons, active highlight style, mobile/desktop layout
 
 import { NavLink } from 'react-router-dom';
 import userIcon from '../../assets/images/icons/User_duotone.svg';

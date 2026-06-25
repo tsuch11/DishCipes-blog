@@ -1,6 +1,6 @@
-// ConfirmModal — modal ยืนยันก่อน action สำคัญ (delete, reset password)
-// แก้ไขได้: backdrop opacity (bg-black/40), card max-width (max-w-sm),
-//           button styles (cancel/confirm), close button icon
+// ── ConfirmModal ──────────────────────────────────────────────────────
+// Confirmation modal before destructive actions (delete, reset password)
+// แก้ไขได้: backdrop opacity (bg-black/40), card max-width (max-w-sm), button styles
 
 import closeIcon from '../../assets/images/icons/Close_round_light.svg';
 

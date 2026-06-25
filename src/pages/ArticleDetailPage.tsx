@@ -1,3 +1,7 @@
+// ── ArticleDetailPage ─────────────────────────────────────────────────
+// Full article view with reading time, related articles, and comment section
+// แก้ไขได้: reading time calculation, related articles count, back-to-top threshold (300px)
+
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { articles } from '../data/articles';

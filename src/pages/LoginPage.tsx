@@ -1,3 +1,7 @@
+// ── LoginPage ─────────────────────────────────────────────────────────
+// Member login form with redirect support (route: /login)
+// แก้ไขได้: form validation rules, redirect path after login, "Forgot password" link
+
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';

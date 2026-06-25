@@ -1,6 +1,6 @@
-// AdminLoginPage — หน้า login สำหรับ admin เท่านั้น (route: /admin/login)
-// แก้ไขได้: card style (bg-stone-100, rounded-2xl), "Admin panel" label,
-//           input border color, submit button style, error toast
+// ── AdminLoginPage ────────────────────────────────────────────────────
+// Admin-only login page (route: /admin/login)
+// แก้ไขได้: card style, "Admin panel" label, input border color, submit button, error toast
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';

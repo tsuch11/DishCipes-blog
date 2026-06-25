@@ -1,7 +1,6 @@
-// ArticlesSection — grid บทความพร้อม filter และ search
-// แก้ไขได้: CATEGORIES list, INITIAL_COUNT (จำนวนบทความเริ่มต้น),
-//           desktop tab bar style, mobile dropdown style, search input style,
-//           "View more" button style, grid columns (sm:grid-cols-2)
+// ── ArticlesSection ───────────────────────────────────────────────────
+// Article grid with category filter and search
+// แก้ไขได้: CATEGORIES, INITIAL_COUNT, tab bar, dropdown, search input, grid columns
 
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { articles } from '../../data/articles';
