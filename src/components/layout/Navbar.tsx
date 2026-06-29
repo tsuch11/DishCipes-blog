@@ -143,7 +143,7 @@ const Navbar = () => {
 					className="flex items-center justify-between max-w-7xl mx-auto px-4 md:px-10"
 					style={navStyle}
 				>
-					<Link to="/" className="font-medium text-brown-600 dark:text-brown-100" style={{ fontSize: 'clamp(1.75rem, 2vw, 1.5rem)' }}>DishCipes<span className="text-brand-green">.</span></Link>
+					<Link to="/" className="font-semibold text-brown-600 dark:text-brown-100" style={{ fontSize: 'clamp(2rem, 2vw, 1.5rem)' }}>DishCipes<span className="text-brand-green">.</span></Link>
 
 					{/* ── Desktop nav ── */}
 					<div className="hidden md:flex items-center gap-1">
