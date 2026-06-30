@@ -51,13 +51,14 @@ const ArticleDetailPage = () => {
 	const fetchComments = useCallback(async () => {
 		const { data } = await supabase
 			.from('comments')
-			.select('id, text, created_at, profiles!user_id(display_name, avatar_url), replies(id, text, created_at, profiles!user_id(display_name, avatar_url)), comment_likes(user_id)')
+			.select('id, text, created_at, profiles!user_id(display_name, avatar_url, username), replies(id, text, created_at, profiles!user_id(display_name, avatar_url, username)), comment_likes(user_id)')
 			.eq('article_id', articleId)
 			.order('created_at', { ascending: true });
 		if (!data) return;
 		setComments(data.map((c: any) => ({
 			id: c.id,
 			name: c.profiles?.display_name ?? 'Unknown',
+			username: c.profiles?.username ?? '',
 			date: fmtDate(c.created_at),
 			avatar: c.profiles?.avatar_url ?? '',
 			text: c.text,
@@ -66,6 +67,7 @@ const ArticleDetailPage = () => {
 			replies: [...(c.replies ?? [])].sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()).map((r: any) => ({
 				id: r.id,
 				name: r.profiles?.display_name ?? 'Unknown',
+				username: r.profiles?.username ?? '',
 				date: fmtDate(r.created_at),
 				avatar: r.profiles?.avatar_url ?? '',
 				text: r.text,
@@ -130,6 +132,7 @@ const ArticleDetailPage = () => {
 			const newReply: Reply = {
 				id: data.id,
 				name: (data.profiles as any)?.display_name ?? user.name,
+				username: (data.profiles as any)?.username ?? user.username,
 				date: fmtDate(data.created_at),
 				avatar: (data.profiles as any)?.avatar_url ?? '',
 				text: data.text,
@@ -152,6 +155,7 @@ const ArticleDetailPage = () => {
 			const newComment: Comment = {
 				id: data.id,
 				name: (data.profiles as any)?.display_name ?? user.name,
+				username: (data.profiles as any)?.username ?? user.username,
 				date: fmtDate(data.created_at),
 				avatar: (data.profiles as any)?.avatar_url ?? '',
 				text: data.text,
@@ -252,14 +256,14 @@ const ArticleDetailPage = () => {
 							{/* ── Mobile author card ── */}
 							<div className="mb-8 bg-brown-200 dark:bg-dark-surface rounded-2xl p-5 md:hidden">
 								<p className="text-xs text-brown-400 dark:text-brown-300 mb-4">Author</p>
-								<div className="flex items-center gap-3 pb-4 mb-4 border-b border-brown-300 dark:border-dark-border">
+								<Link to={`/user/${article.authorUsername}`} className="flex items-center gap-3 pb-4 mb-4 border-b border-brown-300 dark:border-dark-border group">
 									<div className="w-10 h-10 rounded-full bg-brown-300 dark:bg-dark-elevated overflow-hidden shrink-0">
 										{article.authorAvatar ? (
 											<img src={article.authorAvatar} alt={article.authorName} className="w-full h-full object-cover" />
 										) : null}
 									</div>
-									<p className="text-sm font-bold text-brown-500 dark:text-brown-200">{article.authorName}</p>
-								</div>
+									<p className="text-sm font-bold text-brown-500 dark:text-brown-200 group-hover:underline">{article.authorName}</p>
+								</Link>
 								<p className="text-base font-medium text-brown-400 dark:text-brown-300 leading-relaxed mb-3">
 									I am a food enthusiast and freelance writer who specializes in recipe development and home cooking. With a deep love for Thai cuisine, I enjoy sharing recipes, cooking tips, and stories behind every dish.
 								</p>
@@ -343,14 +347,14 @@ const ArticleDetailPage = () => {
 						<aside className="hidden md:block">
 							<div className="sticky top-32 bg-brown-200 dark:bg-dark-surface rounded-2xl p-5">
 								<p className="text-xs text-brown-400 dark:text-brown-300 mb-4">Author</p>
-								<div className="flex items-center gap-3 pb-4 mb-4 border-b border-brown-300 dark:border-dark-border">
+								<Link to={`/user/${article.authorUsername}`} className="flex items-center gap-3 pb-4 mb-4 border-b border-brown-300 dark:border-dark-border group">
 									<div className="w-10 h-10 rounded-full bg-brown-300 dark:bg-dark-elevated overflow-hidden shrink-0">
 										{article.authorAvatar ? (
 											<img src={article.authorAvatar} alt={article.authorName} className="w-full h-full object-cover" />
 										) : null}
 									</div>
-									<p className="text-sm font-bold text-brown-500 dark:text-brown-200">{article.authorName}</p>
-								</div>
+									<p className="text-sm font-bold text-brown-500 dark:text-brown-200 group-hover:underline">{article.authorName}</p>
+								</Link>
 								<p className="text-xs text-brown-400 dark:text-brown-300 leading-relaxed mb-3">
 									I am a food enthusiast and freelance writer who specializes in recipe development and home cooking. With a deep love for Thai cuisine, I enjoy sharing recipes, cooking tips, and stories behind every dish.
 								</p>
