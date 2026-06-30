@@ -1,10 +1,11 @@
 // ── AuthContext ───────────────────────────────────────────────────────
-// Auth state provider — user session, login, logout, register, updateProfile
-// แก้ไขได้: mock users in MOCK_USERS, role types (guest / member / admin)
+// Auth state provider — Supabase Auth + profiles table
+// แก้ไขได้: role types (guest / member / admin), updateProfile fields
 
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { User } from '../types/user';
+import { supabase } from '../lib/supabase';
 
 type AuthContextType = {
 	user: User | null;
@@ -18,61 +19,96 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-const MOCK_USERS: (User & { password: string })[] = [
-	{ id: '1', name: 'Teerapat N.', username: 'teerapat', email: 'admin@dishcipes.com', password: 'admin1234', role: 'admin' },
-	{ id: '2', name: 'Member User', username: 'member', email: 'member@dishcipes.com', password: 'member1234', role: 'member' },
-];
-
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	const [user, setUser] = useState<User | null>(null);
-	const [currentPassword, setCurrentPassword] = useState('');
-	const [registeredUsers, setRegisteredUsers] = useState<(User & { password: string })[]>([]);
 
-	const login = async (email: string, password: string) => {
-		const allUsers = [...MOCK_USERS, ...registeredUsers];
-		const found = allUsers.find((u) => u.email === email && u.password === password);
-		if (found) {
-			const { password: pw, ...userData } = found;
-			setUser(userData);
-			setCurrentPassword(pw);
-			return { success: true, message: '', role: userData.role };
+	// ── Hooks ─────────────────────────────────────────────────────────
+	useEffect(() => {
+		supabase.auth.getSession().then(({ data: { session } }) => {
+			if (session?.user) fetchProfile(session.user.id);
+		});
+
+		const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+			if (session?.user) fetchProfile(session.user.id);
+			else setUser(null);
+		});
+
+		return () => subscription.unsubscribe();
+	}, []);
+
+	// ── Helpers ───────────────────────────────────────────────────────
+	const fetchProfile = async (id: string) => {
+		const { data } = await supabase.from('profiles').select('*').eq('id', id).single();
+		if (data) {
+			setUser({
+				id: data.id,
+				name: data.display_name ?? '',
+				username: data.username ?? '',
+				email: data.email ?? '',
+				role: data.role ?? 'member',
+				avatar: data.avatar_url && !data.avatar_url.startsWith('blob:') ? data.avatar_url : undefined,
+				bio: data.bio ?? undefined,
+			});
 		}
-		return { success: false, message: 'Your email or password is incorrect.' };
+	};
+
+	// ── Handlers ──────────────────────────────────────────────────────
+	const login = async (emailOrUsername: string, password: string) => {
+		let email = emailOrUsername;
+
+		if (!emailOrUsername.includes('@')) {
+			const { data: profile } = await supabase
+				.from('profiles')
+				.select('email')
+				.eq('username', emailOrUsername)
+				.single();
+			if (!profile?.email) return { success: false, message: 'Your password is incorrect or this email doesn\'t exist' };
+			email = profile.email;
+		}
+
+		const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+		if (error) return { success: false, message: 'Your password is incorrect or this email doesn\'t exist' };
+		const role = data.user ? (await supabase.from('profiles').select('role').eq('id', data.user.id).single()).data?.role : 'member';
+		return { success: true, message: '', role: role ?? 'member' };
 	};
 
 	const register = async (data: { name: string; username: string; email: string; password: string }) => {
-		const allUsers = [...MOCK_USERS, ...registeredUsers];
-		const exists = allUsers.find((u) => u.email === data.email);
-		if (exists) return { success: false, message: 'Email is already taken.' };
-		const newUser: User & { password: string } = {
-			id: String(Date.now()),
-			name: data.name,
-			username: data.username,
-			email: data.email,
-			password: data.password,
-			role: 'member',
-		};
-		setRegisteredUsers((prev) => [...prev, newUser]);
+		const { data: authData, error } = await supabase.auth.signUp({ email: data.email, password: data.password });
+		if (error) return { success: false, message: error.message };
+		if (authData.user) {
+			await supabase.from('profiles').insert({
+				id: authData.user.id,
+				email: data.email,
+				display_name: data.name,
+				username: data.username,
+				role: 'member',
+			});
+		}
 		return { success: true, message: '' };
 	};
 
 	const updateProfile = async (data: { name: string; username: string; avatar?: string; bio?: string }) => {
 		if (!user) return { success: false };
+		const { error } = await supabase.from('profiles').update({
+			display_name: data.name,
+			username: data.username,
+			avatar_url: data.avatar,
+			bio: data.bio,
+		}).eq('id', user.id);
+		if (error) return { success: false };
 		setUser((prev) => prev ? { ...prev, ...data } : prev);
 		return { success: true };
 	};
 
-	const resetPassword = async (current: string, newPassword: string) => {
-		if (current !== currentPassword) {
-			return { success: false, message: 'Current password is incorrect.' };
-		}
-		setCurrentPassword(newPassword);
+	const resetPassword = async (_current: string, newPassword: string) => {
+		const { error } = await supabase.auth.updateUser({ password: newPassword });
+		if (error) return { success: false, message: error.message };
 		return { success: true, message: '' };
 	};
 
-	const logout = () => {
+	const logout = async () => {
+		await supabase.auth.signOut();
 		setUser(null);
-		setCurrentPassword('');
 	};
 
 	return (
