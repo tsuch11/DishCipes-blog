@@ -35,7 +35,8 @@ const ProfilePage = () => {
 
 	const handleSave = async (e: React.FormEvent) => {
 		e.preventDefault();
-		await updateProfile({ name, username, avatar });
+		const avatarToSave = avatar.startsWith('blob:') ? (user.avatar ?? '') : avatar;
+		await updateProfile({ name, username, avatar: avatarToSave });
 		setShowToast(true);
 		setTimeout(() => setShowToast(false), 3000);
 	};
