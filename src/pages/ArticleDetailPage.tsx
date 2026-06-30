@@ -125,6 +125,9 @@ const ArticleDetailPage = () => {
 			date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) + ' at ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
 			avatar: '',
 			text: commentText.trim(),
+			likes: 0,
+			likedByMe: false,
+			replies: [],
 		};
 		setComments((prev) => [...prev, newComment]);
 		setCommentText('');
