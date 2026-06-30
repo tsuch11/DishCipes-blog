@@ -6,11 +6,11 @@ import { Link } from 'react-router-dom';
 import type { Article } from '../../types/article';
 
 type ArticleCardProps = {
-	article: Pick<Article, 'id' | 'image' | 'category' | 'title' | 'description' | 'authorName' | 'authorAvatar' | 'date'>;
+	article: Pick<Article, 'id' | 'image' | 'category' | 'title' | 'description' | 'authorName' | 'date'>;
 };
 
 const ArticleCard = ({ article }: ArticleCardProps) => {
-	const { id, image, category, title, description, authorName, authorAvatar, date } = article;
+	const { id, image, category, title, description, authorName, date } = article;
 
 	return (
 		<Link
@@ -38,11 +38,7 @@ const ArticleCard = ({ article }: ArticleCardProps) => {
 			</p>
 
 			<div className="flex items-center gap-2">
-				<div className="w-6 h-6 rounded-full bg-brown-300 dark:bg-dark-elevated overflow-hidden shrink-0">
-					{authorAvatar ? (
-						<img src={authorAvatar} alt={authorName} className="w-full h-full object-cover" />
-					) : null}
-				</div>
+				<div className="w-6 h-6 rounded-full bg-brown-300 dark:bg-dark-elevated overflow-hidden shrink-0" />
 				<span className="text-sm font-medium text-brown-500 dark:text-brown-200">{authorName}</span>
 				<span className="text-sm text-brown-300 dark:text-dark-border">|</span>
 				<span className="text-sm text-brown-400 dark:text-brown-300">{date}</span>
