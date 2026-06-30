@@ -2,6 +2,7 @@
 // Single comment with like button, reply toggle, and replies list
 // แก้ไขได้: avatar size, like icon, reply indent style
 
+import { Link } from 'react-router-dom';
 import type { Comment } from '../../types/comment';
 
 type Props = {
@@ -20,13 +21,13 @@ const CommentItem = ({ comment: c, openReplyId, replyText, onLike, onReplyToggle
 	return (
 		<div className="py-7">
 			<div className="flex items-center gap-3 mb-3">
-				<div className="w-9 h-9 rounded-full bg-brown-300 dark:bg-dark-elevated overflow-hidden shrink-0">
+				<Link to={`/user/${c.username}`} className="w-9 h-9 rounded-full bg-brown-300 dark:bg-dark-elevated overflow-hidden shrink-0">
 					{c.avatar ? (
 						<img src={c.avatar} alt={c.name} className="w-full h-full object-cover" />
 					) : null}
-				</div>
+				</Link>
 				<div>
-					<p className="text-lg font-semibold text-brown-600 dark:text-brown-100">{c.name}</p>
+					<Link to={`/user/${c.username}`} className="text-lg font-semibold text-brown-600 dark:text-brown-100 hover:underline">{c.name}</Link>
 					<p className="text-xs text-brown-300 dark:text-brown-400">{c.date}</p>
 				</div>
 			</div>
@@ -73,11 +74,11 @@ const CommentItem = ({ comment: c, openReplyId, replyText, onLike, onReplyToggle
 				<div className="mt-4 pl-4 border-l-2 border-brown-200 dark:border-dark-border flex flex-col gap-4">
 					{c.replies.map((r) => (
 						<div key={r.id} className="flex items-start gap-3">
-							<div className="w-7 h-7 rounded-full bg-brown-300 dark:bg-dark-elevated overflow-hidden shrink-0">
+							<Link to={`/user/${r.username}`} className="w-7 h-7 rounded-full bg-brown-300 dark:bg-dark-elevated overflow-hidden shrink-0">
 								{r.avatar ? <img src={r.avatar} alt={r.name} className="w-full h-full object-cover" /> : null}
-							</div>
+							</Link>
 							<div>
-								<p className="text-sm font-semibold text-brown-600 dark:text-brown-100">{r.name}</p>
+								<Link to={`/user/${r.username}`} className="text-sm font-semibold text-brown-600 dark:text-brown-100 hover:underline">{r.name}</Link>
 								<p className="text-xs text-brown-300 dark:text-brown-400 mb-1">{r.date}</p>
 								<p className="text-sm text-brown-500 dark:text-brown-200 leading-relaxed">{r.text}</p>
 							</div>
