@@ -12,6 +12,7 @@ import ProfilePage from '../pages/ProfilePage';
 import ResetPasswordPage from '../pages/ResetPasswordPage';
 import AdminPage from '../pages/AdminPage';
 import AdminLoginPage from '../pages/AdminLoginPage';
+import UserProfilePage from '../pages/UserProfilePage';
 
 // pageFade ใช้แค่ opacity (ไม่มี transform) → ไม่สร้าง containing block ให้ fixed element
 // overlay อยู่ใน keyed div เพื่อให้ z-index (z-40) เทียบกับ navbar (z-50) ในตัวเดียวกัน
@@ -40,6 +41,7 @@ const RoutesWithTransition = () => {
 				<Route path="/profile/reset-password" element={<ResetPasswordPage />} />
 				<Route path="/admin/login" element={<AdminLoginPage />} />
 				<Route path="/admin" element={<AdminPage />} />
+				<Route path="/user/:username" element={<UserProfilePage />} />
 			</Routes>
 		</div>
 	);

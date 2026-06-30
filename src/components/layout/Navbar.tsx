@@ -8,9 +8,34 @@ import { useState, useRef, useEffect } from 'react';
 import type { CSSProperties } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { MOCK_NOTIFICATIONS } from '../../data/notifications';
+import { useNotifications } from '../../hooks/useNotifications';
+import type { Notification } from '../../types/notification';
 import bellIcon from '../../assets/images/icons/Bell_light.svg';
 import useDarkMode from '../../hooks/useDarkMode';
+
+const timeAgo = (iso: string) => {
+	const diff = Date.now() - new Date(iso).getTime();
+	const min = Math.floor(diff / 60000);
+	if (min < 60) return `${min}m ago`;
+	const hr = Math.floor(min / 60);
+	if (hr < 24) return `${hr}h ago`;
+	return `${Math.floor(hr / 24)}d ago`;
+};
+
+const notifMsg = (n: Notification) => {
+	const title = n.articleTitle ? `"${n.articleTitle}"` : '';
+	switch (n.type) {
+		case 'comment': return `commented on your article ${title}`;
+		case 'article_like': return `liked your article ${title}`;
+		case 'comment_like': return `liked your comment on ${title}`;
+		case 'follow': return 'started following you';
+		case 'new_article': return `posted a new article ${title}`;
+		default: return '';
+	}
+};
+
+const notifLink = (n: Notification) =>
+	n.type === 'follow' ? `/user/${n.actorUsername}` : `/article/${n.articleId}`;
 
 // ── Constants ─────────────────────────────────────────────────────────
 
@@ -40,10 +65,7 @@ const Navbar = () => {
 
 	// ── Data ─────────────────────────────────────────────────────────────
 
-	const notifications = user
-		? MOCK_NOTIFICATIONS.filter((n) => n.forRoles.includes(user.role as 'member' | 'admin'))
-		: [];
-	const unreadCount = notifications.filter((n) => !n.read).length;
+	const { notifications, unreadCount, markAllRead } = useNotifications();
 
 	// ── Effects ──────────────────────────────────────────────────────────
 
@@ -169,7 +191,7 @@ const Navbar = () => {
 								{/* Bell / notifications */}
 								<div className="relative" ref={bellRef}>
 									<button
-										onClick={() => { setBellOpen((prev) => !prev); setMenuOpen(false); }}
+										onClick={() => { setBellOpen((prev) => { if (!prev) markAllRead(); return !prev; }); setMenuOpen(false); }}
 										className="relative flex items-center justify-center w-9 h-9 rounded-full hover:bg-brown-200 dark:hover:bg-dark-elevated active:scale-90 transition-all duration-150"
 									>
 										<img src={bellIcon} alt="Notifications" className="w-5 h-5" />
@@ -186,25 +208,35 @@ const Navbar = () => {
 											{notifications.length === 0 ? (
 												<p className="px-4 py-6 text-sm text-brown-300 dark:text-brown-400 text-center">No notifications</p>
 											) : (
-												<ul>
+												<ul className="max-h-96 overflow-y-auto">
 													{notifications.map((n) => (
-														<li
-															key={n.id}
-															className={`flex items-start gap-3 px-4 py-3 hover:bg-brown-50 dark:hover:bg-dark-elevated transition-colors duration-150 ${!n.read ? 'bg-brown-50/60 dark:bg-dark-elevated/50' : ''}`}
-														>
-															<div className="w-10 h-10 rounded-full overflow-hidden bg-brown-200 dark:bg-dark-elevated shrink-0 mt-0.5">
-																<img src={n.actorAvatar} alt={n.actorName} className="w-full h-full object-cover" />
-															</div>
-															<div className="flex-1 min-w-0">
-																<p className="text-sm text-brown-600 dark:text-brown-100 leading-snug">
-																	<span className="font-semibold">{n.actorName}</span>{' '}
-																	{n.action}
-																</p>
-																<p className="text-xs text-brown-400 dark:text-brown-300 mt-1">{n.time}</p>
-															</div>
-															{!n.read && (
-																<span className="w-2 h-2 bg-red-400 rounded-full shrink-0 mt-1.5" />
-															)}
+														<li key={n.id}>
+															<button
+																onClick={() => { setBellOpen(false); navigate(notifLink(n)); }}
+																className={`w-full flex items-start gap-3 px-4 py-3 text-left hover:bg-brown-50 dark:hover:bg-dark-elevated transition-colors duration-150 ${!n.isRead ? 'bg-brown-50/60 dark:bg-dark-elevated/50' : ''}`}
+															>
+																<div className="w-10 h-10 rounded-full overflow-hidden bg-brown-200 dark:bg-dark-elevated shrink-0 mt-0.5">
+																	{n.actorAvatar ? (
+																		<img src={n.actorAvatar} alt={n.actorName} className="w-full h-full object-cover" />
+																	) : (
+																		<div className="w-full h-full flex items-center justify-center">
+																			<svg className="w-5 h-5 text-brown-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+																				<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+																			</svg>
+																		</div>
+																	)}
+																</div>
+																<div className="flex-1 min-w-0">
+																	<p className="text-sm text-brown-600 dark:text-brown-100 leading-snug">
+																		<span className="font-semibold">{n.actorName}</span>{' '}
+																		{notifMsg(n)}
+																	</p>
+																	<p className="text-xs text-brown-400 dark:text-brown-300 mt-1">{timeAgo(n.createdAt)}</p>
+																</div>
+																{!n.isRead && (
+																	<span className="w-2 h-2 bg-red-400 rounded-full shrink-0 mt-1.5" />
+																)}
+															</button>
 														</li>
 													))}
 												</ul>

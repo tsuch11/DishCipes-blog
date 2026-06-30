@@ -1,9 +1,16 @@
+// ── Notification Types ─────────────────────────────────────────────────
+
+export type NotificationType = 'comment' | 'article_like' | 'comment_like' | 'follow' | 'new_article';
+
 export type Notification = {
-	id: string;
+	id: number;
+	type: NotificationType;
 	actorName: string;
 	actorAvatar: string;
-	action: string;
-	time: string;
-	read: boolean;
-	forRoles: ('member' | 'admin')[];
+	actorUsername: string;
+	articleId: number | null;
+	articleTitle: string | null;
+	commentId: number | null;
+	isRead: boolean;
+	createdAt: string;
 };

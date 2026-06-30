@@ -3,6 +3,7 @@
 export type Reply = {
 	id: number;
 	name: string;
+	username: string;
 	date: string;
 	avatar: string;
 	text: string;
@@ -11,6 +12,7 @@ export type Reply = {
 export type Comment = {
 	id: number;
 	name: string;
+	username: string;
 	date: string;
 	avatar: string;
 	text: string;

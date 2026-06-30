@@ -4,7 +4,9 @@ export type Article = {
 	category: string;
 	title: string;
 	description: string;
+	authorId?: string;
 	authorName: string;
+	authorUsername?: string;
 	authorAvatar: string;
 	date: string;
 	readTime?: number;

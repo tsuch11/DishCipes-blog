@@ -12,14 +12,16 @@ const formatDate = (iso: string) =>
 const validUrl = (url: string | null | undefined) =>
 	url && !url.startsWith('blob:') ? url : null;
 
-const mapRow = (a: any): Article => ({
+export const mapArticleRow = (a: any): Article => ({
 	id: a.id,
 	title: a.title,
 	description: a.description,
 	content: a.content ?? [],
 	category: a.category,
 	image: a.image ?? '',
+	authorId: a.author_id ?? '',
 	authorName: a.profiles?.display_name ?? 'Unknown',
+	authorUsername: a.profiles?.username ?? '',
 	authorAvatar: validUrl(a.profiles?.avatar_url) ?? '/images/icons/Teerapat.jpg',
 	date: formatDate(a.created_at),
 	readTime: a.read_time ?? 5,
@@ -32,10 +34,10 @@ export const useArticles = () => {
 	useEffect(() => {
 		supabase
 			.from('articles')
-			.select('*, profiles!author_id(display_name, avatar_url)')
+			.select('*, profiles!author_id(display_name, avatar_url, username)')
 			.order('created_at', { ascending: true })
 			.then(({ data }) => {
-				if (data) setArticles(data.map(mapRow));
+				if (data) setArticles(data.map(mapArticleRow));
 				setLoading(false);
 			});
 	}, []);
@@ -51,11 +53,11 @@ export const useArticle = (id: number) => {
 		if (!id) return;
 		supabase
 			.from('articles')
-			.select('*, profiles!author_id(display_name, avatar_url)')
+			.select('*, profiles!author_id(display_name, avatar_url, username)')
 			.eq('id', id)
 			.single()
 			.then(({ data }) => {
-				if (data) setArticle(mapRow(data));
+				if (data) setArticle(mapArticleRow(data));
 				setLoading(false);
 			});
 	}, [id]);
