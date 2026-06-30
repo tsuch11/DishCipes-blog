@@ -117,11 +117,11 @@ const UserProfilePage = () => {
 						</div>
 
 						{/* ── Follow / Edit button ── */}
-						<div className="shrink-0">
+						<div className="sm:shrink-0 w-full sm:w-auto">
 							{isOwnProfile ? (
 								<Link
 									to="/profile"
-									className="px-6 py-2.5 text-sm font-medium text-brown-600 dark:text-brown-100 border border-brown-400 dark:border-dark-border rounded-full hover:bg-brown-100 dark:hover:bg-dark-elevated active:scale-95 transition-all duration-150"
+									className="inline-flex justify-center w-full sm:w-auto px-6 py-2.5 text-sm font-medium text-brown-600 dark:text-brown-100 border border-brown-400 dark:border-dark-border rounded-full hover:bg-brown-100 dark:hover:bg-dark-elevated active:scale-95 transition-all duration-150"
 								>
 									Edit profile
 								</Link>
@@ -129,7 +129,7 @@ const UserProfilePage = () => {
 								<button
 									onClick={isAuthenticated ? toggleFollow : () => navigate('/login')}
 									disabled={followLoading}
-									className={`px-6 py-2.5 text-sm font-medium rounded-full active:scale-95 transition-all duration-150 disabled:opacity-60 ${isFollowing ? 'text-brown-600 dark:text-brown-100 border border-brown-400 dark:border-dark-border hover:bg-brown-100 dark:hover:bg-dark-elevated' : 'text-white bg-brown-600 hover:bg-brown-500'}`}
+									className={`w-full sm:w-auto px-6 py-2.5 text-sm font-medium rounded-full active:scale-95 transition-all duration-150 disabled:opacity-60 ${isFollowing ? 'text-brown-600 dark:text-brown-100 border border-brown-400 dark:border-dark-border hover:bg-brown-100 dark:hover:bg-dark-elevated' : 'text-white bg-brown-600 hover:bg-brown-500'}`}
 								>
 									{isFollowing ? 'Following' : 'Follow'}
 								</button>

@@ -26,6 +26,7 @@ const notifMsg = (n: Notification) => {
 	const title = n.articleTitle ? `"${n.articleTitle}"` : '';
 	switch (n.type) {
 		case 'comment': return `commented on your article ${title}`;
+		case 'reply': return `replied to your comment on ${title}`;
 		case 'article_like': return `liked your article ${title}`;
 		case 'comment_like': return `liked your comment on ${title}`;
 		case 'follow': return 'started following you';
@@ -65,7 +66,7 @@ const Navbar = () => {
 
 	// ── Data ─────────────────────────────────────────────────────────────
 
-	const { notifications, unreadCount, markAllRead } = useNotifications();
+	const { notifications, unreadCount, markAllRead, deleteNotification, clearAll } = useNotifications();
 
 	// ── Effects ──────────────────────────────────────────────────────────
 
@@ -201,19 +202,27 @@ const Navbar = () => {
 									</button>
 
 									{bellOpen && (
-										<div className="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-dark-surface border border-brown-200 dark:border-dark-border rounded-2xl shadow-xl dark:shadow-black/40 py-2 z-50 animate-slideDown">
-											<p className="px-4 py-2 text-xs font-semibold text-brown-400 dark:text-brown-300 uppercase tracking-wide border-b border-brown-100 dark:border-dark-border">
-												Notifications
-											</p>
+										<div className="absolute right-0 top-full mt-2 w-80 max-w-[calc(100vw-1rem)] bg-white dark:bg-dark-surface border border-brown-200 dark:border-dark-border rounded-2xl shadow-xl dark:shadow-black/40 py-2 z-50 animate-slideDown">
+											<div className="flex items-center justify-between px-4 py-2 border-b border-brown-100 dark:border-dark-border">
+												<p className="text-xs font-semibold text-brown-400 dark:text-brown-300 uppercase tracking-wide">Notifications</p>
+												{notifications.length > 0 && (
+													<button
+														onClick={clearAll}
+														className="text-xs text-brown-400 dark:text-brown-300 hover:text-red-500 dark:hover:text-red-400 transition-colors duration-150"
+													>
+														Clear all
+													</button>
+												)}
+											</div>
 											{notifications.length === 0 ? (
 												<p className="px-4 py-6 text-sm text-brown-300 dark:text-brown-400 text-center">No notifications</p>
 											) : (
-												<ul className="max-h-96 overflow-y-auto">
+												<ul className="max-h-72 overflow-y-auto">
 													{notifications.map((n) => (
-														<li key={n.id}>
+														<li key={n.id} className={`group flex items-start gap-3 px-4 py-3 ${!n.isRead ? 'bg-brown-50/60 dark:bg-dark-elevated/50' : ''} hover:bg-brown-50 dark:hover:bg-dark-elevated transition-colors duration-150`}>
 															<button
 																onClick={() => { setBellOpen(false); navigate(notifLink(n)); }}
-																className={`w-full flex items-start gap-3 px-4 py-3 text-left hover:bg-brown-50 dark:hover:bg-dark-elevated transition-colors duration-150 ${!n.isRead ? 'bg-brown-50/60 dark:bg-dark-elevated/50' : ''}`}
+																className="flex items-start gap-3 flex-1 min-w-0 text-left"
 															>
 																<div className="w-10 h-10 rounded-full overflow-hidden bg-brown-200 dark:bg-dark-elevated shrink-0 mt-0.5">
 																	{n.actorAvatar ? (
@@ -236,6 +245,15 @@ const Navbar = () => {
 																{!n.isRead && (
 																	<span className="w-2 h-2 bg-red-400 rounded-full shrink-0 mt-1.5" />
 																)}
+															</button>
+															<button
+																onClick={(e) => { e.stopPropagation(); deleteNotification(n.id); }}
+																className="shrink-0 flex items-center justify-center w-6 h-6 mt-0.5 rounded-full text-brown-300 dark:text-brown-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-150 opacity-50 hover:opacity-100"
+																aria-label="Delete notification"
+															>
+																<svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+																	<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+																</svg>
 															</button>
 														</li>
 													))}
