@@ -6,7 +6,9 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { articles } from '../data/articles';
 import { useAuth } from '../context/AuthContext';
+import type { Comment, Reply } from '../types/comment';
 import Navbar from '../components/layout/Navbar';
+import CommentItem from '../components/shared/CommentItem';
 import Footer from '../components/layout/Footer';
 import happyLightIcon from '../assets/images/icons/happy_light.svg';
 import copyLightIcon from '../assets/images/icons/Copy_light.svg';
@@ -17,13 +19,6 @@ import facebookIcon from '../assets/images/icons/Facebook_black.svg';
 import linkedinIcon from '../assets/images/icons/LinkedIN_black.svg';
 import twitterIcon from '../assets/images/icons/Twitter_black.svg';
 
-type Comment = {
-	id: number;
-	name: string;
-	date: string;
-	avatar: string;
-	text: string;
-};
 
 const INITIAL_COMMENTS: Comment[] = [
 	{
@@ -32,6 +27,9 @@ const INITIAL_COMMENTS: Comment[] = [
 		date: '12 September 2024 at 18:30',
 		avatar: jacobAvatar,
 		text: "I loved this article! It really explains everything in a way that's easy to understand. The tips are super practical and I've already tried a few of them.",
+		likes: 12,
+		likedByMe: false,
+		replies: [],
 	},
 	{
 		id: 2,
@@ -39,6 +37,9 @@ const INITIAL_COMMENTS: Comment[] = [
 		date: '12 September 2024 at 18:30',
 		avatar: ahriAvatar,
 		text: "Such a great read! I've always been curious about this topic and now I finally feel like I understand it. Thanks for breaking it down so clearly!",
+		likes: 7,
+		likedByMe: false,
+		replies: [],
 	},
 	{
 		id: 3,
@@ -46,6 +47,9 @@ const INITIAL_COMMENTS: Comment[] = [
 		date: '12 September 2024 at 18:30',
 		avatar: mimiAvatar,
 		text: 'This article perfectly captures what makes this so fascinating. I had no idea about some of these details. Fascinating stuff!',
+		likes: 4,
+		likedByMe: false,
+		replies: [],
 	},
 ];
 
@@ -70,6 +74,8 @@ const ArticleDetailPage = () => {
 	const [comments, setComments] = useState<Comment[]>(INITIAL_COMMENTS);
 	const [copied, setCopied] = useState(false);
 	const [showAuthModal, setShowAuthModal] = useState(false);
+	const [openReplyId, setOpenReplyId] = useState<number | null>(null);
+	const [replyTexts, setReplyTexts] = useState<Record<number, string>>({});
 
 	const handleLike = () => {
 		if (!isAuthenticated) { setShowAuthModal(true); return; }
@@ -81,6 +87,33 @@ const ArticleDetailPage = () => {
 		navigator.clipboard.writeText(window.location.href);
 		setCopied(true);
 		setTimeout(() => setCopied(false), 2000);
+	};
+
+	const handleCommentLike = (id: number) => {
+		if (!isAuthenticated) { setShowAuthModal(true); return; }
+		setComments((prev) => prev.map((c) =>
+			c.id === id
+				? { ...c, likedByMe: !c.likedByMe, likes: c.likedByMe ? c.likes - 1 : c.likes + 1 }
+				: c
+		));
+	};
+
+	const handleReply = (commentId: number) => {
+		if (!isAuthenticated) { setShowAuthModal(true); return; }
+		const text = replyTexts[commentId]?.trim();
+		if (!text) return;
+		const newReply: Reply = {
+			id: Date.now(),
+			name: 'You',
+			date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) + ' at ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
+			avatar: '',
+			text,
+		};
+		setComments((prev) => prev.map((c) =>
+			c.id === commentId ? { ...c, replies: [...c.replies, newReply] } : c
+		));
+		setReplyTexts((prev) => ({ ...prev, [commentId]: '' }));
+		setOpenReplyId(null);
 	};
 
 	const handleSendComment = () => {
@@ -245,20 +278,16 @@ const ArticleDetailPage = () => {
 
 								<div className="flex flex-col divide-y divide-brown-300 dark:divide-dark-border">
 									{comments.map((c) => (
-										<div key={c.id} className="py-7">
-											<div className="flex items-center gap-3 mb-3">
-												<div className="w-9 h-9 rounded-full bg-brown-300 dark:bg-dark-elevated overflow-hidden shrink-0">
-													{c.avatar ? (
-														<img src={c.avatar} alt={c.name} className="w-full h-full object-cover" />
-													) : null}
-												</div>
-												<div>
-													<p className="text-lg font-semibold text-brown-600 dark:text-brown-100">{c.name}</p>
-													<p className="text-xs text-brown-300 dark:text-brown-400">{c.date}</p>
-												</div>
-											</div>
-											<p className="text-base text-brown-500 dark:text-brown-200 leading-relaxed">{c.text}</p>
-										</div>
+										<CommentItem
+											key={c.id}
+											comment={c}
+											openReplyId={openReplyId}
+											replyText={replyTexts[c.id] ?? ''}
+											onLike={handleCommentLike}
+											onReplyToggle={(id) => setOpenReplyId(openReplyId === id ? null : id)}
+											onReplyTextChange={(id, text) => setReplyTexts((prev) => ({ ...prev, [id]: text }))}
+											onReply={handleReply}
+										/>
 									))}
 								</div>
 							</div>
