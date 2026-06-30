@@ -38,3 +38,6 @@ Thumbs.db
 
 # Tools
 .claude/
+
+# Seed scripts (contain service role key)
+scripts/
