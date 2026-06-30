@@ -40,10 +40,10 @@ const LoginPage = () => {
 			<h1 className="text-4xl font-bold text-brown-600 dark:text-brown-100 text-center mb-8">Log in</h1>
 
 			<form onSubmit={handleSubmit} className="flex flex-col gap-5">
-				<FormField label="Email">
+				<FormField label="Email or Username">
 					<input
-						type="email"
-						placeholder="Email"
+						type="text"
+						placeholder="Email or username"
 						value={email}
 						onChange={(e) => setEmail(e.target.value)}
 						required

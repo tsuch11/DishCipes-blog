@@ -3,7 +3,7 @@
 // แก้ไขได้: CATEGORIES, INITIAL_COUNT, tab bar, dropdown, search input, grid columns
 
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { articles } from '../../data/articles';
+import { useArticles } from '../../hooks/useArticles';
 import ArticleCard from './ArticleCard';
 import ArticleCardSkeleton from './ArticleCardSkeleton';
 import useScrollReveal from '../../animations/useScrollReveal';
@@ -14,12 +14,14 @@ const SKELETON_COUNT = 4;
 
 // articles section
 const ArticlesSection = () => {
+	const { articles, loading: isFetching } = useArticles();
 	const [activeCategory, setActiveCategory] = useState('Highlight');
 	const [searchQuery, setSearchQuery] = useState('');
 	const [showAll, setShowAll] = useState(false);
 	const [dropdownOpen, setDropdownOpen] = useState(false);
-	const [loading, setLoading] = useState(true);
+	const [categoryLoading, setCategoryLoading] = useState(false);
 	const dropdownRef = useRef<HTMLDivElement>(null);
+	const loading = isFetching || categoryLoading;
 
 	const { ref, visible } = useScrollReveal();
 
@@ -34,8 +36,8 @@ const ArticlesSection = () => {
 	}, []);
 
 	useEffect(() => {
-		setLoading(true);
-		const t = setTimeout(() => setLoading(false), 600);
+		setCategoryLoading(true);
+		const t = setTimeout(() => setCategoryLoading(false), 600);
 		return () => clearTimeout(t);
 	}, [activeCategory]);
 
@@ -48,7 +50,7 @@ const ArticlesSection = () => {
 		const matchCategory = activeCategory === 'Highlight' || a.category.toLowerCase() === activeCategory.toLowerCase();
 		const matchSearch = searchQuery.trim() === '' || a.title.toLowerCase().includes(searchQuery.toLowerCase());
 		return matchCategory && matchSearch;
-	}), [activeCategory, searchQuery]);
+	}), [activeCategory, searchQuery, articles]);
 
 	const visible2 = activeCategory === 'Highlight' && !showAll
 		? filtered.slice(0, INITIAL_COUNT)

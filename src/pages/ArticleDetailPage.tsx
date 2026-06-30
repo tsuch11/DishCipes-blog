@@ -2,61 +2,32 @@
 // Full article view with reading time, related articles, and comment section
 // แก้ไขได้: reading time calculation, related articles count, back-to-top threshold (300px)
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
-import { articles } from '../data/articles';
+import { useArticle } from '../hooks/useArticles';
 import { useAuth } from '../context/AuthContext';
+import { supabase } from '../lib/supabase';
 import type { Comment, Reply } from '../types/comment';
 import Navbar from '../components/layout/Navbar';
 import CommentItem from '../components/shared/CommentItem';
 import Footer from '../components/layout/Footer';
 import happyLightIcon from '../assets/images/icons/happy_light.svg';
 import copyLightIcon from '../assets/images/icons/Copy_light.svg';
-import jacobAvatar from '../assets/images/icons/Jacob_lash.svg';
-import ahriAvatar from '../assets/images/icons/Ahri.svg';
-import mimiAvatar from '../assets/images/icons/Mimi_mama.svg';
 import facebookIcon from '../assets/images/icons/Facebook_black.svg';
 import linkedinIcon from '../assets/images/icons/LinkedIN_black.svg';
 import twitterIcon from '../assets/images/icons/Twitter_black.svg';
 
-
-const INITIAL_COMMENTS: Comment[] = [
-	{
-		id: 1,
-		name: 'Jacob Lash',
-		date: '12 September 2024 at 18:30',
-		avatar: jacobAvatar,
-		text: "I loved this article! It really explains everything in a way that's easy to understand. The tips are super practical and I've already tried a few of them.",
-		likes: 12,
-		likedByMe: false,
-		replies: [],
-	},
-	{
-		id: 2,
-		name: 'Ahri',
-		date: '12 September 2024 at 18:30',
-		avatar: ahriAvatar,
-		text: "Such a great read! I've always been curious about this topic and now I finally feel like I understand it. Thanks for breaking it down so clearly!",
-		likes: 7,
-		likedByMe: false,
-		replies: [],
-	},
-	{
-		id: 3,
-		name: 'Mimi mama',
-		date: '12 September 2024 at 18:30',
-		avatar: mimiAvatar,
-		text: 'This article perfectly captures what makes this so fascinating. I had no idea about some of these details. Fascinating stuff!',
-		likes: 4,
-		likedByMe: false,
-		replies: [],
-	},
-];
+const fmtDate = (iso: string) => {
+	const d = new Date(iso);
+	return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+		+ ' at ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+};
 
 const ArticleDetailPage = () => {
 	const { id } = useParams<{ id: string }>();
-	const article = articles.find((a) => a.id === Number(id));
-	const { isAuthenticated } = useAuth();
+	const articleId = Number(id);
+	const { article, loading: articleLoading } = useArticle(articleId);
+	const { user, isAuthenticated } = useAuth();
 	const navigate = useNavigate();
 	const location = useLocation();
 
@@ -69,18 +40,62 @@ const ArticleDetailPage = () => {
 	}, []);
 
 	const [liked, setLiked] = useState(false);
-	const [likeCount, setLikeCount] = useState(321);
+	const [likeCount, setLikeCount] = useState(0);
 	const [commentText, setCommentText] = useState('');
-	const [comments, setComments] = useState<Comment[]>(INITIAL_COMMENTS);
+	const [comments, setComments] = useState<Comment[]>([]);
 	const [copied, setCopied] = useState(false);
 	const [showAuthModal, setShowAuthModal] = useState(false);
 	const [openReplyId, setOpenReplyId] = useState<number | null>(null);
 	const [replyTexts, setReplyTexts] = useState<Record<number, string>>({});
 
-	const handleLike = () => {
-		if (!isAuthenticated) { setShowAuthModal(true); return; }
-		setLiked((prev) => !prev);
-		setLikeCount((prev) => (liked ? prev - 1 : prev + 1));
+	const fetchComments = useCallback(async () => {
+		const { data } = await supabase
+			.from('comments')
+			.select('id, text, created_at, profiles!user_id(display_name, avatar_url), replies(id, text, created_at, profiles!user_id(display_name, avatar_url)), comment_likes(user_id)')
+			.eq('article_id', articleId)
+			.order('created_at', { ascending: true });
+		if (!data) return;
+		setComments(data.map((c: any) => ({
+			id: c.id,
+			name: c.profiles?.display_name ?? 'Unknown',
+			date: fmtDate(c.created_at),
+			avatar: c.profiles?.avatar_url ?? '',
+			text: c.text,
+			likes: c.comment_likes?.length ?? 0,
+			likedByMe: user ? (c.comment_likes?.some((l: any) => l.user_id === user.id) ?? false) : false,
+			replies: [...(c.replies ?? [])].sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()).map((r: any) => ({
+				id: r.id,
+				name: r.profiles?.display_name ?? 'Unknown',
+				date: fmtDate(r.created_at),
+				avatar: r.profiles?.avatar_url ?? '',
+				text: r.text,
+			})),
+		})));
+	}, [articleId, user?.id]);
+
+	useEffect(() => { fetchComments(); }, [fetchComments]);
+
+	useEffect(() => {
+		if (!articleId) return;
+		supabase.from('article_likes').select('*', { count: 'exact', head: true }).eq('article_id', articleId)
+			.then(({ count }) => setLikeCount(count ?? 0));
+		if (user) {
+			supabase.from('article_likes').select('user_id').eq('article_id', articleId).eq('user_id', user.id).maybeSingle()
+				.then(({ data }) => setLiked(!!data));
+		}
+	}, [articleId, user?.id]);
+
+	const handleLike = async () => {
+		if (!isAuthenticated || !user) { setShowAuthModal(true); return; }
+		if (liked) {
+			await supabase.from('article_likes').delete().eq('article_id', articleId).eq('user_id', user.id);
+			setLiked(false);
+			setLikeCount((prev) => prev - 1);
+		} else {
+			await supabase.from('article_likes').insert({ article_id: articleId, user_id: user.id });
+			setLiked(true);
+			setLikeCount((prev) => prev + 1);
+		}
 	};
 
 	const handleCopyLink = () => {
@@ -89,49 +104,77 @@ const ArticleDetailPage = () => {
 		setTimeout(() => setCopied(false), 2000);
 	};
 
-	const handleCommentLike = (id: number) => {
-		if (!isAuthenticated) { setShowAuthModal(true); return; }
-		setComments((prev) => prev.map((c) =>
-			c.id === id
-				? { ...c, likedByMe: !c.likedByMe, likes: c.likedByMe ? c.likes - 1 : c.likes + 1 }
-				: c
-		));
+	const handleCommentLike = async (commentId: number) => {
+		if (!isAuthenticated || !user) { setShowAuthModal(true); return; }
+		const comment = comments.find((c) => c.id === commentId);
+		if (!comment) return;
+		if (comment.likedByMe) {
+			await supabase.from('comment_likes').delete().eq('comment_id', commentId).eq('user_id', user.id);
+			setComments((prev) => prev.map((c) => c.id === commentId ? { ...c, likedByMe: false, likes: c.likes - 1 } : c));
+		} else {
+			await supabase.from('comment_likes').insert({ comment_id: commentId, user_id: user.id });
+			setComments((prev) => prev.map((c) => c.id === commentId ? { ...c, likedByMe: true, likes: c.likes + 1 } : c));
+		}
 	};
 
-	const handleReply = (commentId: number) => {
-		if (!isAuthenticated) { setShowAuthModal(true); return; }
+	const handleReply = async (commentId: number) => {
+		if (!isAuthenticated || !user) { setShowAuthModal(true); return; }
 		const text = replyTexts[commentId]?.trim();
 		if (!text) return;
-		const newReply: Reply = {
-			id: Date.now(),
-			name: 'You',
-			date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) + ' at ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
-			avatar: '',
-			text,
-		};
-		setComments((prev) => prev.map((c) =>
-			c.id === commentId ? { ...c, replies: [...c.replies, newReply] } : c
-		));
+		const { data } = await supabase
+			.from('replies')
+			.insert({ comment_id: commentId, user_id: user.id, text })
+			.select('id, text, created_at, profiles!user_id(display_name, avatar_url)')
+			.single();
+		if (data) {
+			const newReply: Reply = {
+				id: data.id,
+				name: (data.profiles as any)?.display_name ?? user.name,
+				date: fmtDate(data.created_at),
+				avatar: (data.profiles as any)?.avatar_url ?? '',
+				text: data.text,
+			};
+			setComments((prev) => prev.map((c) => c.id === commentId ? { ...c, replies: [...c.replies, newReply] } : c));
+		}
 		setReplyTexts((prev) => ({ ...prev, [commentId]: '' }));
 		setOpenReplyId(null);
 	};
 
-	const handleSendComment = () => {
-		if (!isAuthenticated) { setShowAuthModal(true); return; }
+	const handleSendComment = async () => {
+		if (!isAuthenticated || !user) { setShowAuthModal(true); return; }
 		if (!commentText.trim()) return;
-		const newComment: Comment = {
-			id: Date.now(),
-			name: 'You',
-			date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) + ' at ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
-			avatar: '',
-			text: commentText.trim(),
-			likes: 0,
-			likedByMe: false,
-			replies: [],
-		};
-		setComments((prev) => [...prev, newComment]);
+		const { data } = await supabase
+			.from('comments')
+			.insert({ article_id: articleId, user_id: user.id, text: commentText.trim() })
+			.select('id, text, created_at, profiles!user_id(display_name, avatar_url)')
+			.single();
+		if (data) {
+			const newComment: Comment = {
+				id: data.id,
+				name: (data.profiles as any)?.display_name ?? user.name,
+				date: fmtDate(data.created_at),
+				avatar: (data.profiles as any)?.avatar_url ?? '',
+				text: data.text,
+				likes: 0,
+				likedByMe: false,
+				replies: [],
+			};
+			setComments((prev) => [...prev, newComment]);
+		}
 		setCommentText('');
 	};
+
+	if (articleLoading) {
+		return (
+			<div className="min-h-screen flex flex-col font-sans dark:bg-dark-bg">
+				<Navbar />
+				<main className="flex-1 flex items-center justify-center">
+					<p className="text-brown-400 dark:text-brown-300 text-sm">Loading...</p>
+				</main>
+				<Footer />
+			</div>
+		);
+	}
 
 	if (!article) {
 		return (

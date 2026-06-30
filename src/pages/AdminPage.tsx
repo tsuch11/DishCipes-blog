@@ -5,7 +5,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { articles as initialArticles } from '../data/articles';
+import { useArticles } from '../hooks/useArticles';
 import { MOCK_NOTIFICATIONS } from '../data/notifications';
 import AdminSidebar from '../components/admin/AdminSidebar';
 import type { AdminView } from '../components/admin/AdminSidebar';
@@ -43,13 +43,12 @@ type ArticleForm = {
 const AdminPage = () => {
 	const { user, isAuthenticated, logout, updateProfile, resetPassword } = useAuth();
 	const navigate = useNavigate();
+	const { articles: fetchedArticles } = useArticles();
 
 	const [view, setView] = useState<AdminView>('articles');
 	const [articleSubview, setArticleSubview] = useState<'list' | 'create' | 'edit'>('list');
 	const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-	const [adminArticles, setAdminArticles] = useState<AdminArticle[]>(() =>
-		initialArticles.map(a => ({ ...a, status: 'published' as const, readTime: a.readTime ?? 5, content: a.content ?? [] }))
-	);
+	const [adminArticles, setAdminArticles] = useState<AdminArticle[]>([]);
 	const [editingArticle, setEditingArticle] = useState<AdminArticle | null>(null);
 	const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
 	const [searchQuery, setSearchQuery] = useState('');
@@ -59,7 +58,13 @@ const AdminPage = () => {
 	const [toast, setToast] = useState<{ show: boolean; title: string; message: string }>({ show: false, title: '', message: '' });
 	const thumbnailRef = useRef<HTMLInputElement>(null);
 
-	const [categories, setCategories] = useState<string[]>(() => Array.from(new Set(initialArticles.map(a => a.category))));
+	const [categories, setCategories] = useState<string[]>([]);
+
+	useEffect(() => {
+		if (fetchedArticles.length === 0) return;
+		setAdminArticles(fetchedArticles.map(a => ({ ...a, status: 'published' as const, readTime: a.readTime ?? 5, content: a.content ?? [] })));
+		setCategories(Array.from(new Set(fetchedArticles.map(a => a.category))));
+	}, [fetchedArticles]);
 	const [openMenuId, setOpenMenuId] = useState<number | null>(null);
 
 	useEffect(() => {
