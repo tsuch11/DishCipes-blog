@@ -8,6 +8,7 @@ import LandingPage from '../pages/LandingPage';
 import ArticleDetailPage from '../pages/ArticleDetailPage';
 import LoginPage from '../pages/LoginPage';
 import SignupPage from '../pages/SignupPage';
+import ArticleFormPage from '../pages/ArticleFormPage';
 import VerifyEmailPage from '../pages/VerifyEmailPage';
 import ForgotPasswordPage from '../pages/ForgotPasswordPage';
 import VerifyResetPage from '../pages/VerifyResetPage';
@@ -37,7 +38,9 @@ const RoutesWithTransition = () => {
 			)}
 			<Routes>
 				<Route path="/" element={<LandingPage />} />
+				<Route path="/article/new" element={<ArticleFormPage />} />
 				<Route path="/article/:id" element={<ArticleDetailPage />} />
+				<Route path="/article/:id/edit" element={<ArticleFormPage />} />
 				<Route path="/login" element={<LoginPage />} />
 				<Route path="/signup" element={<SignupPage />} />
 				<Route path="/verify-email" element={<VerifyEmailPage />} />

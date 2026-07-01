@@ -267,11 +267,24 @@ const ArticleDetailPage = () => {
 
 					<div className="grid grid-cols-1 gap-10 pb-16 md:grid-cols-[1fr_260px]">
 						<article>
-							<div className="flex items-center gap-3 mb-3">
-								<span className="px-2.5 py-0.5 text-xs font-medium text-brand-green bg-brand-green-light dark:bg-brand-green/15 rounded-full">
-									{article.category}
-								</span>
-								<span className="text-xs text-brown-400 dark:text-brown-300">{article.date}</span>
+							<div className="flex items-center justify-between gap-3 mb-3">
+								<div className="flex items-center gap-3">
+									<span className="px-2.5 py-0.5 text-xs font-medium text-brand-green bg-brand-green-light dark:bg-brand-green/15 rounded-full">
+										{article.category}
+									</span>
+									<span className="text-xs text-brown-400 dark:text-brown-300">{article.date}</span>
+								</div>
+								{(user?.id === article.authorId || user?.role === 'admin') && (
+									<button
+										onClick={() => navigate(`/article/${articleId}/edit`)}
+										className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-brown-500 dark:text-brown-300 border border-brown-300 dark:border-dark-border rounded-full hover:bg-brown-100 dark:hover:bg-dark-elevated hover:text-brown-600 dark:hover:text-brown-100 transition-all duration-150"
+									>
+										<svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+										</svg>
+										Edit
+									</button>
+								)}
 							</div>
 
 							<h1 className="text-2xl font-bold text-brown-600 dark:text-brown-100 leading-tight mb-6 md:text-3xl">
