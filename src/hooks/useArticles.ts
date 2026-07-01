@@ -1,7 +1,7 @@
 // ── useArticles / useArticle ──────────────────────────────────────────
 // Fetch articles from Supabase with author profile join
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { Article } from '../types/article';
 import { supabase } from '../lib/supabase';
 
@@ -12,6 +12,7 @@ const formatDate = (iso: string) =>
 const validUrl = (url: string | null | undefined) =>
 	url && !url.startsWith('blob:') ? url : null;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const mapArticleRow = (a: any): Article => ({
 	id: a.id,
 	title: a.title,
@@ -25,24 +26,25 @@ export const mapArticleRow = (a: any): Article => ({
 	authorAvatar: validUrl(a.profiles?.avatar_url) ?? '/images/icons/Teerapat.jpg',
 	date: formatDate(a.created_at),
 	readTime: a.read_time ?? 5,
+	status: a.status ?? 'published',
 });
 
 export const useArticles = () => {
 	const [articles, setArticles] = useState<Article[]>([]);
 	const [loading, setLoading] = useState(true);
 
-	useEffect(() => {
-		supabase
+	const refetch = useCallback(async () => {
+		const { data } = await supabase
 			.from('articles')
 			.select('*, profiles!author_id(display_name, avatar_url, username)')
-			.order('created_at', { ascending: true })
-			.then(({ data }) => {
-				if (data) setArticles(data.map(mapArticleRow));
-				setLoading(false);
-			});
+			.order('created_at', { ascending: true });
+		if (data) setArticles(data.map(mapArticleRow));
+		setLoading(false);
 	}, []);
 
-	return { articles, loading };
+	useEffect(() => { refetch(); }, [refetch]);
+
+	return { articles, loading, refetch };
 };
 
 export const useArticle = (id: number) => {
