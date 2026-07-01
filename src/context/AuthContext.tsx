@@ -11,6 +11,10 @@ type AuthContextType = {
 	user: User | null;
 	login: (email: string, password: string) => Promise<{ success: boolean; message: string; role?: string }>;
 	register: (data: { name: string; username: string; email: string; password: string }) => Promise<{ success: boolean; message: string }>;
+	verifyEmail: (email: string, token: string) => Promise<{ success: boolean; message: string }>;
+	sendPasswordReset: (email: string) => Promise<{ success: boolean; message: string }>;
+	verifyPasswordReset: (email: string, token: string) => Promise<{ success: boolean; message: string }>;
+	setNewPassword: (password: string) => Promise<{ success: boolean; message: string }>;
 	updateProfile: (data: { name: string; username: string; avatar?: string; bio?: string }) => Promise<{ success: boolean }>;
 	resetPassword: (current: string, newPassword: string) => Promise<{ success: boolean; message: string }>;
 	logout: () => void;
@@ -67,7 +71,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 		}
 
 		const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-		if (error) return { success: false, message: 'Your password is incorrect or this email doesn\'t exist' };
+		if (error) {
+			if (error.message.toLowerCase().includes('email not confirmed')) return { success: false, message: 'email_not_confirmed' };
+			return { success: false, message: 'Your password is incorrect or this email doesn\'t exist' };
+		}
 		const role = data.user ? (await supabase.from('profiles').select('role').eq('id', data.user.id).single()).data?.role : 'member';
 		return { success: true, message: '', role: role ?? 'member' };
 	};
@@ -100,6 +107,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 		return { success: true };
 	};
 
+	const verifyEmail = async (email: string, token: string) => {
+		const { error } = await supabase.auth.verifyOtp({ email, token, type: 'signup' });
+		if (error) return { success: false, message: error.message };
+		return { success: true, message: '' };
+	};
+
+	const sendPasswordReset = async (email: string) => {
+		const { error } = await supabase.auth.resetPasswordForEmail(email, {
+			redirectTo: `${window.location.origin}/set-new-password`,
+		});
+		if (error) return { success: false, message: error.message };
+		return { success: true, message: '' };
+	};
+
+	const verifyPasswordReset = async (email: string, token: string) => {
+		const { error } = await supabase.auth.verifyOtp({ email, token, type: 'recovery' });
+		if (error) return { success: false, message: error.message };
+		return { success: true, message: '' };
+	};
+
+	const setNewPassword = async (password: string) => {
+		const { error } = await supabase.auth.updateUser({ password });
+		if (error) return { success: false, message: error.message };
+		return { success: true, message: '' };
+	};
+
 	const resetPassword = async (_current: string, newPassword: string) => {
 		const { error } = await supabase.auth.updateUser({ password: newPassword });
 		if (error) return { success: false, message: error.message };
@@ -112,7 +145,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	};
 
 	return (
-		<AuthContext.Provider value={{ user, login, register, updateProfile, resetPassword, logout, isAuthenticated: user !== null }}>
+		<AuthContext.Provider value={{ user, login, register, verifyEmail, sendPasswordReset, verifyPasswordReset, setNewPassword, updateProfile, resetPassword, logout, isAuthenticated: user !== null }}>
 			{children}
 		</AuthContext.Provider>
 	);
