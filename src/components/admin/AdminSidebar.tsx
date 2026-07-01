@@ -22,7 +22,7 @@ type Props = {
 };
 
 const NAV_ITEMS: { view: AdminView; label: string; icon: string }[] = [
-	{ view: 'analytics', label: 'Dashboard', icon: fileIcon },
+	{ view: 'analytics', label: 'Dashboard', icon: '/images/images/icons/Dashboard.svg' },
 	{ view: 'articles', label: 'Article management', icon: notebookIcon },
 	{ view: 'categories', label: 'Category management', icon: fileIcon },
 	{ view: 'users', label: 'User management', icon: userIcon },
