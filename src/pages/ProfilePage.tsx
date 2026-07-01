@@ -5,6 +5,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { supabase } from '../lib/supabase';
 import Navbar from '../components/layout/Navbar';
 import ProfileSidebar from '../components/profile/ProfileSidebar';
 import GoBackButton from '../components/ui/GoBackButton';
@@ -27,16 +28,20 @@ const ProfilePage = () => {
 
 	if (!isAuthenticated || !user) return null;
 
-	const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (!file) return;
-		setAvatar(URL.createObjectURL(file));
+		const ext = file.name.split('.').pop() ?? 'jpg';
+		const path = `${user.id}.${ext}`;
+		const { error } = await supabase.storage.from('avatars').upload(path, file, { upsert: true });
+		if (error) { console.error(error); return; }
+		const { data } = supabase.storage.from('avatars').getPublicUrl(path);
+		setAvatar(data.publicUrl);
 	};
 
 	const handleSave = async (e: React.FormEvent) => {
 		e.preventDefault();
-		const avatarToSave = avatar.startsWith('blob:') ? (user.avatar ?? '') : avatar;
-		await updateProfile({ name, username, avatar: avatarToSave });
+		await updateProfile({ name, username, avatar });
 		setShowToast(true);
 		setTimeout(() => setShowToast(false), 3000);
 	};
