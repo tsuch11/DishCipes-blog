@@ -11,7 +11,7 @@ import bellIcon from '../../assets/images/icons/Bell_light.svg';
 import outIcon from '../../assets/images/icons/Out_light.svg';
 import signOutIcon from '../../assets/images/icons/Sign_out_squre_light.svg';
 
-export type AdminView = 'articles' | 'categories' | 'profile' | 'notifications' | 'reset-password';
+export type AdminView = 'articles' | 'categories' | 'users' | 'profile' | 'notifications' | 'reset-password';
 
 type Props = {
 	activeView: AdminView;
@@ -24,6 +24,7 @@ type Props = {
 const NAV_ITEMS: { view: AdminView; label: string; icon: string }[] = [
 	{ view: 'articles', label: 'Article management', icon: notebookIcon },
 	{ view: 'categories', label: 'Category management', icon: fileIcon },
+	{ view: 'users', label: 'User management', icon: userIcon },
 	{ view: 'profile', label: 'Profile', icon: userIcon },
 	{ view: 'notifications', label: 'Notification', icon: bellIcon },
 	{ view: 'reset-password', label: 'Reset password', icon: bellIcon },
