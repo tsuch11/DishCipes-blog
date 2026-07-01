@@ -81,7 +81,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 	const register = async (data: { name: string; username: string; email: string; password: string }) => {
 		const { data: authData, error } = await supabase.auth.signUp({ email: data.email, password: data.password });
-		if (error) return { success: false, message: error.message };
+		if (error) return { success: false, message: 'email_taken' };
+
+		// identities = [] → email exists but unconfirmed, Supabase auto-resent OTP
+		if (authData.user?.identities?.length === 0) {
+			return { success: false, message: 'email_unconfirmed' };
+		}
+
 		if (authData.user) {
 			await supabase.from('profiles').insert({
 				id: authData.user.id,
