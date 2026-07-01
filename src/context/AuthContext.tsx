@@ -72,7 +72,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 		const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 		if (error) {
-			if (error.message.toLowerCase().includes('email not confirmed')) return { success: false, message: 'email_not_confirmed' };
 			return { success: false, message: 'Your password is incorrect or this email doesn\'t exist' };
 		}
 		const role = data.user ? (await supabase.from('profiles').select('role').eq('id', data.user.id).single()).data?.role : 'member';
@@ -82,12 +81,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	const register = async (data: { name: string; username: string; email: string; password: string }) => {
 		const { data: authData, error } = await supabase.auth.signUp({ email: data.email, password: data.password });
 		if (error) return { success: false, message: 'email_taken' };
-
-		// identities = [] → email exists but unconfirmed, Supabase auto-resent OTP
-		if (authData.user?.identities?.length === 0) {
-			return { success: false, message: 'email_unconfirmed' };
-		}
-
 		if (authData.user) {
 			await supabase.from('profiles').insert({
 				id: authData.user.id,
