@@ -197,6 +197,17 @@ const Navbar = () => {
 
 						{user ? (
 							<>
+								{/* Write button */}
+								<Link
+									to="/article/new"
+									className="flex items-center gap-1.5 px-4 py-1.5 text-sm font-medium text-white bg-brown-600 rounded-full hover:bg-brown-500 active:scale-95 transition-all duration-150"
+								>
+									<svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+									</svg>
+									Write
+								</Link>
+
 								{/* Bell / notifications */}
 								<div className="relative" ref={bellRef}>
 									<button
@@ -424,6 +435,16 @@ const Navbar = () => {
 								<span className="text-sm font-semibold text-brown-600 dark:text-brown-100">{user.name}</span>
 							</div>
 							<div className="flex flex-col">
+								<Link
+									to="/article/new"
+									onClick={() => setHamburgerOpen(false)}
+									className="flex items-center gap-3 px-2 py-3 text-sm font-medium text-brown-600 dark:text-brown-100 hover:bg-brown-200 dark:hover:bg-dark-elevated rounded-lg transition-colors duration-150"
+								>
+									<svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+									</svg>
+									Write article
+								</Link>
 								<Link
 									to="/profile"
 									onClick={() => setHamburgerOpen(false)}
