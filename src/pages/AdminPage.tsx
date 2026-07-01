@@ -183,10 +183,15 @@ const AdminPage = () => {
 	const handleLogout = () => { logout(); navigate('/'); };
 	const handleNavigate = (v: AdminView) => { setView(v); if (v === 'articles') setArticleSubview('list'); };
 
-	const handleProfileAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleProfileAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (!file) return;
-		setProfileAvatar(URL.createObjectURL(file));
+		const ext = file.name.split('.').pop() ?? 'jpg';
+		const path = `${user.id}.${ext}`;
+		const { error } = await supabase.storage.from('avatars').upload(path, file, { upsert: true });
+		if (error) { console.error(error); return; }
+		const { data } = supabase.storage.from('avatars').getPublicUrl(path);
+		setProfileAvatar(data.publicUrl);
 	};
 
 	const handleProfileSave = async (e: React.FormEvent) => {
