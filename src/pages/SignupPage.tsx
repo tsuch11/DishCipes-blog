@@ -3,7 +3,7 @@
 // แก้ไขได้: form validation rules, required fields, success redirect path
 
 import { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import AuthPageLayout from '../components/ui/AuthPageLayout';
 import FormField from '../components/ui/FormField';
@@ -12,15 +12,12 @@ import inputCls from '../utils/inputCls';
 const SignupPage = () => {
 	const { register } = useAuth();
 	const navigate = useNavigate();
-	const location = useLocation();
-	const returnPath: string = (location.state as { from?: string })?.from ?? '/';
 
 	const [name, setName] = useState('');
 	const [username, setUsername] = useState('');
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [errors, setErrors] = useState<Record<string, string>>({});
-	const [success, setSuccess] = useState(false);
 
 	const validate = (): Record<string, string> => {
 		const errs: Record<string, string> = {};
@@ -43,27 +40,8 @@ const SignupPage = () => {
 		}
 
 		setErrors({});
-		setSuccess(true);
+		navigate('/verify-email', { state: { email } });
 	};
-
-	if (success) {
-		return (
-			<AuthPageLayout cardCls="px-10 py-16 text-center">
-				<div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center mx-auto mb-8">
-					<svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-					</svg>
-				</div>
-				<h2 className="text-3xl font-bold text-brown-600 dark:text-brown-100 mb-8">Registration success</h2>
-				<button
-					onClick={() => navigate(returnPath)}
-					className="px-10 py-3 text-sm font-medium text-white bg-brown-600 rounded-full hover:bg-brown-500 active:scale-95 transition-all duration-150"
-				>
-					Continue
-				</button>
-			</AuthPageLayout>
-		);
-	}
 
 	return (
 		<AuthPageLayout>
