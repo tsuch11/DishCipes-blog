@@ -1,6 +1,6 @@
 // ── Notification Types ─────────────────────────────────────────────────
 
-export type NotificationType = 'comment' | 'reply' | 'article_like' | 'comment_like' | 'follow' | 'new_article';
+export type NotificationType = 'comment' | 'reply' | 'article_like' | 'comment_like' | 'follow' | 'new_article' | 'new_user';
 
 export type Notification = {
 	id: number;
