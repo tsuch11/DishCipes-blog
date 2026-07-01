@@ -35,6 +35,10 @@ const SignupPage = () => {
 
 		const result = await register({ name, username, email, password });
 		if (!result.success) {
+			if (result.message === 'email_unconfirmed') {
+				navigate('/verify-email', { state: { email } });
+				return;
+			}
 			setErrors({ email: 'Email is already taken. Please try another email.' });
 			return;
 		}
