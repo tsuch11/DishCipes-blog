@@ -6,7 +6,9 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useArticles } from '../hooks/useArticles';
-import { MOCK_NOTIFICATIONS } from '../data/notifications';
+import { useNotifications } from '../hooks/useNotifications';
+import { supabase } from '../lib/supabase';
+import type { Notification } from '../types/notification';
 import AdminSidebar from '../components/admin/AdminSidebar';
 import type { AdminView } from '../components/admin/AdminSidebar';
 import ConfirmModal from '../components/ui/ConfirmModal';
@@ -43,7 +45,8 @@ type ArticleForm = {
 const AdminPage = () => {
 	const { user, isAuthenticated, logout, updateProfile, resetPassword } = useAuth();
 	const navigate = useNavigate();
-	const { articles: fetchedArticles } = useArticles();
+	const { articles: fetchedArticles, refetch: refetchArticles } = useArticles();
+	const { notifications } = useNotifications();
 
 	const [view, setView] = useState<AdminView>('articles');
 	const [articleSubview, setArticleSubview] = useState<'list' | 'create' | 'edit'>('list');
@@ -62,7 +65,7 @@ const AdminPage = () => {
 
 	useEffect(() => {
 		if (fetchedArticles.length === 0) return;
-		setAdminArticles(fetchedArticles.map(a => ({ ...a, status: 'published' as const, readTime: a.readTime ?? 5, content: a.content ?? [] })));
+		setAdminArticles(fetchedArticles.map(a => ({ ...a, status: (a.status ?? 'published') as 'published' | 'draft', readTime: a.readTime ?? 5, content: a.content ?? [] })));
 		setCategories(Array.from(new Set(fetchedArticles.map(a => a.category))));
 	}, [fetchedArticles]);
 	const [openMenuId, setOpenMenuId] = useState<number | null>(null);
@@ -112,43 +115,61 @@ const AdminPage = () => {
 		setArticleSubview('edit');
 	};
 
-	const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleThumbnailChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (!file) return;
-		setForm(prev => ({ ...prev, image: URL.createObjectURL(file) }));
+		const ext = file.name.split('.').pop() ?? 'jpg';
+		const path = `thumbnails/${Date.now()}.${ext}`;
+		const { error } = await supabase.storage.from('article-images').upload(path, file);
+		if (error) { console.error('Upload error:', error); return; }
+		const { data } = supabase.storage.from('article-images').getPublicUrl(path);
+		setForm(prev => ({ ...prev, image: data.publicUrl }));
 	};
 
-	const buildArticle = (status: 'published' | 'draft'): AdminArticle => ({
-		id: editingArticle?.id ?? Date.now(),
-		image: form.image,
-		category: form.category,
-		authorName: form.authorName,
-		authorAvatar: user.avatar ?? '',
+	const buildPayload = (status: 'published' | 'draft') => ({
 		title: form.title,
 		description: form.description,
-		date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }),
-		readTime: Math.max(1, Math.ceil(form.content.split(' ').length / 200)),
 		content: form.content ? form.content.split('\n\n').filter(Boolean) : [],
+		category: form.category,
+		image: form.image,
+		read_time: Math.max(1, Math.ceil(form.content.split(' ').length / 200)),
 		status,
 	});
 
-	const handleSaveDraft = () => {
-		const article = buildArticle('draft');
-		setAdminArticles(prev => articleSubview === 'edit' ? prev.map(a => a.id === article.id ? article : a) : [article, ...prev]);
+	const handleSaveDraft = async () => {
+		const payload = buildPayload('draft');
+		if (articleSubview === 'edit' && editingArticle) {
+			const { error } = await supabase.from('articles').update(payload).eq('id', editingArticle.id);
+			if (error) { console.error(error); return; }
+		} else {
+			const { error } = await supabase.from('articles').insert({ ...payload, author_id: user.id });
+			if (error) { console.error(error); return; }
+		}
+		await refetchArticles();
 		setArticleSubview('list');
-		showToast('Create article and saved as draft', 'You can publish article later');
+		showToast('Saved as draft', 'You can publish the article later');
 	};
 
-	const handleSavePublish = () => {
-		const article = buildArticle('published');
-		setAdminArticles(prev => articleSubview === 'edit' ? prev.map(a => a.id === article.id ? article : a) : [article, ...prev]);
+	const handleSavePublish = async () => {
+		const payload = buildPayload('published');
+		if (articleSubview === 'edit' && editingArticle) {
+			const { error } = await supabase.from('articles').update(payload).eq('id', editingArticle.id);
+			if (error) { console.error(error); return; }
+			showToast('Article updated', 'Your article has been successfully updated');
+		} else {
+			const { error } = await supabase.from('articles').insert({ ...payload, author_id: user.id });
+			if (error) { console.error(error); return; }
+			showToast('Article published', 'Your article has been successfully published');
+		}
+		await refetchArticles();
 		setArticleSubview('list');
-		showToast('Create article and published', 'Your article has been successfully published');
 	};
 
-	const handleDeleteConfirm = () => {
+	const handleDeleteConfirm = async () => {
 		if (deleteTargetId === null) return;
-		setAdminArticles(prev => prev.filter(a => a.id !== deleteTargetId));
+		const { error } = await supabase.from('articles').delete().eq('id', deleteTargetId);
+		if (error) { console.error(error); return; }
+		await refetchArticles();
 		setDeleteTargetId(null);
 		if (articleSubview === 'edit') setArticleSubview('list');
 		showToast('Article deleted', 'The article has been removed');
@@ -191,7 +212,17 @@ const AdminPage = () => {
 		}
 	};
 
-	const adminNotifications = MOCK_NOTIFICATIONS.filter(n => n.forRoles.includes('admin'));
+	const getNotifText = (n: Notification) => {
+		switch (n.type) {
+			case 'comment': return `commented on "${n.articleTitle}"`;
+			case 'reply': return 'replied to your comment';
+			case 'article_like': return `liked "${n.articleTitle}"`;
+			case 'comment_like': return 'liked your comment';
+			case 'follow': return 'followed you';
+			default: return '';
+		}
+	};
+
 	const inputCls = (err?: boolean) =>
 		`w-full px-4 py-3 text-sm text-stone-700 dark:text-brown-100 bg-white dark:bg-dark-elevated border rounded-xl outline-none placeholder:text-stone-300 dark:placeholder:text-brown-400 transition-colors duration-150 ${err ? 'border-red-400' : 'border-stone-200 dark:border-dark-border focus:border-stone-400 dark:focus:border-dark-border'}`;
 
@@ -474,17 +505,17 @@ const AdminPage = () => {
 						<h1 className="text-xl font-bold text-stone-800 dark:text-brown-100 mb-6">Notification</h1>
 						<hr className="border-stone-200 dark:border-dark-border mb-6" />
 						<div className="max-w-lg bg-white dark:bg-dark-surface rounded-xl border border-stone-200 dark:border-dark-border overflow-hidden">
-							{adminNotifications.length === 0 && <p className="px-5 py-10 text-center text-sm text-stone-400 dark:text-brown-400">No notifications</p>}
-							{adminNotifications.map((n, i) => (
-								<div key={n.id} className={`flex items-start gap-3 px-5 py-4 ${!n.read ? 'bg-stone-50 dark:bg-dark-elevated' : ''} ${i < adminNotifications.length - 1 ? 'border-b border-stone-100 dark:border-dark-border' : ''}`}>
+							{notifications.length === 0 && <p className="px-5 py-10 text-center text-sm text-stone-400 dark:text-brown-400">No notifications</p>}
+							{notifications.map((n, i) => (
+								<div key={n.id} className={`flex items-start gap-3 px-5 py-4 ${!n.isRead ? 'bg-stone-50 dark:bg-dark-elevated' : ''} ${i < notifications.length - 1 ? 'border-b border-stone-100 dark:border-dark-border' : ''}`}>
 									<div className="w-10 h-10 rounded-full overflow-hidden bg-stone-200 dark:bg-dark-border shrink-0 mt-0.5">
-										<img src={n.actorAvatar} alt={n.actorName} className="w-full h-full object-cover" />
+										{n.actorAvatar ? <img src={n.actorAvatar} alt={n.actorName} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-stone-300 dark:bg-dark-border" />}
 									</div>
 									<div className="flex-1">
-										<p className="text-sm text-stone-700 dark:text-brown-100"><span className="font-semibold">{n.actorName}</span>{' '}{n.action}</p>
-										<p className="text-xs text-stone-400 dark:text-brown-400 mt-1">{n.time}</p>
+										<p className="text-sm text-stone-700 dark:text-brown-100"><span className="font-semibold">{n.actorName}</span>{' '}{getNotifText(n)}</p>
+										<p className="text-xs text-stone-400 dark:text-brown-400 mt-1">{new Date(n.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
 									</div>
-									{!n.read && <span className="w-2 h-2 bg-red-400 rounded-full shrink-0 mt-2" />}
+									{!n.isRead && <span className="w-2 h-2 bg-red-400 rounded-full shrink-0 mt-2" />}
 								</div>
 							))}
 						</div>
