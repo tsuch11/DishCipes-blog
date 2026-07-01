@@ -171,6 +171,7 @@ const CommentItem = ({ comment: c, openReplyId, replyText, currentUserId, isAdmi
 					<textarea
 						value={replyText}
 						onChange={(e) => onReplyTextChange(c.id, e.target.value)}
+						onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); onReply(c.id); } }}
 						placeholder="Write a reply..."
 						rows={2}
 						className="w-full px-3 py-2 text-sm text-brown-600 dark:text-brown-100 bg-white dark:bg-dark-elevated border border-brown-200 dark:border-dark-border rounded-xl outline-none placeholder:text-brown-300 dark:placeholder:text-brown-400 focus:border-brown-400 dark:focus:border-dark-border transition-colors duration-150 mb-2"
