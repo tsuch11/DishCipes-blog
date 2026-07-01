@@ -46,7 +46,7 @@ const AdminPage = () => {
 	const { user, isAuthenticated, logout, updateProfile, resetPassword } = useAuth();
 	const navigate = useNavigate();
 	const { articles: fetchedArticles, refetch: refetchArticles } = useArticles();
-	const { notifications } = useNotifications();
+	const { notifications, markAllRead, deleteNotification } = useNotifications();
 
 	const [view, setView] = useState<AdminView>('articles');
 	const [articleSubview, setArticleSubview] = useState<'list' | 'create' | 'edit'>('list');
@@ -514,7 +514,12 @@ const AdminPage = () => {
 
 				{view === 'notifications' && (
 					<div className="px-4 py-6 md:px-12 md:py-8">
-						<h1 className="text-xl font-bold text-stone-800 dark:text-brown-100 mb-6">Notification</h1>
+						<div className="flex items-center justify-between mb-6">
+							<h1 className="text-xl font-bold text-stone-800 dark:text-brown-100">Notification</h1>
+							{notifications.some((n) => !n.isRead) && (
+								<button onClick={markAllRead} className="text-sm text-stone-500 dark:text-brown-300 hover:text-stone-800 dark:hover:text-brown-100 transition-colors duration-150">Mark all as read</button>
+							)}
+						</div>
 						<hr className="border-stone-200 dark:border-dark-border mb-6" />
 						<div className="max-w-lg bg-white dark:bg-dark-surface rounded-xl border border-stone-200 dark:border-dark-border overflow-hidden">
 							{notifications.length === 0 && <p className="px-5 py-10 text-center text-sm text-stone-400 dark:text-brown-400">No notifications</p>}
@@ -527,7 +532,12 @@ const AdminPage = () => {
 										<p className="text-sm text-stone-700 dark:text-brown-100"><span className="font-semibold">{n.actorName}</span>{' '}{getNotifText(n)}</p>
 										<p className="text-xs text-stone-400 dark:text-brown-400 mt-1">{new Date(n.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
 									</div>
-									{!n.isRead && <span className="w-2 h-2 bg-red-400 rounded-full shrink-0 mt-2" />}
+									<div className="flex items-center gap-2 shrink-0 mt-1">
+										{!n.isRead && <span className="w-2 h-2 bg-red-400 rounded-full" />}
+										<button onClick={() => deleteNotification(n.id)} className="hover:opacity-60 transition-opacity duration-150">
+											<img src={trashIcon} alt="Delete" className="w-4 h-4" />
+										</button>
+									</div>
 								</div>
 							))}
 						</div>
