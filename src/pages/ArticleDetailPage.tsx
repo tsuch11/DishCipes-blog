@@ -47,16 +47,18 @@ const ArticleDetailPage = () => {
 	const [showAuthModal, setShowAuthModal] = useState(false);
 	const [openReplyId, setOpenReplyId] = useState<number | null>(null);
 	const [replyTexts, setReplyTexts] = useState<Record<number, string>>({});
+	const [replyTargetUserId, setReplyTargetUserId] = useState<string | null>(null);
 
 	const fetchComments = useCallback(async () => {
 		const { data } = await supabase
 			.from('comments')
-			.select('id, text, created_at, profiles!user_id(display_name, avatar_url, username), replies(id, text, created_at, profiles!user_id(display_name, avatar_url, username)), comment_likes(user_id)')
+			.select('id, text, created_at, user_id, profiles!user_id(display_name, avatar_url, username), replies(id, text, created_at, user_id, profiles!user_id(display_name, avatar_url, username), reply_likes(user_id)), comment_likes(user_id)')
 			.eq('article_id', articleId)
 			.order('created_at', { ascending: true });
 		if (!data) return;
 		setComments(data.map((c: any) => ({
 			id: c.id,
+			userId: c.user_id ?? '',
 			name: c.profiles?.display_name ?? 'Unknown',
 			username: c.profiles?.username ?? '',
 			date: fmtDate(c.created_at),
@@ -66,11 +68,14 @@ const ArticleDetailPage = () => {
 			likedByMe: user ? (c.comment_likes?.some((l: any) => l.user_id === user.id) ?? false) : false,
 			replies: [...(c.replies ?? [])].sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()).map((r: any) => ({
 				id: r.id,
+				userId: r.user_id ?? '',
 				name: r.profiles?.display_name ?? 'Unknown',
 				username: r.profiles?.username ?? '',
 				date: fmtDate(r.created_at),
 				avatar: r.profiles?.avatar_url ?? '',
 				text: r.text,
+				likes: r.reply_likes?.length ?? 0,
+				likedByMe: user ? (r.reply_likes?.some((l: any) => l.user_id === user.id) ?? false) : false,
 			})),
 		})));
 	}, [articleId, user?.id]);
@@ -123,24 +128,65 @@ const ArticleDetailPage = () => {
 		if (!isAuthenticated || !user) { setShowAuthModal(true); return; }
 		const text = replyTexts[commentId]?.trim();
 		if (!text) return;
-		const { data } = await supabase
+		const { error } = await supabase
 			.from('replies')
-			.insert({ comment_id: commentId, user_id: user.id, text })
-			.select('id, text, created_at, profiles!user_id(display_name, avatar_url)')
-			.single();
-		if (data) {
-			const newReply: Reply = {
-				id: data.id,
-				name: (data.profiles as any)?.display_name ?? user.name,
-				username: (data.profiles as any)?.username ?? user.username,
-				date: fmtDate(data.created_at),
-				avatar: (data.profiles as any)?.avatar_url ?? '',
-				text: data.text,
-			};
-			setComments((prev) => prev.map((c) => c.id === commentId ? { ...c, replies: [...c.replies, newReply] } : c));
-		}
+			.insert({ comment_id: commentId, user_id: user.id, text, reply_to_user_id: replyTargetUserId || null });
+		if (error) { console.error('Reply insert error:', error); return; }
+		await fetchComments();
 		setReplyTexts((prev) => ({ ...prev, [commentId]: '' }));
+		setReplyTargetUserId(null);
 		setOpenReplyId(null);
+	};
+
+	const handleReplyLike = async (replyId: number, commentId: number) => {
+		if (!isAuthenticated || !user) { setShowAuthModal(true); return; }
+		const reply = comments.find((c) => c.id === commentId)?.replies.find((r) => r.id === replyId);
+		if (!reply) return;
+		const updateReplies = (liked: boolean) =>
+			setComments((prev) => prev.map((c) => c.id === commentId
+				? { ...c, replies: c.replies.map((r) => r.id === replyId ? { ...r, likedByMe: liked, likes: r.likes + (liked ? 1 : -1) } : r) }
+				: c
+			));
+		if (reply.likedByMe) {
+			await supabase.from('reply_likes').delete().eq('reply_id', replyId).eq('user_id', user.id);
+			updateReplies(false);
+		} else {
+			await supabase.from('reply_likes').insert({ reply_id: replyId, user_id: user.id });
+			updateReplies(true);
+		}
+	};
+
+	const handleReplyToReply = (commentId: number, authorName: string, authorUserId: string) => {
+		if (!isAuthenticated || !user) { setShowAuthModal(true); return; }
+		setOpenReplyId(commentId);
+		setReplyTexts((prev) => ({ ...prev, [commentId]: `@${authorName} ` }));
+		setReplyTargetUserId(authorUserId);
+	};
+
+	const handleEditComment = async (commentId: number, newText: string) => {
+		await supabase.from('comments').update({ text: newText }).eq('id', commentId);
+		setComments((prev) => prev.map((c) => c.id === commentId ? { ...c, text: newText } : c));
+	};
+
+	const handleDeleteComment = async (commentId: number) => {
+		await supabase.from('comments').delete().eq('id', commentId);
+		setComments((prev) => prev.filter((c) => c.id !== commentId));
+	};
+
+	const handleEditReply = async (replyId: number, commentId: number, newText: string) => {
+		await supabase.from('replies').update({ text: newText }).eq('id', replyId);
+		setComments((prev) => prev.map((c) => c.id === commentId
+			? { ...c, replies: c.replies.map((r) => r.id === replyId ? { ...r, text: newText } : r) }
+			: c
+		));
+	};
+
+	const handleDeleteReply = async (replyId: number, commentId: number) => {
+		await supabase.from('replies').delete().eq('id', replyId);
+		setComments((prev) => prev.map((c) => c.id === commentId
+			? { ...c, replies: c.replies.filter((r) => r.id !== replyId) }
+			: c
+		));
 	};
 
 	const handleSendComment = async () => {
@@ -154,6 +200,7 @@ const ArticleDetailPage = () => {
 		if (data) {
 			const newComment: Comment = {
 				id: data.id,
+				userId: user.id,
 				name: (data.profiles as any)?.display_name ?? user.name,
 				username: (data.profiles as any)?.username ?? user.username,
 				date: fmtDate(data.created_at),
@@ -283,24 +330,24 @@ const ArticleDetailPage = () => {
 										{likeCount}
 									</button>
 
-									<div className="flex items-center gap-2 md:gap-3">
+									<div className="flex flex-wrap items-center gap-2 md:gap-3">
 										<button
 											onClick={handleCopyLink}
-											className="flex items-center gap-1.5 px-6 py-2.5 text-base font-medium text-brown-600 dark:text-brown-100 bg-white dark:bg-dark-elevated border border-brown-400 dark:border-dark-border rounded-full hover:bg-brown-100 dark:hover:bg-dark-border transition-colors duration-150 md:px-10 md:py-2.5"
+											className="flex items-center gap-1.5 px-5 py-2 text-sm font-medium text-brown-600 dark:text-brown-100 bg-white dark:bg-dark-elevated border border-brown-400 dark:border-dark-border rounded-full hover:bg-brown-100 dark:hover:bg-dark-border transition-colors duration-150 md:px-10 md:py-2.5 md:text-base"
 										>
-											<img src={copyLightIcon} alt="" className="w-6 h-6 md:w-8 md:h-8" />
+											<img src={copyLightIcon} alt="" className="w-5 h-5 md:w-8 md:h-8" />
 											{copied ? 'Copied!' : 'Copy link'}
 										</button>
 
 										<div className="flex items-center gap-1 md:gap-2">
 											<a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Share on Facebook" className="opacity-90 dark:opacity-60 hover:opacity-70 dark:hover:opacity-90 transition-opacity duration-150">
-												<img src={facebookIcon} alt="" className="w-12 h-12" />
+												<img src={facebookIcon} alt="" className="w-9 h-9 md:w-12 md:h-12" />
 											</a>
 											<a href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer" aria-label="Share on LinkedIn" className="opacity-90 dark:opacity-60 hover:opacity-70 dark:hover:opacity-90 transition-opacity duration-150">
-												<img src={linkedinIcon} alt="" className="w-12 h-12" />
+												<img src={linkedinIcon} alt="" className="w-9 h-9 md:w-12 md:h-12" />
 											</a>
 											<a href="https://x.com/" target="_blank" rel="noopener noreferrer" aria-label="Share on X" className="opacity-90 dark:opacity-60 hover:opacity-70 dark:hover:opacity-90 transition-opacity duration-150">
-												<img src={twitterIcon} alt="" className="w-12 h-12" />
+												<img src={twitterIcon} alt="" className="w-9 h-9 md:w-12 md:h-12" />
 											</a>
 										</div>
 									</div>
@@ -309,10 +356,16 @@ const ArticleDetailPage = () => {
 
 							{/* ── Comments ── */}
 							<div className="max-w-3xl">
-								<p className="text-base text-brown-400 dark:text-brown-300 mb-3">Comment</p>
+								<p className="text-base text-brown-400 dark:text-brown-300 mb-3">
+									{(() => {
+										const total = comments.length + comments.reduce((sum, c) => sum + c.replies.length, 0);
+										return total > 0 ? `${total} Comment${total > 1 ? 's' : ''}` : 'Comments';
+									})()}
+								</p>
 								<textarea
 									value={commentText}
 									onChange={(e) => setCommentText(e.target.value)}
+									onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendComment(); } }}
 									placeholder="What are your thoughts?"
 									rows={3}
 									className="w-full px-4 py-3 text-base text-brown-600 dark:text-brown-100 bg-white dark:bg-dark-elevated border border-brown-200 dark:border-dark-border rounded-xl outline-none placeholder:text-brown-300 dark:placeholder:text-brown-400 focus:border-brown-400 dark:focus:border-dark-border transition-colors duration-150 mb-3"
@@ -333,10 +386,18 @@ const ArticleDetailPage = () => {
 											comment={c}
 											openReplyId={openReplyId}
 											replyText={replyTexts[c.id] ?? ''}
+											currentUserId={user?.id ?? ''}
+											isAdmin={user?.role === 'admin'}
 											onLike={handleCommentLike}
-											onReplyToggle={(id) => setOpenReplyId(openReplyId === id ? null : id)}
+											onReplyToggle={(id) => { setOpenReplyId(openReplyId === id ? null : id); setReplyTargetUserId(null); }}
 											onReplyTextChange={(id, text) => setReplyTexts((prev) => ({ ...prev, [id]: text }))}
 											onReply={handleReply}
+											onReplyLike={handleReplyLike}
+											onReplyToReply={handleReplyToReply}
+											onEdit={handleEditComment}
+											onDelete={handleDeleteComment}
+											onEditReply={handleEditReply}
+											onDeleteReply={handleDeleteReply}
 										/>
 									))}
 								</div>
