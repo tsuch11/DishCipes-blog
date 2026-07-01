@@ -128,25 +128,11 @@ const ArticleDetailPage = () => {
 		if (!isAuthenticated || !user) { setShowAuthModal(true); return; }
 		const text = replyTexts[commentId]?.trim();
 		if (!text) return;
-		const { data } = await supabase
+		const { error } = await supabase
 			.from('replies')
-			.insert({ comment_id: commentId, user_id: user.id, text, reply_to_user_id: replyTargetUserId ?? null })
-			.select('id, text, created_at, profiles!user_id(display_name, avatar_url)')
-			.single();
-		if (data) {
-			const newReply: Reply = {
-				id: data.id,
-				userId: user.id,
-				name: (data.profiles as any)?.display_name ?? user.name,
-				username: (data.profiles as any)?.username ?? user.username,
-				date: fmtDate(data.created_at),
-				avatar: (data.profiles as any)?.avatar_url ?? '',
-				text: data.text,
-				likes: 0,
-				likedByMe: false,
-			};
-			setComments((prev) => prev.map((c) => c.id === commentId ? { ...c, replies: [...c.replies, newReply] } : c));
-		}
+			.insert({ comment_id: commentId, user_id: user.id, text, reply_to_user_id: replyTargetUserId || null });
+		if (error) { console.error('Reply insert error:', error); return; }
+		await fetchComments();
 		setReplyTexts((prev) => ({ ...prev, [commentId]: '' }));
 		setReplyTargetUserId(null);
 		setOpenReplyId(null);
@@ -214,6 +200,7 @@ const ArticleDetailPage = () => {
 		if (data) {
 			const newComment: Comment = {
 				id: data.id,
+				userId: user.id,
 				name: (data.profiles as any)?.display_name ?? user.name,
 				username: (data.profiles as any)?.username ?? user.username,
 				date: fmtDate(data.created_at),
@@ -370,11 +357,15 @@ const ArticleDetailPage = () => {
 							{/* ── Comments ── */}
 							<div className="max-w-3xl">
 								<p className="text-base text-brown-400 dark:text-brown-300 mb-3">
-									{comments.length > 0 ? `${comments.length} Comment${comments.length > 1 ? 's' : ''}` : 'Comments'}
+									{(() => {
+										const total = comments.length + comments.reduce((sum, c) => sum + c.replies.length, 0);
+										return total > 0 ? `${total} Comment${total > 1 ? 's' : ''}` : 'Comments';
+									})()}
 								</p>
 								<textarea
 									value={commentText}
 									onChange={(e) => setCommentText(e.target.value)}
+									onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendComment(); } }}
 									placeholder="What are your thoughts?"
 									rows={3}
 									className="w-full px-4 py-3 text-base text-brown-600 dark:text-brown-100 bg-white dark:bg-dark-elevated border border-brown-200 dark:border-dark-border rounded-xl outline-none placeholder:text-brown-300 dark:placeholder:text-brown-400 focus:border-brown-400 dark:focus:border-dark-border transition-colors duration-150 mb-3"
