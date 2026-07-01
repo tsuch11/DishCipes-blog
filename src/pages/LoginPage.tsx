@@ -30,6 +30,8 @@ const LoginPage = () => {
 
 		if (result.success) {
 			navigate(returnPath);
+		} else if (result.message === 'email_not_confirmed') {
+			navigate('/verify-email', { state: { email } });
 		} else {
 			setError(result.message);
 		}
@@ -62,7 +64,7 @@ const LoginPage = () => {
 					/>
 				</FormField>
 
-				<div className="flex justify-center mt-2">
+				<div className="flex flex-col items-center gap-3 mt-2">
 					<button
 						type="submit"
 						disabled={loading}
@@ -70,6 +72,9 @@ const LoginPage = () => {
 					>
 						{loading ? 'Logging in...' : 'Log in'}
 					</button>
+					<Link to="/forgot-password" className="text-sm text-brown-400 dark:text-brown-300 hover:text-brown-600 dark:hover:text-brown-100 transition-colors duration-150">
+						Forgot password?
+					</Link>
 				</div>
 			</form>
 
