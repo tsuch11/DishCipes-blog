@@ -231,6 +231,8 @@ const AdminPage = () => {
 			case 'article_like': return `liked "${n.articleTitle}"`;
 			case 'comment_like': return 'liked your comment';
 			case 'follow': return 'followed you';
+			case 'new_article': return `published "${n.articleTitle}"`;
+			case 'new_user': return 'just joined DishCipes';
 			default: return '';
 		}
 	};
