@@ -74,8 +74,20 @@ const AdminPage = () => {
 
 	useEffect(() => { fetchUsers(); }, []);
 
-	const handlePromote = async (id: string) => {
-		await supabase.from('profiles').update({ role: 'admin' }).eq('id', id);
+	const [promoteTargetId, setPromoteTargetId] = useState<string | null>(null);
+	const [demoteTargetId, setDemoteTargetId] = useState<string | null>(null);
+
+	const handlePromoteConfirm = async () => {
+		if (!promoteTargetId) return;
+		await supabase.from('profiles').update({ role: 'admin' }).eq('id', promoteTargetId);
+		setPromoteTargetId(null);
+		fetchUsers();
+	};
+
+	const handleDemoteConfirm = async () => {
+		if (!demoteTargetId) return;
+		await supabase.from('profiles').update({ role: 'member' }).eq('id', demoteTargetId);
+		setDemoteTargetId(null);
 		fetchUsers();
 	};
 
@@ -486,7 +498,10 @@ const AdminPage = () => {
 									</div>
 									<div className="flex items-center gap-2 shrink-0">
 										{u.role !== 'admin' && (
-											<button onClick={() => handlePromote(u.id)} className="px-3 py-1.5 text-xs font-medium text-stone-600 dark:text-brown-200 bg-stone-100 dark:bg-dark-elevated rounded-lg hover:bg-stone-200 dark:hover:bg-dark-border transition-colors duration-150">Promote</button>
+											<button onClick={() => setPromoteTargetId(u.id)} className="px-3 py-1.5 text-xs font-medium text-stone-600 dark:text-brown-200 bg-stone-100 dark:bg-dark-elevated rounded-lg hover:bg-stone-200 dark:hover:bg-dark-border transition-colors duration-150">Promote</button>
+										)}
+										{u.role === 'admin' && u.id !== user?.id && (
+											<button onClick={() => setDemoteTargetId(u.id)} className="px-3 py-1.5 text-xs font-medium text-orange-600 bg-orange-50 dark:bg-orange-900/20 dark:text-orange-400 rounded-lg hover:bg-orange-100 transition-colors duration-150">Demote</button>
 										)}
 										{u.role !== 'admin' && (
 											<button onClick={() => handleToggleBan(u.id, u.isBanned)} className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors duration-150 ${u.isBanned ? 'text-green-600 bg-green-50 dark:bg-green-900/20 dark:text-green-400 hover:bg-green-100' : 'text-red-500 bg-red-50 dark:bg-red-900/20 dark:text-red-400 hover:bg-red-100'}`}>{u.isBanned ? 'Unban' : 'Ban'}</button>
@@ -637,6 +652,28 @@ const AdminPage = () => {
 					cancelLabel="Cancel"
 					onConfirm={handleDeleteConfirm}
 					onCancel={() => setDeleteTargetId(null)}
+				/>
+			)}
+
+			{promoteTargetId !== null && (
+				<ConfirmModal
+					title="Promote to admin"
+					message="Are you sure you want to promote this user to admin?"
+					confirmLabel="Promote"
+					cancelLabel="Cancel"
+					onConfirm={handlePromoteConfirm}
+					onCancel={() => setPromoteTargetId(null)}
+				/>
+			)}
+
+			{demoteTargetId !== null && (
+				<ConfirmModal
+					title="Demote to member"
+					message="Are you sure you want to demote this admin to member?"
+					confirmLabel="Demote"
+					cancelLabel="Cancel"
+					onConfirm={handleDemoteConfirm}
+					onCancel={() => setDemoteTargetId(null)}
 				/>
 			)}
 
