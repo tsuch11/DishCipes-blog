@@ -7,7 +7,7 @@ import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useArticle } from '../hooks/useArticles';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
-import type { Comment, Reply } from '../types/comment';
+import type { Comment } from '../types/comment';
 import Navbar from '../components/layout/Navbar';
 import CommentItem from '../components/shared/CommentItem';
 import Footer from '../components/layout/Footer';
