@@ -73,8 +73,12 @@ const Navbar = () => {
 	useEffect(() => {
 		const handler = (e: MouseEvent) => {
 			if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false);
-			if (bellRef.current && !bellRef.current.contains(e.target as Node)) setBellOpen(false);
-			if (headerRef.current && !headerRef.current.contains(e.target as Node)) setHamburgerOpen(false);
+			if (headerRef.current && !headerRef.current.contains(e.target as Node)) {
+				setHamburgerOpen(false);
+				setBellOpen(false);
+			} else if (bellRef.current?.offsetParent !== null && !bellRef.current?.contains(e.target as Node)) {
+				setBellOpen(false);
+			}
 		};
 		document.addEventListener('mousedown', handler);
 		return () => document.removeEventListener('mousedown', handler);
@@ -221,7 +225,7 @@ const Navbar = () => {
 													{notifications.map((n) => (
 														<li key={n.id} className={`group flex items-start gap-3 px-4 py-3 ${!n.isRead ? 'bg-brown-50/60 dark:bg-dark-elevated/50' : ''} hover:bg-brown-50 dark:hover:bg-dark-elevated transition-colors duration-150`}>
 															<button
-																onClick={() => { setBellOpen(false); navigate(notifLink(n)); }}
+																onClick={async () => { setBellOpen(false); await deleteNotification(n.id); navigate(notifLink(n)); }}
 																className="flex items-start gap-3 flex-1 min-w-0 text-left"
 															>
 																<div className="w-10 h-10 rounded-full overflow-hidden bg-brown-200 dark:bg-dark-elevated shrink-0 mt-0.5">
@@ -352,7 +356,7 @@ const Navbar = () => {
 						)}
 					</div>
 
-					{/* ── Mobile: dark toggle + hamburger ── */}
+					{/* ── Mobile: dark toggle + bell + hamburger ── */}
 					<div className="flex items-center gap-1 md:hidden">
 						<button
 							onClick={toggleDark}
@@ -370,9 +374,22 @@ const Navbar = () => {
 							)}
 						</button>
 
+						{user && (
+							<button
+								onClick={() => { setBellOpen((prev) => { if (!prev) markAllRead(); return !prev; }); setHamburgerOpen(false); }}
+								className="relative flex items-center justify-center w-9 h-9 rounded-full hover:bg-brown-200 dark:hover:bg-dark-elevated active:scale-90 transition-all duration-150"
+								aria-label="Notifications"
+							>
+								<img src={bellIcon} alt="Notifications" className="w-5 h-5" />
+								{unreadCount > 0 && (
+									<span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
+								)}
+							</button>
+						)}
+
 						<button
 							className="flex flex-col justify-center items-center gap-1.5 w-9 h-9 rounded-md hover:bg-brown-200 dark:hover:bg-dark-elevated active:scale-90 transition-all duration-150"
-							onClick={() => setHamburgerOpen((prev) => !prev)}
+							onClick={() => { setHamburgerOpen((prev) => !prev); setBellOpen(false); setMenuOpen(false); }}
 							aria-label="Menu"
 						>
 							<span className={`block w-5 h-0.5 bg-brown-600 dark:bg-brown-100 rounded-full transition-all duration-300 ${hamburgerOpen ? 'rotate-45 translate-y-2' : ''}`} />
@@ -464,6 +481,68 @@ const Navbar = () => {
 								Sign up
 							</Link>
 						</div>
+					)}
+				</div>
+			)}
+
+			{/* ── Notification dropdown (mobile only — desktop uses bellRef container) ── */}
+			{bellOpen && (
+				<div className="md:hidden absolute right-4 top-full mt-2 w-80 max-w-[calc(100vw-1rem)] bg-white dark:bg-dark-surface border border-brown-200 dark:border-dark-border rounded-2xl shadow-xl dark:shadow-black/40 py-2 z-50 animate-slideDown">
+					<div className="flex items-center justify-between px-4 py-2 border-b border-brown-100 dark:border-dark-border">
+						<p className="text-xs font-semibold text-brown-400 dark:text-brown-300 uppercase tracking-wide">Notifications</p>
+						{notifications.length > 0 && (
+							<button
+								onClick={clearAll}
+								className="text-xs text-brown-400 dark:text-brown-300 hover:text-red-500 dark:hover:text-red-400 transition-colors duration-150"
+							>
+								Clear all
+							</button>
+						)}
+					</div>
+					{notifications.length === 0 ? (
+						<p className="px-4 py-6 text-sm text-brown-300 dark:text-brown-400 text-center">No notifications</p>
+					) : (
+						<ul className="max-h-72 overflow-y-auto">
+							{notifications.map((n) => (
+								<li key={n.id} className={`group flex items-start gap-3 px-4 py-3 ${!n.isRead ? 'bg-brown-50/60 dark:bg-dark-elevated/50' : ''} hover:bg-brown-50 dark:hover:bg-dark-elevated transition-colors duration-150`}>
+									<button
+										onClick={async () => { setBellOpen(false); await deleteNotification(n.id); navigate(notifLink(n)); }}
+										className="flex items-start gap-3 flex-1 min-w-0 text-left"
+									>
+										<div className="w-10 h-10 rounded-full overflow-hidden bg-brown-200 dark:bg-dark-elevated shrink-0 mt-0.5">
+											{n.actorAvatar ? (
+												<img src={n.actorAvatar} alt={n.actorName} className="w-full h-full object-cover" />
+											) : (
+												<div className="w-full h-full flex items-center justify-center">
+													<svg className="w-5 h-5 text-brown-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+														<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+													</svg>
+												</div>
+											)}
+										</div>
+										<div className="flex-1 min-w-0">
+											<p className="text-sm text-brown-600 dark:text-brown-100 leading-snug">
+												<span className="font-semibold">{n.actorName}</span>{' '}
+												{notifMsg(n)}
+											</p>
+											<p className="text-xs text-brown-400 dark:text-brown-300 mt-1">{timeAgo(n.createdAt)}</p>
+										</div>
+										{!n.isRead && (
+											<span className="w-2 h-2 bg-red-400 rounded-full shrink-0 mt-1.5" />
+										)}
+									</button>
+									<button
+										onClick={(e) => { e.stopPropagation(); deleteNotification(n.id); }}
+										className="shrink-0 flex items-center justify-center w-6 h-6 mt-0.5 rounded-full text-brown-300 dark:text-brown-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-150 opacity-50 hover:opacity-100"
+										aria-label="Delete notification"
+									>
+										<svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+										</svg>
+									</button>
+								</li>
+							))}
+						</ul>
 					)}
 				</div>
 			)}
