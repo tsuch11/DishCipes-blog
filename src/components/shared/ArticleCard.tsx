@@ -6,11 +6,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import type { Article } from '../../types/article';
 
 type ArticleCardProps = {
-	article: Pick<Article, 'id' | 'image' | 'category' | 'title' | 'description' | 'authorName' | 'authorUsername' | 'date'>;
+	article: Pick<Article, 'id' | 'image' | 'category' | 'title' | 'description' | 'authorName' | 'authorUsername' | 'authorAvatar' | 'date'>;
 };
 
 const ArticleCard = ({ article }: ArticleCardProps) => {
-	const { id, image, category, title, description, authorName, authorUsername, date } = article;
+	const { id, image, category, title, description, authorName, authorUsername, authorAvatar, date } = article;
 	const navigate = useNavigate();
 
 	return (
@@ -39,7 +39,9 @@ const ArticleCard = ({ article }: ArticleCardProps) => {
 			</p>
 
 			<div className="flex items-center gap-2">
-				<div className="w-6 h-6 rounded-full bg-brown-300 dark:bg-dark-elevated overflow-hidden shrink-0" />
+				<div className="w-6 h-6 rounded-full bg-brown-300 dark:bg-dark-elevated overflow-hidden shrink-0">
+					{authorAvatar && <img src={authorAvatar} alt={authorName} className="w-full h-full object-cover" />}
+				</div>
 				<Link
 					to={`/user/${authorUsername}`}
 					onClick={(e) => e.stopPropagation()}
