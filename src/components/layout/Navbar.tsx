@@ -25,18 +25,22 @@ const timeAgo = (iso: string) => {
 const notifMsg = (n: Notification) => {
 	const title = n.articleTitle ? `"${n.articleTitle}"` : '';
 	switch (n.type) {
-		case 'comment': return `commented on your article ${title}`;
+		case 'comment': return `commented on ${title}`;
 		case 'reply': return `replied to your comment on ${title}`;
-		case 'article_like': return `liked your article ${title}`;
+		case 'article_like': return `liked ${title}`;
 		case 'comment_like': return `liked your comment on ${title}`;
 		case 'follow': return 'started following you';
 		case 'new_article': return `posted a new article ${title}`;
+		case 'new_user': return 'just joined DishCipes';
 		default: return '';
 	}
 };
 
-const notifLink = (n: Notification) =>
-	n.type === 'follow' ? `/user/${n.actorUsername}` : `/article/${n.articleId}`;
+const notifLink = (n: Notification) => {
+	if (n.type === 'follow') return `/user/${n.actorUsername}`;
+	if (n.type === 'new_user') return `/user/${n.actorUsername}`;
+	return `/article/${n.articleId}`;
+};
 
 // ── Constants ─────────────────────────────────────────────────────────
 
