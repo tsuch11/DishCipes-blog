@@ -3,7 +3,11 @@
 
 import { useNavigate } from 'react-router-dom';
 
-const GoBackButton = () => {
+type Props = {
+	label?: string;
+};
+
+const GoBackButton = ({ label = 'Go back' }: Props) => {
 	const navigate = useNavigate();
 	return (
 		<button
@@ -13,7 +17,7 @@ const GoBackButton = () => {
 			<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 				<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
 			</svg>
-			Go back
+			{label}
 		</button>
 	);
 };
