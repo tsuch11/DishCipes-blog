@@ -2,36 +2,44 @@
 // Full article view with reading time, related articles, and comment section
 // แก้ไขได้: reading time calculation, related articles count, back-to-top threshold (300px)
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useArticle } from '../hooks/useArticles';
+import { useArticleLikes } from '../hooks/useArticleLikes';
+import { useComments } from '../hooks/useComments';
 import { useAuth } from '../context/AuthContext';
-import { supabase } from '../lib/supabase';
-import type { Comment, Reply } from '../types/comment';
 import Navbar from '../components/layout/Navbar';
-import CommentItem from '../components/shared/CommentItem';
 import Footer from '../components/layout/Footer';
+import CommentItem from '../components/shared/CommentItem';
+import PageLoader from '../components/ui/PageLoader';
+import AuthModal from '../components/ui/AuthModal';
+import GoBackButton from '../components/ui/GoBackButton';
 import happyLightIcon from '../assets/images/icons/happy_light.svg';
 import copyLightIcon from '../assets/images/icons/Copy_light.svg';
 import facebookIcon from '../assets/images/icons/Facebook_black.svg';
 import linkedinIcon from '../assets/images/icons/LinkedIN_black.svg';
 import twitterIcon from '../assets/images/icons/Twitter_black.svg';
 
-const fmtDate = (iso: string) => {
-	const d = new Date(iso);
-	return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
-		+ ' at ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-};
-
 const ArticleDetailPage = () => {
 	const { id } = useParams<{ id: string }>();
 	const articleId = Number(id);
 	const { article, loading: articleLoading } = useArticle(articleId);
-	const { user, isAuthenticated } = useAuth();
+	const { user } = useAuth();
 	const navigate = useNavigate();
 	const location = useLocation();
 
+	// ── Hooks ─────────────────────────────────────────────────────────
+	const { liked, likeCount, toggle: toggleLike } = useArticleLikes(articleId, user?.id);
+	const { comments, sendComment, likeComment, editComment, deleteComment, sendReply, likeReply, editReply, deleteReply } = useComments(articleId, user?.id);
+
+	// ── UI State ──────────────────────────────────────────────────────
 	const [showBackTop, setShowBackTop] = useState(false);
+	const [commentText, setCommentText] = useState('');
+	const [copied, setCopied] = useState(false);
+	const [showAuthModal, setShowAuthModal] = useState(false);
+	const [openReplyId, setOpenReplyId] = useState<number | null>(null);
+	const [replyTexts, setReplyTexts] = useState<Record<number, string>>({});
+	const [replyTargetUserId, setReplyTargetUserId] = useState<string | null>(null);
 
 	useEffect(() => {
 		const onScroll = () => setShowBackTop(window.scrollY > 300);
@@ -39,71 +47,8 @@ const ArticleDetailPage = () => {
 		return () => window.removeEventListener('scroll', onScroll);
 	}, []);
 
-	const [liked, setLiked] = useState(false);
-	const [likeCount, setLikeCount] = useState(0);
-	const [commentText, setCommentText] = useState('');
-	const [comments, setComments] = useState<Comment[]>([]);
-	const [copied, setCopied] = useState(false);
-	const [showAuthModal, setShowAuthModal] = useState(false);
-	const [openReplyId, setOpenReplyId] = useState<number | null>(null);
-	const [replyTexts, setReplyTexts] = useState<Record<number, string>>({});
-	const [replyTargetUserId, setReplyTargetUserId] = useState<string | null>(null);
-
-	const fetchComments = useCallback(async () => {
-		const { data } = await supabase
-			.from('comments')
-			.select('id, text, created_at, user_id, profiles!user_id(display_name, avatar_url, username), replies(id, text, created_at, user_id, profiles!user_id(display_name, avatar_url, username), reply_likes(user_id)), comment_likes(user_id)')
-			.eq('article_id', articleId)
-			.order('created_at', { ascending: true });
-		if (!data) return;
-		setComments(data.map((c: any) => ({
-			id: c.id,
-			userId: c.user_id ?? '',
-			name: c.profiles?.display_name ?? 'Unknown',
-			username: c.profiles?.username ?? '',
-			date: fmtDate(c.created_at),
-			avatar: c.profiles?.avatar_url ?? '',
-			text: c.text,
-			likes: c.comment_likes?.length ?? 0,
-			likedByMe: user ? (c.comment_likes?.some((l: any) => l.user_id === user.id) ?? false) : false,
-			replies: [...(c.replies ?? [])].sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()).map((r: any) => ({
-				id: r.id,
-				userId: r.user_id ?? '',
-				name: r.profiles?.display_name ?? 'Unknown',
-				username: r.profiles?.username ?? '',
-				date: fmtDate(r.created_at),
-				avatar: r.profiles?.avatar_url ?? '',
-				text: r.text,
-				likes: r.reply_likes?.length ?? 0,
-				likedByMe: user ? (r.reply_likes?.some((l: any) => l.user_id === user.id) ?? false) : false,
-			})),
-		})));
-	}, [articleId, user?.id]);
-
-	useEffect(() => { fetchComments(); }, [fetchComments]);
-
-	useEffect(() => {
-		if (!articleId) return;
-		supabase.from('article_likes').select('*', { count: 'exact', head: true }).eq('article_id', articleId)
-			.then(({ count }) => setLikeCount(count ?? 0));
-		if (user) {
-			supabase.from('article_likes').select('user_id').eq('article_id', articleId).eq('user_id', user.id).maybeSingle()
-				.then(({ data }) => setLiked(!!data));
-		}
-	}, [articleId, user?.id]);
-
-	const handleLike = async () => {
-		if (!isAuthenticated || !user) { setShowAuthModal(true); return; }
-		if (liked) {
-			await supabase.from('article_likes').delete().eq('article_id', articleId).eq('user_id', user.id);
-			setLiked(false);
-			setLikeCount((prev) => prev - 1);
-		} else {
-			await supabase.from('article_likes').insert({ article_id: articleId, user_id: user.id });
-			setLiked(true);
-			setLikeCount((prev) => prev + 1);
-		}
-	};
+	// ── Handlers ─────────────────────────────────────────────────────
+	const showAuth = () => setShowAuthModal(true);
 
 	const handleCopyLink = () => {
 		navigator.clipboard.writeText(window.location.href);
@@ -111,121 +56,30 @@ const ArticleDetailPage = () => {
 		setTimeout(() => setCopied(false), 2000);
 	};
 
-	const handleCommentLike = async (commentId: number) => {
-		if (!isAuthenticated || !user) { setShowAuthModal(true); return; }
-		const comment = comments.find((c) => c.id === commentId);
-		if (!comment) return;
-		if (comment.likedByMe) {
-			await supabase.from('comment_likes').delete().eq('comment_id', commentId).eq('user_id', user.id);
-			setComments((prev) => prev.map((c) => c.id === commentId ? { ...c, likedByMe: false, likes: c.likes - 1 } : c));
-		} else {
-			await supabase.from('comment_likes').insert({ comment_id: commentId, user_id: user.id });
-			setComments((prev) => prev.map((c) => c.id === commentId ? { ...c, likedByMe: true, likes: c.likes + 1 } : c));
-		}
+	const handleSendComment = () => {
+		if (!commentText.trim()) return;
+		sendComment(commentText.trim(), user?.name ?? 'Unknown', user?.username ?? '', user?.avatar ?? '', showAuth);
+		setCommentText('');
 	};
 
-	const handleReply = async (commentId: number) => {
-		if (!isAuthenticated || !user) { setShowAuthModal(true); return; }
+	const handleReply = (commentId: number) => {
 		const text = replyTexts[commentId]?.trim();
 		if (!text) return;
-		const { error } = await supabase
-			.from('replies')
-			.insert({ comment_id: commentId, user_id: user.id, text, reply_to_user_id: replyTargetUserId || null });
-		if (error) { console.error('Reply insert error:', error); return; }
-		await fetchComments();
+		sendReply(commentId, text, replyTargetUserId, showAuth);
 		setReplyTexts((prev) => ({ ...prev, [commentId]: '' }));
 		setReplyTargetUserId(null);
 		setOpenReplyId(null);
 	};
 
-	const handleReplyLike = async (replyId: number, commentId: number) => {
-		if (!isAuthenticated || !user) { setShowAuthModal(true); return; }
-		const reply = comments.find((c) => c.id === commentId)?.replies.find((r) => r.id === replyId);
-		if (!reply) return;
-		const updateReplies = (liked: boolean) =>
-			setComments((prev) => prev.map((c) => c.id === commentId
-				? { ...c, replies: c.replies.map((r) => r.id === replyId ? { ...r, likedByMe: liked, likes: r.likes + (liked ? 1 : -1) } : r) }
-				: c
-			));
-		if (reply.likedByMe) {
-			await supabase.from('reply_likes').delete().eq('reply_id', replyId).eq('user_id', user.id);
-			updateReplies(false);
-		} else {
-			await supabase.from('reply_likes').insert({ reply_id: replyId, user_id: user.id });
-			updateReplies(true);
-		}
-	};
-
 	const handleReplyToReply = (commentId: number, authorName: string, authorUserId: string) => {
-		if (!isAuthenticated || !user) { setShowAuthModal(true); return; }
+		if (!user) { showAuth(); return; }
 		setOpenReplyId(commentId);
 		setReplyTexts((prev) => ({ ...prev, [commentId]: `@${authorName} ` }));
 		setReplyTargetUserId(authorUserId);
 	};
 
-	const handleEditComment = async (commentId: number, newText: string) => {
-		await supabase.from('comments').update({ text: newText }).eq('id', commentId);
-		setComments((prev) => prev.map((c) => c.id === commentId ? { ...c, text: newText } : c));
-	};
-
-	const handleDeleteComment = async (commentId: number) => {
-		await supabase.from('comments').delete().eq('id', commentId);
-		setComments((prev) => prev.filter((c) => c.id !== commentId));
-	};
-
-	const handleEditReply = async (replyId: number, commentId: number, newText: string) => {
-		await supabase.from('replies').update({ text: newText }).eq('id', replyId);
-		setComments((prev) => prev.map((c) => c.id === commentId
-			? { ...c, replies: c.replies.map((r) => r.id === replyId ? { ...r, text: newText } : r) }
-			: c
-		));
-	};
-
-	const handleDeleteReply = async (replyId: number, commentId: number) => {
-		await supabase.from('replies').delete().eq('id', replyId);
-		setComments((prev) => prev.map((c) => c.id === commentId
-			? { ...c, replies: c.replies.filter((r) => r.id !== replyId) }
-			: c
-		));
-	};
-
-	const handleSendComment = async () => {
-		if (!isAuthenticated || !user) { setShowAuthModal(true); return; }
-		if (!commentText.trim()) return;
-		const { data } = await supabase
-			.from('comments')
-			.insert({ article_id: articleId, user_id: user.id, text: commentText.trim() })
-			.select('id, text, created_at, profiles!user_id(display_name, avatar_url)')
-			.single();
-		if (data) {
-			const newComment: Comment = {
-				id: data.id,
-				userId: user.id,
-				name: (data.profiles as any)?.display_name ?? user.name,
-				username: (data.profiles as any)?.username ?? user.username,
-				date: fmtDate(data.created_at),
-				avatar: (data.profiles as any)?.avatar_url ?? '',
-				text: data.text,
-				likes: 0,
-				likedByMe: false,
-				replies: [],
-			};
-			setComments((prev) => [...prev, newComment]);
-		}
-		setCommentText('');
-	};
-
-	if (articleLoading) {
-		return (
-			<div className="min-h-screen flex flex-col font-sans dark:bg-dark-bg">
-				<Navbar />
-				<main className="flex-1 flex items-center justify-center">
-					<p className="text-brown-400 dark:text-brown-300 text-sm">Loading...</p>
-				</main>
-				<Footer />
-			</div>
-		);
-	}
+	// ── Render ────────────────────────────────────────────────────────
+	if (articleLoading) return <PageLoader />;
 
 	if (!article) {
 		return (
@@ -250,12 +104,9 @@ const ArticleDetailPage = () => {
 
 			<main className="flex-1 animate-pageFade">
 				<div className="max-w-7xl mx-auto px-4 pt-6 md:px-10">
-					<button onClick={() => navigate(-1)} className="inline-flex items-center gap-1.5 text-sm text-brown-400 dark:text-brown-300 hover:text-brown-600 dark:hover:text-brown-100 transition-colors duration-150 mb-5">
-						<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-						</svg>
-						Latest Recipes
-					</button>
+					<div className="mb-5">
+						<GoBackButton label="Latest Recipes" />
+					</div>
 
 					<div className="relative w-full aspect-video bg-brown-200 dark:bg-dark-elevated rounded-2xl overflow-hidden mb-8">
 						{article.image ? (
@@ -336,7 +187,7 @@ const ArticleDetailPage = () => {
 							<div className="pt-6 mb-8 max-w-3xl">
 								<div className="flex flex-col gap-3 w-full bg-brown-200 dark:bg-dark-surface rounded-lg px-3 py-3 md:flex-row md:items-center md:justify-between md:px-6 md:py-4">
 									<button
-										onClick={handleLike}
+										onClick={() => toggleLike(showAuth)}
 										className={`flex items-center justify-center gap-1.5 w-full py-2 text-base font-medium rounded-full border transition-colors duration-150 md:w-auto md:px-10 md:py-2.5 ${liked ? 'bg-brown-600 text-white border-brown-600' : 'bg-white dark:bg-dark-elevated text-brown-500 dark:text-brown-200 border-brown-400 dark:border-dark-border hover:bg-brown-100 dark:hover:bg-dark-border'}`}
 									>
 										<img src={happyLightIcon} alt="" className={`w-6 h-6 md:w-8 md:h-8 ${liked ? 'invert' : ''}`} />
@@ -401,16 +252,16 @@ const ArticleDetailPage = () => {
 											replyText={replyTexts[c.id] ?? ''}
 											currentUserId={user?.id ?? ''}
 											isAdmin={user?.role === 'admin'}
-											onLike={handleCommentLike}
+											onLike={(commentId) => likeComment(commentId, showAuth)}
 											onReplyToggle={(id) => { setOpenReplyId(openReplyId === id ? null : id); setReplyTargetUserId(null); }}
 											onReplyTextChange={(id, text) => setReplyTexts((prev) => ({ ...prev, [id]: text }))}
 											onReply={handleReply}
-											onReplyLike={handleReplyLike}
+											onReplyLike={(replyId, commentId) => likeReply(replyId, commentId, showAuth)}
 											onReplyToReply={handleReplyToReply}
-											onEdit={handleEditComment}
-											onDelete={handleDeleteComment}
-											onEditReply={handleEditReply}
-											onDeleteReply={handleDeleteReply}
+											onEdit={editComment}
+											onDelete={deleteComment}
+											onEditReply={editReply}
+											onDeleteReply={deleteReply}
 										/>
 									))}
 								</div>
@@ -456,31 +307,7 @@ const ArticleDetailPage = () => {
 			)}
 
 			{showAuthModal && (
-				<div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4" onClick={() => setShowAuthModal(false)}>
-					<div className="relative bg-white dark:bg-dark-surface rounded-2xl px-12 py-14 w-full max-w-lg text-center shadow-xl" onClick={(e) => e.stopPropagation()}>
-						<button
-							onClick={() => setShowAuthModal(false)}
-							className="absolute top-5 right-5 w-8 h-8 flex items-center justify-center text-brown-400 dark:text-brown-300 hover:text-brown-600 dark:hover:text-brown-100 transition-colors duration-150"
-						>
-							<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-							</svg>
-						</button>
-						<h2 className="text-4xl font-semibold text-brown-600 dark:text-brown-100 mb-8">Create an account to<br />continue</h2>
-						<button
-							onClick={() => { setShowAuthModal(false); navigate('/signup', { state: { from: location.pathname } }); }}
-							className="px-12 py-3.5 text-base font-medium text-white bg-brown-600 rounded-full hover:bg-brown-500 transition-colors duration-150"
-						>
-							Create account
-						</button>
-						<p className="text-sm text-brown-400 dark:text-brown-300 mt-4">
-							Already have an account?{' '}
-							<Link to="/login" state={{ from: location.pathname }} onClick={() => setShowAuthModal(false)} className="font-medium text-brown-600 dark:text-brown-100 hover:underline">
-								Log in
-							</Link>
-						</p>
-					</div>
-				</div>
+				<AuthModal from={location.pathname} onClose={() => setShowAuthModal(false)} />
 			)}
 		</div>
 	);
