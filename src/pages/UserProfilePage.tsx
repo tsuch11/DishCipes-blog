@@ -12,6 +12,8 @@ import type { Article } from '../types/article';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import ArticleCard from '../components/shared/ArticleCard';
+import PageLoader from '../components/ui/PageLoader';
+import GoBackButton from '../components/ui/GoBackButton';
 
 // ── Types ──────────────────────────────────────────────────────────────
 type ProfileData = {
@@ -55,17 +57,7 @@ const UserProfilePage = () => {
 	// ── Render ────────────────────────────────────────────────────────
 	const isOwnProfile = currentUser?.id === profile?.id;
 
-	if (loading) {
-		return (
-			<div className="min-h-screen flex flex-col font-sans dark:bg-dark-bg">
-				<Navbar />
-				<main className="flex-1 flex items-center justify-center">
-					<p className="text-brown-400 dark:text-brown-300 text-sm">Loading...</p>
-				</main>
-				<Footer />
-			</div>
-		);
-	}
+	if (loading) return <PageLoader />;
 
 	if (!profile) return null;
 
@@ -75,15 +67,9 @@ const UserProfilePage = () => {
 
 			<main className="flex-1 animate-pageFade">
 				<div className="max-w-7xl mx-auto px-4 pt-6 pb-16 md:px-10">
-					<button
-						onClick={() => navigate(-1)}
-						className="inline-flex items-center gap-1.5 text-sm text-brown-400 dark:text-brown-300 hover:text-brown-600 dark:hover:text-brown-100 transition-colors duration-150 mb-8"
-					>
-						<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-						</svg>
-						Back
-					</button>
+					<div className="mb-8">
+						<GoBackButton label="Back" />
+					</div>
 
 					{/* ── Profile header ── */}
 					<div className="flex flex-col gap-6 mb-10 sm:flex-row sm:items-start sm:gap-8">

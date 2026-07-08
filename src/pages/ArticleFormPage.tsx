@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
+import PageLoader from '../components/ui/PageLoader';
 import inputCls from '../utils/inputCls';
 
 const MAX_IMAGE_MB = 5;
@@ -136,16 +137,7 @@ const ArticleFormPage = () => {
 		return null;
 	}
 
-	if (fetchLoading) {
-		return (
-			<div className="min-h-screen flex flex-col font-sans dark:bg-dark-bg">
-				<Navbar />
-				<main className="flex-1 flex items-center justify-center">
-					<p className="text-brown-400 dark:text-brown-300 text-sm">Loading...</p>
-				</main>
-			</div>
-		);
-	}
+	if (fetchLoading) return <PageLoader />;
 
 	// ── Render ────────────────────────────────────────────────────────
 	return (
