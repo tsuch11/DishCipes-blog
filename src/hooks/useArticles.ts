@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import type { Article } from '../types/article';
-import { supabase } from '../lib/supabase';
+import { fetchArticles, fetchArticleById } from '../lib/queries/articles';
 
 const formatDate = (iso: string) =>
 	new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -34,10 +34,7 @@ export const useArticles = () => {
 	const [loading, setLoading] = useState(true);
 
 	const refetch = useCallback(async () => {
-		const { data } = await supabase
-			.from('articles')
-			.select('*, profiles!author_id(display_name, avatar_url, username)')
-			.order('created_at', { ascending: true });
+		const { data } = await fetchArticles();
 		if (data) setArticles(data.map(mapArticleRow));
 		setLoading(false);
 	}, []);
@@ -53,15 +50,10 @@ export const useArticle = (id: number) => {
 
 	useEffect(() => {
 		if (!id) return;
-		supabase
-			.from('articles')
-			.select('*, profiles!author_id(display_name, avatar_url, username)')
-			.eq('id', id)
-			.single()
-			.then(({ data }) => {
-				if (data) setArticle(mapArticleRow(data));
-				setLoading(false);
-			});
+		fetchArticleById(id).then(({ data }) => {
+			if (data) setArticle(mapArticleRow(data));
+			setLoading(false);
+		});
 	}, [id]);
 
 	return { article, loading };

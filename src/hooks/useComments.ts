@@ -2,8 +2,20 @@
 // Fetch and mutate comments and replies for a single article
 
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '../lib/supabase';
 import type { Comment } from '../types/comment';
+import {
+	fetchComments,
+	insertComment,
+	updateComment,
+	deleteComment,
+	insertCommentLike,
+	deleteCommentLike,
+	insertReply,
+	updateReply,
+	deleteReply,
+	insertReplyLike,
+	deleteReplyLike,
+} from '../lib/queries/comments';
 
 const fmtDate = (iso: string) => {
 	const d = new Date(iso);
@@ -14,12 +26,8 @@ const fmtDate = (iso: string) => {
 export const useComments = (articleId: number, userId?: string) => {
 	const [comments, setComments] = useState<Comment[]>([]);
 
-	const fetchComments = useCallback(async () => {
-		const { data } = await supabase
-			.from('comments')
-			.select('id, text, created_at, user_id, profiles!user_id(display_name, avatar_url, username), replies(id, text, created_at, user_id, profiles!user_id(display_name, avatar_url, username), reply_likes(user_id)), comment_likes(user_id)')
-			.eq('article_id', articleId)
-			.order('created_at', { ascending: true });
+	const refetchComments = useCallback(async () => {
+		const { data } = await fetchComments(articleId);
 		if (!data) return;
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		setComments(data.map((c: any) => ({
@@ -49,15 +57,11 @@ export const useComments = (articleId: number, userId?: string) => {
 		})));
 	}, [articleId, userId]);
 
-	useEffect(() => { fetchComments(); }, [fetchComments]);
+	useEffect(() => { refetchComments(); }, [refetchComments]);
 
 	const sendComment = async (text: string, displayName: string, username: string, avatar: string, onUnauthenticated: () => void) => {
 		if (!userId) { onUnauthenticated(); return; }
-		const { data } = await supabase
-			.from('comments')
-			.insert({ article_id: articleId, user_id: userId, text })
-			.select('id, text, created_at')
-			.single();
+		const { data } = await insertComment(articleId, userId, text);
 		if (!data) return;
 		const newComment: Comment = {
 			id: data.id,
@@ -79,31 +83,29 @@ export const useComments = (articleId: number, userId?: string) => {
 		const comment = comments.find((c) => c.id === commentId);
 		if (!comment) return;
 		if (comment.likedByMe) {
-			await supabase.from('comment_likes').delete().eq('comment_id', commentId).eq('user_id', userId);
+			await deleteCommentLike(commentId, userId);
 			setComments((prev) => prev.map((c) => c.id === commentId ? { ...c, likedByMe: false, likes: c.likes - 1 } : c));
 		} else {
-			await supabase.from('comment_likes').insert({ comment_id: commentId, user_id: userId });
+			await insertCommentLike(commentId, userId);
 			setComments((prev) => prev.map((c) => c.id === commentId ? { ...c, likedByMe: true, likes: c.likes + 1 } : c));
 		}
 	};
 
 	const editComment = async (commentId: number, newText: string) => {
-		await supabase.from('comments').update({ text: newText }).eq('id', commentId);
+		await updateComment(commentId, newText);
 		setComments((prev) => prev.map((c) => c.id === commentId ? { ...c, text: newText } : c));
 	};
 
-	const deleteComment = async (commentId: number) => {
-		await supabase.from('comments').delete().eq('id', commentId);
+	const removeComment = async (commentId: number) => {
+		await deleteComment(commentId);
 		setComments((prev) => prev.filter((c) => c.id !== commentId));
 	};
 
 	const sendReply = async (commentId: number, text: string, replyToUserId: string | null, onUnauthenticated: () => void) => {
 		if (!userId) { onUnauthenticated(); return; }
-		const { error } = await supabase
-			.from('replies')
-			.insert({ comment_id: commentId, user_id: userId, text, reply_to_user_id: replyToUserId || null });
+		const { error } = await insertReply(commentId, userId, text, replyToUserId);
 		if (error) { console.error('Reply insert error:', error); return; }
-		await fetchComments();
+		await refetchComments();
 	};
 
 	const likeReply = async (replyId: number, commentId: number, onUnauthenticated: () => void) => {
@@ -116,24 +118,24 @@ export const useComments = (articleId: number, userId?: string) => {
 				: c
 			));
 		if (reply.likedByMe) {
-			await supabase.from('reply_likes').delete().eq('reply_id', replyId).eq('user_id', userId);
+			await deleteReplyLike(replyId, userId);
 			update(false);
 		} else {
-			await supabase.from('reply_likes').insert({ reply_id: replyId, user_id: userId });
+			await insertReplyLike(replyId, userId);
 			update(true);
 		}
 	};
 
 	const editReply = async (replyId: number, commentId: number, newText: string) => {
-		await supabase.from('replies').update({ text: newText }).eq('id', replyId);
+		await updateReply(replyId, newText);
 		setComments((prev) => prev.map((c) => c.id === commentId
 			? { ...c, replies: c.replies.map((r) => r.id === replyId ? { ...r, text: newText } : r) }
 			: c
 		));
 	};
 
-	const deleteReply = async (replyId: number, commentId: number) => {
-		await supabase.from('replies').delete().eq('id', replyId);
+	const removeReply = async (replyId: number, commentId: number) => {
+		await deleteReply(replyId);
 		setComments((prev) => prev.map((c) => c.id === commentId
 			? { ...c, replies: c.replies.filter((r) => r.id !== replyId) }
 			: c
@@ -145,10 +147,10 @@ export const useComments = (articleId: number, userId?: string) => {
 		sendComment,
 		likeComment,
 		editComment,
-		deleteComment,
+		deleteComment: removeComment,
 		sendReply,
 		likeReply,
 		editReply,
-		deleteReply,
+		deleteReply: removeReply,
 	};
 };
