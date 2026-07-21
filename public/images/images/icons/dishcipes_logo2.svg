@@ -1,0 +1,26 @@
+<svg width="100%" viewBox="0 0 680 320" role="img" style="" xmlns="http://www.w3.org/2000/svg">
+<title style="fill:rgb(0, 0, 0);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">DishCipes logo no background</title>
+<desc style="fill:rgb(0, 0, 0);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">DishCipes logo without dot and without background</desc>
+<defs>
+
+<mask id="imagine-text-gaps-a7yos8" maskUnits="userSpaceOnUse"><rect x="0" y="0" width="680" height="320" fill="white"/><rect x="267.5667419433594" y="21.175716400146484" width="144.86654663085938" height="92.73388671875" fill="black" rx="2"/><rect x="248.67825317382812" y="89.17571258544922" width="182.64349365234375" height="92.73388671875" fill="black" rx="2"/><rect x="253.77908325195312" y="275.94970703125" width="172.44183349609375" height="20.432201385498047" fill="black" rx="2"/></mask></defs>
+
+
+<text x="340" y="90" text-anchor="middle" font-family="Poppins, sans-serif" font-size="64" font-weight="600" fill="#26231E" letter-spacing="-1" style="fill:rgb(38, 35, 30);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Poppins, sans-serif;font-size:64px;font-weight:600;text-anchor:middle;dominant-baseline:auto">Dish</text>
+<text x="340" y="158" text-anchor="middle" font-family="Poppins, sans-serif" font-size="64" font-weight="300" fill="#26231E" letter-spacing="-1" style="fill:rgb(38, 35, 30);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Poppins, sans-serif;font-size:64px;font-weight:300;text-anchor:middle;dominant-baseline:auto">Cipes</text>
+
+
+<line x1="210" y1="170" x2="470" y2="170" stroke="#26231E" stroke-width="0.8" opacity="0.2" mask="url(#imagine-text-gaps-a7yos8)" style="fill:rgb(0, 0, 0);stroke:rgb(38, 35, 30);color:rgb(11, 11, 11);stroke-width:0.8px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.2;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+
+<path d="M282 210 Q289 193 282 176" fill="none" stroke="#26231E" stroke-width="2.5" stroke-linecap="round" opacity="0.75" mask="url(#imagine-text-gaps-a7yos8)" style="fill:none;stroke:rgb(38, 35, 30);color:rgb(11, 11, 11);stroke-width:2.5px;stroke-linecap:round;stroke-linejoin:miter;opacity:0.75;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+<path d="M340 205 Q347 188 340 171" fill="none" stroke="#26231E" stroke-width="2.5" stroke-linecap="round" opacity="0.75" mask="url(#imagine-text-gaps-a7yos8)" style="fill:none;stroke:rgb(38, 35, 30);color:rgb(11, 11, 11);stroke-width:2.5px;stroke-linecap:round;stroke-linejoin:miter;opacity:0.75;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+<path d="M398 210 Q405 193 398 176" fill="none" stroke="#26231E" stroke-width="2.5" stroke-linecap="round" opacity="0.75" mask="url(#imagine-text-gaps-a7yos8)" style="fill:none;stroke:rgb(38, 35, 30);color:rgb(11, 11, 11);stroke-width:2.5px;stroke-linecap:round;stroke-linejoin:miter;opacity:0.75;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+
+<path d="M210 240 Q340 278 470 240" fill="none" stroke="#26231E" stroke-width="3" stroke-linecap="round" style="fill:none;stroke:rgb(38, 35, 30);color:rgb(11, 11, 11);stroke-width:3px;stroke-linecap:round;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+<line x1="210" y1="240" x2="470" y2="240" stroke="#26231E" stroke-width="1" opacity="0.2" style="fill:rgb(0, 0, 0);stroke:rgb(38, 35, 30);color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.2;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+
+<text x="340" y="290" text-anchor="middle" font-family="Poppins, sans-serif" font-size="11" font-weight="400" fill="#26231E" letter-spacing="4" opacity="0.4" style="fill:rgb(38, 35, 30);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.4;font-family:Poppins, sans-serif;font-size:11px;font-weight:400;text-anchor:middle;dominant-baseline:auto">RECIPES &amp; STORIES</text>
+</svg>
