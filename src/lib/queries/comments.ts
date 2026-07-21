@@ -8,7 +8,7 @@ const COMMENT_SELECT = [
 	'profiles!user_id(display_name, avatar_url, username)',
 	'replies(id, text, created_at, user_id, profiles!user_id(display_name, avatar_url, username), reply_likes(user_id))',
 	'comment_likes(user_id)',
-].join(', ') as const;
+].join(', ');
 
 export const fetchComments = (articleId: number) =>
 	supabase
