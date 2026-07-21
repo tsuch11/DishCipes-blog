@@ -5,6 +5,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import type { Notification } from '../types/notification';
+import {
+	fetchNotifications,
+	markAllNotificationsRead,
+	deleteNotification as dbDeleteNotification,
+	clearAllNotifications,
+} from '../lib/queries/notifications';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mapRow = (n: any): Notification => ({
@@ -27,12 +33,7 @@ export const useNotifications = () => {
 
 	const refetch = useCallback(async () => {
 		if (!user) { setNotifications([]); setUnreadCount(0); return; }
-		const { data } = await supabase
-			.from('notifications')
-			.select('*, profiles!actor_id(display_name, avatar_url, username), articles(title)')
-			.eq('user_id', user.id)
-			.order('created_at', { ascending: false })
-			.limit(50);
+		const { data } = await fetchNotifications(user.id);
 		if (data) {
 			const mapped = data.map(mapRow);
 			setNotifications(mapped);
@@ -57,26 +58,26 @@ export const useNotifications = () => {
 
 	const markAllRead = async () => {
 		if (!user) return;
-		await supabase.from('notifications').update({ is_read: true }).eq('user_id', user.id).eq('is_read', false);
+		await markAllNotificationsRead(user.id);
 		setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
 		setUnreadCount(0);
 	};
 
-	const deleteNotification = async (id: number) => {
-		await supabase.from('notifications').delete().eq('id', id);
-		setNotifications((prev) => prev.filter((n) => n.id !== id));
-		setUnreadCount((prev) => {
-			const deleted = notifications.find((n) => n.id === id);
-			return deleted && !deleted.isRead ? prev - 1 : prev;
+	const removeNotification = async (id: number) => {
+		await dbDeleteNotification(id);
+		setNotifications((prev) => {
+			const deleted = prev.find((n) => n.id === id);
+			if (deleted && !deleted.isRead) setUnreadCount((c) => c - 1);
+			return prev.filter((n) => n.id !== id);
 		});
 	};
 
 	const clearAll = async () => {
 		if (!user) return;
-		await supabase.from('notifications').delete().eq('user_id', user.id);
+		await clearAllNotifications(user.id);
 		setNotifications([]);
 		setUnreadCount(0);
 	};
 
-	return { notifications, unreadCount, markAllRead, deleteNotification, clearAll };
+	return { notifications, unreadCount, markAllRead, deleteNotification: removeNotification, clearAll };
 };
