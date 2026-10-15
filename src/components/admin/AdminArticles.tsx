@@ -52,7 +52,6 @@ const AdminArticles = ({ subview, onSubviewChange, showToast }: Props) => {
 	const { articles: fetchedArticles, refetch: refetchArticles } = useArticles();
 
 	// ── State ─────────────────────────────────────────────────────────
-	const [adminArticles, setAdminArticles] = useState<AdminArticle[]>([]);
 	const [editingArticle, setEditingArticle] = useState<AdminArticle | null>(null);
 	const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
 	const [searchQuery, setSearchQuery] = useState('');
@@ -70,10 +69,12 @@ const AdminArticles = ({ subview, onSubviewChange, showToast }: Props) => {
 		});
 	}, []);
 
-	useEffect(() => {
-		if (fetchedArticles.length === 0) return;
-		setAdminArticles(fetchedArticles.map((a) => ({ ...a, status: (a.status ?? 'published') as 'published' | 'draft', readTime: a.readTime ?? 5, content: a.content ?? [] })));
-	}, [fetchedArticles]);
+	const adminArticles: AdminArticle[] = fetchedArticles.map((a) => ({
+		...a,
+		status: (a.status ?? 'published') as 'published' | 'draft',
+		readTime: a.readTime ?? 5,
+		content: a.content ?? [],
+	}));
 
 	useEffect(() => {
 		const handler = (e: MouseEvent) => {
